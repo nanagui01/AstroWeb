@@ -72,8 +72,12 @@ TabIntro:Button({
 })
 
 -- ==================== REBIRTHING ====================
-local rebirthSection = TabRebirth:Section({ Title = "Rebirthing Options", Opened = true })
-
+local rebirthSection = TabRebirth:Section({
+    Title = "Rebirthing Options",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 local isAutoStrength = false
 rebirthSection:Toggle({
     Title = "Auto Strength",
@@ -336,7 +340,12 @@ TabTeleport:Button({
 })
 
 -- ==================== ROCKS ====================
-local rocksSection = TabRocks:Section({ Title = "Rocks", Opened = true })
+local rocksSection = TabRocks:Section({
+    Title = "Rocks",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 
 local punchAnimConn = nil
 rocksSection:Toggle({
@@ -560,7 +569,12 @@ local function unequipAllPets()
 end
 
 -- ==================== SEÇÃO 1: GYM TELEPORTS ====================
-local teleportSection = TabFarmV1:Section({ Title = "Gym Teleports", Opened = true })
+local teleportSection = TabFarmV1:Section({
+    Title = "Gym Teleports",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 
 teleportSection:Dropdown({
     Title = "Bench Press Location",
@@ -595,7 +609,12 @@ teleportSection:Button({
 })
 
 -- ==================== SEÇÃO 2: QUICK TRAVEL ====================
-local travelSection = TabFarmV1:Section({ Title = "Quick Travel", Opened = true })
+local travelSection = TabFarmV1:Section({
+    Title = "Quick Travel",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 
 local quickTps = {
     {"Tiny Island", CFrame.new(-37.1, 9.2, 1919)},
@@ -616,8 +635,12 @@ for _, tp in pairs(quickTps) do
 end
 
 -- ==================== SEÇÃO 3: STRENGTH GRINDING ====================
-local grindSection = TabFarmV1:Section({ Title = "Strength Grinding", Opened = true })
-
+local grindSection = TabFarmV1:Section({
+    Title = "Strength Grinding",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 grindSection:Input({
     Title = "Rep Threads",
     Placeholder = "Number of threads (default: 1)",
@@ -647,7 +670,12 @@ grindSection:Toggle({
 })
 
 -- ==================== SEÇÃO 4: AUTO EXERCISES ====================
-local exerciseSection = TabFarmV1:Section({ Title = "Auto Exercises", Opened = true })
+local exerciseSection = TabFarmV1:Section({
+    Title = "Auto Exercises",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 
 exerciseSection:Toggle({
     Title = "Auto Pushups",
@@ -716,7 +744,12 @@ exerciseSection:Toggle({
 })
 
 -- ==================== SEÇÃO 5: AUTO MACHINES ====================
-local machineSection = TabFarmV1:Section({ Title = "Auto Gym Machines", Opened = true })
+local machineSection = TabFarmV1:Section({
+    Title = "Auto Gym Machines",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 
 local jungleBench = false
 machineSection:Toggle({
@@ -831,8 +864,12 @@ machineSection:Toggle({
 })
 
 -- ==================== SEÇÃO 6: ROCK COMBOS ====================
-local rockComboSection = TabFarmV1:Section({ Title = "Auto Rock Combos", Opened = true })
-
+local rockComboSection = TabFarmV1:Section({
+    Title = "Auto Rock Combos",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 rockComboSection:Toggle({
     Title = "Pushups + Ancient Jungle Rock",
     Desc = "Combines pushups with jungle rock",
@@ -936,7 +973,12 @@ rockComboSection:Toggle({
 })
 
 -- ==================== SEÇÃO 7: UTILITIES ====================
-local utilitySection = TabFarmV1:Section({ Title = "Utilities", Opened = true })
+local utilitySection = TabFarmV1:Section({
+    Title = "Utilities",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 
 utilitySection:Toggle({
     Title = "Eat Egg (30 Min)",
@@ -1135,7 +1177,12 @@ TabPets:Button({
 local TabKilling = Window:Tab({ Title = "Killing", Icon = "lucide:swords" })
 
 -- Seção principal
-local killSection = TabKilling:Section({ Title = "Combat Options", Opened = true })
+local killSection = TabKilling:Section({
+    Title = "Combat Options",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 
 -- ==================== AUTO PUNCH ====================
 local autoPunch = false
@@ -1414,8 +1461,12 @@ TabUltimates:Toggle({
 
 
 -- ==================== MISC ====================
-local miscSection = TabMisc:Section({ Title = "Miscellaneous", Opened = true })
-
+local miscSection = TabMisc:Section({
+    Title = "Miscellaneous",
+    Opened = false,
+    Box = true,
+    BoxBorder = true
+})
 -- Brawl God Mode
 local brawlGodMode = false
 miscSection:Toggle({
