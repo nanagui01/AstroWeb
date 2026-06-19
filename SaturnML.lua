@@ -25,11 +25,12 @@ local Window = WindUI:CreateWindow({
     SideBarWidth = 160,
     ShowMinimizeButton = true,
     MinimizeKey = Enum.KeyCode.RightControl,
-    Tag = {
+})
+
+Window:Tag({
         Title = "Beta",
         Icon = "lucide:sparkle",  -- ou "star" se preferir
         Color = Color3.fromRGB(255, 200, 0)  -- dourado
-    }
 })
 
 -- ==================== ABAS ====================
