@@ -1647,7 +1647,7 @@ QuestNeta = function()
 end
 
 
-local redzlib = loadstring(game:HttpGet("https://pastefy.app/bRpnrNDA/raw"))()
+local redzlib = loadstring(game:HttpGet("https://pastefy.app/ZE9qbrr2/raw"))()
 _G.HeartBoss=_G.HeartBoss or false
 
 local function FarmBossEvent()
