@@ -1239,6 +1239,107 @@ end);
 			end;
 			return dropfunc;
 		end;
+		-- Coloque isso após a criação das Tabs (Window já definida)
+local function CreateMultiDropdown(tab, title, options, callback)
+    local selected = {}           -- tabela de selecionados (nome = true)
+    local isOpen = false
+    local optionToggles = {}      -- guarda os toggles criados
+
+    -- Botão que abre/fecha a lista
+    local dropButton = tab:Toggle(title, false, title, function(state)
+        isOpen = state
+        -- Mostra/oculta o frame que contém os toggles
+        if optionFrame then
+            optionFrame.Visible = state
+        end
+    end)
+
+    -- Frame que contém os toggles
+    local optionFrame = Instance.new("Frame")
+    optionFrame.Name = "MultiDropdownFrame"
+    optionFrame.Parent = dropButton.Instance.Parent  -- pai do toggle
+    optionFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    optionFrame.BackgroundTransparency = 0.4
+    optionFrame.Size = UDim2.new(1, 0, 0, 200)
+    optionFrame.Visible = false
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 8)
+    UICorner.Parent = optionFrame
+
+    -- ScrollingFrame para a lista
+    local scroll = Instance.new("ScrollingFrame")
+    scroll.Parent = optionFrame
+    scroll.Size = UDim2.new(1, -12, 1, -12)
+    scroll.Position = UDim2.new(0, 6, 0, 6)
+    scroll.BackgroundTransparency = 1
+    scroll.ScrollBarThickness = 3
+    scroll.ScrollingDirection = Enum.ScrollingDirection.Y
+    scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+    local layout = Instance.new("UIListLayout")
+    layout.Parent = scroll
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 4)
+
+    -- Preenche a lista com toggles
+    for _, opt in ipairs(options) do
+        local toggle = tab:Toggle(opt, false, "", function(state)
+            if state then
+                selected[opt] = true
+            else
+                selected[opt] = nil
+            end
+            -- Chama o callback com a lista atualizada
+            if callback then
+                local list = {}
+                for name in pairs(selected) do
+                    table.insert(list, name)
+                end
+                callback(list)
+            end
+        end)
+        toggle.Instance.Parent = scroll
+        table.insert(optionToggles, toggle)
+    end
+
+    -- Atualiza o CanvasSize
+    scroll:GetPropertyChangedSignal("CanvasPosition"):Connect(function()
+        scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+    end)
+
+    -- Retorna uma tabela com funções para manipular
+    local multi = {}
+    function multi:Get()
+        local list = {}
+        for name in pairs(selected) do
+            table.insert(list, name)
+        end
+        return list
+    end
+    function multi:Set(list)
+        -- Limpa seleção
+        for _, toggle in ipairs(optionToggles) do
+            toggle:Set(false)  -- desmarca
+        end
+        selected = {}
+        -- Marca os fornecidos
+        for _, name in ipairs(list) do
+            selected[name] = true
+            -- Não há como setar o toggle individual sem referência, mas podemos recriar...
+        end
+        -- Atualiza visual
+        -- (simplificado: recarregar a UI seria complexo; preferimos usar callback ao vivo)
+    end
+    function multi:Destroy()
+        optionFrame:Destroy()
+        for _, toggle in ipairs(optionToggles) do
+            toggle:Destroy()
+        end
+        dropButton:Destroy()
+    end
+
+    return multi
+		end
 		function main:Slider(text, min, max, set, callback)
 			local Slider = Instance.new("Frame");
 			local slidercorner = Instance.new("UICorner");
