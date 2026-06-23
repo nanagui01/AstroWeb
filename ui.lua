@@ -783,82 +783,47 @@ end);
 		end);
 		local main = {};
 		function main:Button(text, callback)
-			local Button = Instance.new("Frame");
-			local UICorner = Instance.new("UICorner");
-			local TextLabel = Instance.new("TextLabel");
-			local TextButton = Instance.new("TextButton");
-			local UICorner_2 = Instance.new("UICorner");
-			local Black = Instance.new("Frame");
-			local UICorner_3 = Instance.new("UICorner");
-			Button.Name = "Button";
-			Button.Parent = MainFramePage;
-			Button.BackgroundColor3 = _G.Primary;
-			Button.BackgroundTransparency = 1;
-			Button.Size = UDim2.new(1, 0, 0, 36);
-			UICorner.CornerRadius = UDim.new(0, 5);
-			UICorner.Parent = Button;
-			local ImageLabel = Instance.new("ImageLabel");
-			ImageLabel.Name = "ImageLabel";
-			ImageLabel.Parent = TextButton;
-			ImageLabel.BackgroundColor3 = _G.Primary;
-			ImageLabel.BackgroundTransparency = 1;
-			ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5);
-			ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0);
-			ImageLabel.Size = UDim2.new(0, 15, 0, 15);
-			ImageLabel.Image = "rbxassetid://10734898355";
-			ImageLabel.ImageTransparency = 0;
-			ImageLabel.ImageColor3 = Color3.fromRGB(255, 255, 255);
-			CreateRounded(TextButton, 4);
-			TextButton.Name = "TextButton";
-			TextButton.Parent = Button;
-			TextButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200);
-			TextButton.BackgroundTransparency = 0.8;
-			TextButton.AnchorPoint = Vector2.new(1, 0.5);
-			TextButton.Position = UDim2.new(1, -1, 0.5, 0);
-			TextButton.Size = UDim2.new(0, 25, 0, 25);
-			TextButton.Font = Enum.Font.Nunito;
-			TextButton.Text = "";
-			TextButton.TextXAlignment = Enum.TextXAlignment.Left;
-			TextButton.TextColor3 = Color3.fromRGB(255, 255, 255);
-			TextButton.TextSize = 15;
-			TextLabel.Name = "TextLabel";
-			TextLabel.Parent = Button;
-			TextLabel.BackgroundColor3 = _G.Primary;
-			TextLabel.BackgroundTransparency = 1;
-			TextLabel.AnchorPoint = Vector2.new(0, 0.5);
-			TextLabel.Position = UDim2.new(0, 20, 0.5, 0);
-			TextLabel.Size = UDim2.new(1, -50, 1, 0);
-			TextLabel.Font = Enum.Font.Cartoon;
-			TextLabel.RichText = true;
-			TextLabel.Text = text;
-			TextLabel.TextXAlignment = Enum.TextXAlignment.Left;
-			TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
-			TextLabel.TextSize = 15;
-			TextLabel.ClipsDescendants = true;
-            local ArrowRight = Instance.new("ImageLabel");
-			ArrowRight.Name = "ArrowRight";
-			ArrowRight.Parent = Button;
-			ArrowRight.BackgroundColor3 = _G.Primary;
-			ArrowRight.BackgroundTransparency = 1;
-			ArrowRight.AnchorPoint = Vector2.new(0, 0.5);
-			ArrowRight.Position = UDim2.new(0, 0, 0.5, 0);
-			ArrowRight.Size = UDim2.new(0, 15, 0, 15);
-			ArrowRight.Image = "rbxassetid://10709768347";
-			ArrowRight.ImageTransparency = 0;
-			ArrowRight.ImageColor3 = Color3.fromRGB(255, 255, 255);
-			Black.Name = "Black";
-			Black.Parent = Button;
-			Black.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
-			Black.BackgroundTransparency = 1;
-			Black.BorderSizePixel = 0;
-			Black.Position = UDim2.new(0, 0, 0, 0);
-			Black.Size = UDim2.new(1, 0, 0, 33);
-			UICorner_3.CornerRadius = UDim.new(0, 5);
-			UICorner_3.Parent = Black;
-			TextButton.MouseButton1Click:Connect(function()
-				callback();
-			end);
-		end;
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(1, 0, 0, 36)
+    Button.BackgroundColor3 = _G.Primary
+    Button.BackgroundTransparency = 0.85
+    Button.AutoButtonColor = false
+    Button.Font = Enum.Font.GothamSemibold
+    Button.Text = text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = 13
+    Button.Parent = MainFramePage
+    CreateRounded(Button, 8)
+
+    local Arrow = Instance.new("ImageLabel")
+    Arrow.AnchorPoint = Vector2.new(1, 0.5)
+    Arrow.Position = UDim2.new(1, -14, 0.5, 0)
+    Arrow.Size = UDim2.new(0, 14, 0, 14)
+    Arrow.BackgroundTransparency = 1
+    Arrow.Image = "rbxassetid://10709768347"
+    Arrow.ImageColor3 = Color3.fromRGB(200, 200, 200)
+    Arrow.Rotation = 180
+    Arrow.Parent = Button
+
+    Button.MouseEnter:Connect(function()
+        TweenService:Create(Button, TweenInfo.new(0.15), {BackgroundTransparency = 0.7}):Play()
+    end)
+    Button.MouseLeave:Connect(function()
+        TweenService:Create(Button, TweenInfo.new(0.15), {BackgroundTransparency = 0.85}):Play()
+    end)
+    Button.MouseButton1Down:Connect(function()
+        TweenService:Create(Button, TweenInfo.new(0.08), {BackgroundTransparency = 0.6}):Play()
+    end)
+    Button.MouseButton1Click:Connect(function()
+        pcall(callback)
+    end)
+
+    local btnfunc = {}
+    btnfunc.Instance = Button
+    function btnfunc:Destroy() Button:Destroy() end
+    return btnfunc
+		end
+	
 		function main:Toggle(text, config, desc, callback)
     config = config or false
     local toggled = config
