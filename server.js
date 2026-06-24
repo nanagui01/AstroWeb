@@ -16,11 +16,10 @@ const loaderRoutes = require('./routes/loader');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Remove banco antigo
 const DB_PATH = path.join(__dirname, 'saturn.db');
 if (fs.existsSync(DB_PATH)) {
   fs.unlinkSync(DB_PATH);
-  console.log('🗑️ Banco antigo removido.');
+  console.log('🗑️ Banco antigo removido');
 }
 
 app.set('trust proxy', 1);
@@ -53,35 +52,21 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// 🔥 ROTA DE EMERGÊNCIA - acesse no navegador se o login falhar
-app.get('/api/reset-admin', async (req, res) => {
-  try {
-    const db = getDb();
-    const email = 'nanagui@youtubepontucom';
-    const password = '001010GGZEHEN';
-    
-    db.run('DELETE FROM admins');
-    const hash = bcrypt.hashSync(password, 10);
-    db.prepare('INSERT INTO admins (email, password_hash) VALUES (?, ?)').run([email, hash]);
-    saveDb();
-    
-    res.json({ 
-      success: true, 
-      message: 'Admin resetado com sucesso',
-      email: email,
-      password: password,
-      hash: hash.substring(0, 10) + '...'
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+app.get('/api/reset-admin', (req, res) => {
+  const db = getDb();
+  const email = 'nanagui@youtubepontucom';
+  const password = '001010GGZEHEN';
+  db.run('DELETE FROM admins');
+  const hash = bcrypt.hashSync(password, 10);
+  db.prepare('INSERT INTO admins (email, password_hash) VALUES (?, ?)').run([email, hash]);
+  saveDb();
+  res.json({ success: true, email, password });
 });
 
 (async () => {
   try {
     await initDatabase();
     const db = getDb();
-
     const adminEmail = process.env.ADMIN_EMAIL || 'nanagui@youtubepontucom';
     const adminPassword = process.env.ADMIN_PASSWORD || '001010GGZEHEN';
 
@@ -90,13 +75,11 @@ app.get('/api/reset-admin', async (req, res) => {
     saveDb();
 
     console.log(`✅ Admin criado: ${adminEmail}`);
-    console.log(`🔑 Senha: ${adminPassword}`);
-
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🪐 Saturn Panel rodando em http://0.0.0.0:${PORT}`);
+      console.log(`🪐 Rodando na porta ${PORT}`);
     });
   } catch (error) {
-    console.error('❌ Falha na inicialização:', error);
+    console.error('❌ Erro:', error);
     process.exit(1);
   }
 })();
