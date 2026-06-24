@@ -5,139 +5,293 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saturn Storage - Dashboard</title>
   <style>
-    body { background: #000; color: #fff; font-family: Arial, sans-serif; margin: 0; display: flex; }
-    .sidebar { width: 220px; background: #111; padding: 1.5rem; height: 100vh; box-sizing: border-box; }
-    .sidebar h2 { margin-top: 0; }
-    .sidebar button { display: block; width: 100%; background: none; border: none; color: #aaa; padding: 0.7rem; text-align: left; cursor: pointer; font-size: 1rem; border-radius: 4px; }
+    body { background: #000; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; }
+    .sidebar { width: 220px; background: #111; padding: 1.5rem; height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; }
+    .sidebar h2 { margin-top: 0; font-size: 1.4rem; }
+    .sidebar button { background: none; border: none; color: #aaa; padding: 0.7rem 0.8rem; text-align: left; cursor: pointer; font-size: 1rem; border-radius: 6px; margin-bottom: 0.3rem; transition: all 0.2s; }
     .sidebar button:hover, .sidebar button.active { background: #222; color: #fff; }
-    .content { flex: 1; padding: 2rem; }
-    table { width: 100%; border-collapse: collapse; background: #111; border-radius: 8px; overflow: hidden; }
-    th { background: #222; padding: 0.8rem; text-align: left; }
-    td { padding: 0.8rem; border-bottom: 1px solid #222; }
-    .badge { padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; }
-    .online { background: #0c6; color: #000; }
-    .offline { background: #f44; color: #fff; }
-    button.action { background: #fff; color: #000; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; margin-right: 0.3rem; }
-    button.danger { background: #f44; color: #fff; }
-    .hidden { display: none; }
-    #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
-    #modal.show { display: flex; }
-    .modal-content { background: #111; padding: 2rem; border-radius: 8px; width: 400px; }
-    input, textarea, select { width: 100%; padding: 0.5rem; margin: 0.5rem 0; background: #222; border: 1px solid #333; color: #fff; border-radius: 4px; }
-    textarea { height: 200px; font-family: monospace; }
+    .logout-btn { margin-top: auto; color: #f44 !important; }
+    .content { flex: 1; padding: 2rem; overflow-y: auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .header h1 { margin: 0; }
+    .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+    .btn-primary { background: #fff; color: #000; }
+    .btn-primary:hover { background: #ddd; }
+    .btn-danger { background: #c0392b; color: #fff; }
+    .btn-danger:hover { background: #e74c3c; }
+    table { width: 100%; border-collapse: collapse; background: #111; border-radius: 10px; overflow: hidden; }
+    th { background: #222; padding: 0.8rem; text-align: left; font-size: 0.85rem; color: #aaa; }
+    td { padding: 0.8rem; border-bottom: 1px solid #222; font-size: 0.9rem; }
+    tr:last-child td { border-bottom: none; }
+    .badge { padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
+    .online { background: #27ae60; color: #fff; }
+    .offline { background: #e74c3c; color: #fff; }
+    .loader-cell { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #aaa; word-break: break-all; }
+    .copy-btn { background: #333; color: #fff; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-left: 0.5rem; }
+    .copy-btn:hover { background: #555; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 100; }
+    .modal.show { display: flex; }
+    .modal-content { background: #111; padding: 2rem; border-radius: 12px; width: 450px; max-width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-content h2 { margin-top: 0; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.3rem; color: #aaa; font-size: 0.9rem; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.7rem; background: #222; border: 1px solid #333; color: #fff; border-radius: 6px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box; }
+    .form-group textarea { height: 180px; resize: vertical; font-family: 'Fira Code', monospace; }
+    .file-upload { border: 2px dashed #333; border-radius: 8px; padding: 1.2rem; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+    .file-upload:hover { border-color: #fff; }
+    .file-upload input[type="file"] { display: none; }
+    .file-name { margin-top: 0.5rem; color: #0c6; font-size: 0.85rem; }
+    .loader-box { background: #222; border-radius: 6px; padding: 0.8rem; margin-top: 0.5rem; font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #ddd; word-break: break-all; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #27ae60; color: #fff; padding: 1rem 1.5rem; border-radius: 8px; font-weight: 500; z-index: 200; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   </style>
 </head>
 <body>
   <div class="sidebar">
-    <h2>Saturn</h2>
-    <button class="active" data-tab="scripts">Scripts</button>
-    <button onclick="logout()">Sair</button>
+    <h2>🪐 Saturn</h2>
+    <button class="active" data-tab="scripts">📜 Scripts</button>
+    <button class="logout-btn" onclick="logout()">🚪 Sair</button>
   </div>
 
   <div class="content">
-    <h1>Scripts</h1>
-    <button onclick="openModal()" style="margin-bottom:1rem; padding:0.5rem 1rem; background:#fff; color:#000; border:none; border-radius:4px;">+ Novo Script</button>
+    <div class="header">
+      <h1>Scripts</h1>
+      <button class="btn btn-primary" onclick="openModal()">+ Novo Script</button>
+    </div>
     <table>
-      <thead><tr><th>Nome</th><th>Status</th><th>Ações</th></tr></thead>
+      <thead><tr><th>Nome</th><th>Status</th><th>Loader</th><th>Ações</th></tr></thead>
       <tbody id="scriptsTable"></tbody>
     </table>
   </div>
 
-  <div id="modal">
+  <!-- Modal -->
+  <div id="modal" class="modal">
     <div class="modal-content">
       <h2 id="modalTitle">Novo Script</h2>
       <form id="scriptForm">
         <input type="hidden" id="scriptId">
-        <input type="text" id="scriptName" placeholder="Nome do script" required>
-        <textarea id="scriptContent" placeholder="Conteúdo do script" required></textarea>
-        <select id="scriptStatus">
-          <option value="online">Online</option>
-          <option value="offline">Offline</option>
-        </select>
-        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
-          <button type="submit" style="flex:1; background:#fff; color:#000; border:none; padding:0.5rem;">Salvar</button>
-          <button type="button" onclick="closeModal()" style="flex:1; background:#333; color:#fff; border:none;">Cancelar</button>
+        <div class="form-group">
+          <label>Nome do script</label>
+          <input type="text" id="scriptName" placeholder="Meu Script" required>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="scriptStatus">
+            <option value="online">Online</option>
+            <option value="offline">Offline</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Conteúdo (Lua)</label>
+          <textarea id="scriptContent" placeholder="-- Código Lua aqui"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Ou envie um arquivo .txt / .lua</label>
+          <div class="file-upload" id="fileDropArea">
+            📁 Clique ou arraste um arquivo
+            <input type="file" id="fileInput" accept=".txt,.lua">
+            <div class="file-name" id="fileName"></div>
+          </div>
+        </div>
+        <div style="display:flex; gap:0.8rem; margin-top:1.5rem;">
+          <button type="submit" class="btn btn-primary" style="flex:1;">Salvar</button>
+          <button type="button" class="btn btn-danger" onclick="closeModal()" style="flex:1;">Cancelar</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
+    // API helper com credenciais
     async function api(url, options = {}) {
       const res = await fetch(url, { credentials: 'include', ...options });
-      if (res.status === 401) window.location.href = '/admin';
+      if (res.status === 401) {
+        window.location.href = '/admin';
+        throw new Error('Unauthorized');
+      }
       return res;
     }
 
+    // Carregar lista de scripts
     async function loadScripts() {
-      const res = await api('/api/scripts');
-      const scripts = await res.json();
-      const tbody = document.getElementById('scriptsTable');
-      tbody.innerHTML = scripts.map(s => `
-        <tr>
-          <td>${s.name}</td>
-          <td><span class="badge ${s.status}">${s.status}</span></td>
-          <td>
-            <button class="action" onclick="editScript('${s.id}')">Editar</button>
-            <button class="action danger" onclick="deleteScript('${s.id}')">Excluir</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function openModal() {
-      document.getElementById('modal').classList.add('show');
-      document.getElementById('modalTitle').textContent = 'Novo Script';
-      document.getElementById('scriptForm').reset();
-      document.getElementById('scriptId').value = '';
-    }
-
-    function closeModal() {
-      document.getElementById('modal').classList.remove('show');
-    }
-
-    async function editScript(id) {
-      const res = await api(`/api/scripts/${id}`);
-      const script = await res.json();
-      document.getElementById('scriptId').value = script.id;
-      document.getElementById('scriptName').value = script.name;
-      document.getElementById('scriptContent').value = script.content;
-      document.getElementById('scriptStatus').value = script.status;
-      document.getElementById('modalTitle').textContent = 'Editar Script';
-      document.getElementById('modal').classList.add('show');
-    }
-
-    async function deleteScript(id) {
-      if (confirm('Tem certeza?')) {
-        await api(`/api/scripts/${id}`, { method: 'DELETE' });
-        loadScripts();
+      try {
+        const res = await api('/api/scripts');
+        const scripts = await res.json();
+        const tbody = document.getElementById('scriptsTable');
+        if (scripts.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#666;padding:2rem;">Nenhum script criado ainda</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = scripts.map(s => {
+          const loaderUrl = `${window.location.origin}/api/load/${s.id}`;
+          return `
+            <tr>
+              <td><strong>${escapeHtml(s.name)}</strong></td>
+              <td><span class="badge ${s.status}">${s.status}</span></td>
+              <td>
+                <span class="loader-cell">${loaderUrl}</span>
+                <button class="copy-btn" onclick="copyLoader('${s.id}')" title="Copiar Loader">📋</button>
+              </td>
+              <td>
+                <button class="btn btn-primary" style="padding:0.3rem 0.8rem;font-size:0.8rem;" onclick="editScript('${s.id}')">Editar</button>
+                <button class="btn btn-danger" style="padding:0.3rem 0.8rem;font-size:0.8rem;" onclick="deleteScript('${s.id}')">Excluir</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error(err);
       }
     }
 
-    document.getElementById('scriptForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('scriptId').value;
-      const name = document.getElementById('scriptName').value;
-      const content = document.getElementById('scriptContent').value;
-      const status = document.getElementById('scriptStatus').value;
-
-      const url = id ? `/api/scripts/${id}` : '/api/scripts';
-      const method = id ? 'PUT' : 'POST';
-
-      await api(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, content, status })
+    function copyLoader(id) {
+      const loaderUrl = `${window.location.origin}/api/load/${id}`;
+      const loaderCode = `-- Substitua "SUA_KEY_AQUI" pela chave secreta\nlocal headers = {["X-Saturn-Key"] = "saturn_loader_secret_2024"}\nlocal response = game:HttpGet("${loaderUrl}", true, headers)\nloadstring(response)()`;
+      navigator.clipboard.writeText(loaderCode).then(() => {
+        showToast('✅ Loader copiado para a área de transferência!');
+      }).catch(() => {
+        prompt('Copie manualmente:', loaderCode);
       });
-
-      closeModal();
-      loadScripts();
-    });
-
-    function logout() {
-      fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).then(() => window.location.href = '/admin');
     }
 
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Modal
+    const modal = document.getElementById('modal');
+    const scriptForm = document.getElementById('scriptForm');
+    const fileInput = document.getElementById('fileInput');
+    const fileDropArea = document.getElementById('fileDropArea');
+    const fileName = document.getElementById('fileName');
+    const scriptContent = document.getElementById('scriptContent');
+
+    function openModal(script = null) {
+      modal.classList.add('show');
+      if (script) {
+        document.getElementById('modalTitle').textContent = 'Editar Script';
+        document.getElementById('scriptId').value = script.id;
+        document.getElementById('scriptName').value = script.name;
+        document.getElementById('scriptStatus').value = script.status;
+        scriptContent.value = script.content;
+        fileName.textContent = '';
+      } else {
+        document.getElementById('modalTitle').textContent = 'Novo Script';
+        scriptForm.reset();
+        document.getElementById('scriptId').value = '';
+        fileName.textContent = '';
+      }
+    }
+
+    function closeModal() {
+      modal.classList.remove('show');
+    }
+
+    // Upload de arquivo
+    fileDropArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) readFile(file);
+    });
+
+    // Drag and drop
+    fileDropArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileDropArea.style.borderColor = '#fff';
+    });
+    fileDropArea.addEventListener('dragleave', () => {
+      fileDropArea.style.borderColor = '#333';
+    });
+    fileDropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileDropArea.style.borderColor = '#333';
+      const file = e.dataTransfer.files[0];
+      if (file && (file.name.endsWith('.txt') || file.name.endsWith('.lua'))) {
+        readFile(file);
+      } else {
+        alert('Apenas arquivos .txt ou .lua são permitidos.');
+      }
+    });
+
+    function readFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        scriptContent.value = e.target.result;
+        fileName.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      };
+      reader.readAsText(file);
+    }
+
+    // Salvar script
+    scriptForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('scriptId').value;
+      const name = document.getElementById('scriptName').value.trim();
+      const status = document.getElementById('scriptStatus').value;
+      const content = scriptContent.value;
+
+      if (!name || !content) {
+        alert('Preencha o nome e o conteúdo (ou envie um arquivo).');
+        return;
+      }
+
+      const method = id ? 'PUT' : 'POST';
+      const url = id ? `/api/scripts/${id}` : '/api/scripts';
+
+      try {
+        const res = await api(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, content, status })
+        });
+        const savedScript = await res.json();
+
+        closeModal();
+        loadScripts();
+
+        // Se for novo script, exibir o loader automaticamente
+        if (!id) {
+          const loaderUrl = `${window.location.origin}/api/load/${savedScript.id}`;
+          showToast(`✅ Script criado! Loader: ${loaderUrl}`);
+        } else {
+          showToast('✅ Script atualizado!');
+        }
+      } catch (err) {
+        alert('Erro ao salvar script.');
+        console.error(err);
+      }
+    });
+
+    // Editar
+    async function editScript(id) {
+      const res = await api(`/api/scripts/${id}`);
+      const script = await res.json();
+      openModal(script);
+    }
+
+    // Excluir
+    async function deleteScript(id) {
+      if (!confirm('Tem certeza que deseja excluir este script?')) return;
+      await api(`/api/scripts/${id}`, { method: 'DELETE' });
+      loadScripts();
+      showToast('🗑️ Script excluído.');
+    }
+
+    function logout() {
+      fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).then(() => {
+        window.location.href = '/admin';
+      });
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+    }
+
+    // Inicializar
     loadScripts();
   </script>
 </body>
