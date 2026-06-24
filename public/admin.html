@@ -6,87 +6,103 @@
   <title>Saturn Panel - Admin</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="icon" href="data:,">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code&display=swap" rel="stylesheet">
 </head>
-<body class="bg-black text-white flex min-h-screen">
+<body class="flex min-h-screen bg-black text-white">
+
   <!-- Sidebar -->
-  <aside class="w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col p-6 min-h-screen">
-    <h2 class="text-xl font-bold mb-10">SATURN</h2>
-    <nav class="flex flex-col gap-4">
-      <button class="tab-link text-left py-2 px-3 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition" data-tab="dashboard">Dashboard</button>
-      <button class="tab-link text-left py-2 px-3 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition" data-tab="scripts">Scripts</button>
-      <button class="tab-link text-left py-2 px-3 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition" data-tab="keys">Keys</button>
-      <button class="tab-link text-left py-2 px-3 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900 transition" data-tab="settings">Settings</button>
+  <aside class="sidebar">
+    <div class="sidebar-logo">SATURN</div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-link active" data-tab="dashboard">Dashboard</button>
+      <button class="sidebar-link" data-tab="scripts">Scripts</button>
+      <button class="sidebar-link" data-tab="keys">Keys</button>
+      <button class="sidebar-link" data-tab="settings">Settings</button>
     </nav>
-    <div class="mt-auto">
-      <button id="logoutBtn" class="text-red-400 hover:text-red-300 transition">Logout</button>
+    <div class="sidebar-footer">
+      <button id="logoutBtn" class="sidebar-logout">Logout</button>
     </div>
   </aside>
 
-  <!-- Main content -->
-  <main class="flex-1 p-8">
-    <!-- Login form (hidden if authenticated) -->
-    <div id="loginSection" class="max-w-md mx-auto mt-20 hidden">
-      <h2 class="text-2xl font-bold mb-6">Admin Login</h2>
+  <!-- Main -->
+  <main class="main-content flex-1">
+
+    <!-- Login section -->
+    <div id="loginSection" class="login-container hidden">
+      <h2 class="login-title">Admin Login</h2>
       <form id="loginForm">
-        <input type="email" id="email" placeholder="Email" class="w-full p-3 mb-3 bg-zinc-900 border border-zinc-700 rounded-lg text-white">
-        <input type="password" id="password" placeholder="Password" class="w-full p-3 mb-4 bg-zinc-900 border border-zinc-700 rounded-lg text-white">
-        <p id="loginError" class="text-red-500 mb-3 hidden">Invalid credentials</p>
-        <button type="submit" class="w-full bg-white text-black font-semibold py-3 rounded-lg hover:bg-gray-200 transition">Login</button>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="email" class="form-input" placeholder="admin@saturn.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="••••••••">
+        </div>
+        <p id="loginError" class="form-error">Invalid credentials</p>
+        <button type="submit" class="btn btn-primary btn-block mt-2">Login</button>
       </form>
     </div>
 
-    <!-- Dashboard (hidden until authenticated) -->
+    <!-- App section -->
     <div id="appSection" class="hidden">
+
+      <!-- Dashboard Tab -->
       <div id="tab-dashboard" class="tab-content">
-        <h2 class="text-3xl font-bold mb-8">Dashboard</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6"><div class="text-zinc-400 text-sm">Total Scripts</div><div class="text-3xl font-bold" id="statScripts">0</div></div>
-          <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6"><div class="text-zinc-400 text-sm">Total Keys</div><div class="text-3xl font-bold" id="statKeys">0</div></div>
-          <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6"><div class="text-zinc-400 text-sm">Active Keys</div><div class="text-3xl font-bold" id="statActiveKeys">0</div></div>
-          <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6"><div class="text-zinc-400 text-sm">Online Scripts</div><div class="text-3xl font-bold" id="statOnlineScripts">0</div></div>
+        <h2 class="card-header" style="font-size:2rem;">Dashboard</h2>
+        <div class="stats-grid mt-4">
+          <div class="stat-card"><div class="stat-label">Total Scripts</div><div class="stat-value" id="statScripts">0</div></div>
+          <div class="stat-card"><div class="stat-label">Total Keys</div><div class="stat-value" id="statKeys">0</div></div>
+          <div class="stat-card"><div class="stat-label">Active Keys</div><div class="stat-value" id="statActiveKeys">0</div></div>
+          <div class="stat-card"><div class="stat-label">Online Scripts</div><div class="stat-value" id="statOnlineScripts">0</div></div>
         </div>
       </div>
 
+      <!-- Scripts Tab -->
       <div id="tab-scripts" class="tab-content hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-3xl font-bold">Scripts</h2>
-          <button id="newScriptBtn" class="bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">+ New Script</button>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="card-header" style="font-size:2rem;">Scripts</h2>
+          <button id="newScriptBtn" class="btn btn-primary">+ New Script</button>
         </div>
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-          <table class="w-full text-left">
-            <thead class="border-b border-zinc-800"><tr><th class="p-4 text-zinc-400">Name</th><th class="p-4 text-zinc-400">Status</th><th class="p-4 text-zinc-400">Loader</th><th class="p-4 text-zinc-400">Actions</th></tr></thead>
+        <div class="table-container">
+          <table class="table">
+            <thead><tr><th>Name</th><th>Status</th><th>Loader</th><th>Actions</th></tr></thead>
             <tbody id="scriptsTable"></tbody>
           </table>
         </div>
       </div>
 
+      <!-- Keys Tab -->
       <div id="tab-keys" class="tab-content hidden">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-3xl font-bold">Keys</h2>
-          <button id="newKeyBtn" class="bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-gray-200">+ Generate Key</button>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="card-header" style="font-size:2rem;">Keys</h2>
+          <button id="newKeyBtn" class="btn btn-primary">+ Generate Key</button>
         </div>
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-          <table class="w-full text-left">
-            <thead class="border-b border-zinc-800"><tr><th class="p-4 text-zinc-400">Key</th><th class="p-4 text-zinc-400">Expires</th><th class="p-4 text-zinc-400">HWID</th><th class="p-4 text-zinc-400">Status</th><th class="p-4 text-zinc-400">Actions</th></tr></thead>
+        <div class="table-container">
+          <table class="table">
+            <thead><tr><th>Key</th><th>Expires</th><th>HWID</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="keysTable"></tbody>
           </table>
         </div>
       </div>
 
+      <!-- Settings Tab -->
       <div id="tab-settings" class="tab-content hidden">
-        <h2 class="text-3xl font-bold mb-6">Settings</h2>
-        <p class="text-zinc-400">System configuration will be here.</p>
+        <h2 class="card-header" style="font-size:2rem;">Settings</h2>
+        <p class="text-sm" style="color:#a0a0a0;">System configuration panel coming soon.</p>
       </div>
+
     </div>
   </main>
 
-  <div id="modal" class="fixed inset-0 bg-black/80 flex items-center justify-center hidden z-50">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-8 w-full max-w-xl max-h-[90vh] overflow-auto">
-      <h3 id="modalTitle" class="text-xl font-bold mb-4"></h3>
+  <!-- Modal -->
+  <div id="modal" class="modal-overlay">
+    <div class="modal">
+      <h3 id="modalTitle" class="modal-title"></h3>
       <div id="modalContent"></div>
-      <div class="flex justify-end gap-3 mt-6">
-        <button id="modalCancel" class="px-4 py-2 border border-zinc-700 rounded-lg">Cancel</button>
-        <button id="modalSave" class="px-4 py-2 bg-white text-black rounded-lg font-semibold">Save</button>
+      <div class="modal-actions">
+        <button id="modalCancel" class="btn btn-secondary">Cancel</button>
+        <button id="modalSave" class="btn btn-primary">Save</button>
       </div>
     </div>
   </div>
