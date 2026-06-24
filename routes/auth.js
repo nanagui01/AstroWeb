@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const argon2 = require('argon2');
+const bcrypt = require('bcryptjs');
 const authenticateToken = require('../middleware/auth');
 
 router.post('/login', async (req, res) => {
@@ -13,10 +13,23 @@ router.post('/login', async (req, res) => {
 
   try {
     const admin = req.db.prepare('SELECT * FROM admins WHERE email = ?').get([email]);
-    if (!admin) return res.status(401).json({ error: 'Credenciais inválidas' });
+    
+    if (!admin) {
+      console.log('❌ Admin não encontrado:', email);
+      return res.status(401).json({ error: 'Credenciais inválidas' });
+    }
 
-    const valid = await argon2.verify(admin.password_hash, password);
-    if (!valid) return res.status(401).json({ error: 'Credenciais inválidas' });
+    if (!admin.password_hash || admin.password_hash === '') {
+      console.log('❌ Hash vazio para:', email);
+      return res.status(500).json({ error: 'Erro interno. Acesse /api/reset-admin' });
+    }
+
+    const valid = bcrypt.compareSync(password, admin.password_hash);
+    
+    if (!valid) {
+      console.log('❌ Senha incorreta para:', email);
+      return res.status(401).json({ error: 'Credenciais inválidas' });
+    }
 
     const token = jwt.sign(
       { id: admin.id, email: admin.email, role: 'admin' },
