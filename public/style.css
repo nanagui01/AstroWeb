@@ -1,0 +1,14 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', system-ui, sans-serif; }
+.hidden { display: none !important; }
+.tab-link.active { background: #18181b; color: white; }
+.status-badge { padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.status-online { background: rgba(0,204,102,0.2); color: #0c6; }
+.status-offline { background: rgba(255,68,68,0.2); color: #f44; }
+.status-maintenance { background: rgba(255,170,0,0.2); color: #fa0; }
+.status-development { background: rgba(100,100,255,0.2); color: #88f; }
+.status-active { background: rgba(0,204,102,0.2); color: #0c6; }
+.status-expired { background: rgba(255,68,68,0.2); color: #f44; }
+.status-revoked { background: rgba(255,170,0,0.2); color: #fa0; }
+button { cursor: pointer; transition: all 0.2s; }
+button:active { transform: scale(0.98); }
