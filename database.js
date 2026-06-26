@@ -6,7 +6,9 @@ const DB_PATH = path.join('/tmp', 'saturn-data.json');
 let DB = {
   admins: [],
   scripts: [],
-  versions: []
+  versions: [],
+  keys: [],
+  securityLogs: []
 };
 
 function loadDb() {
