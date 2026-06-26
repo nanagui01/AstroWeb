@@ -11,7 +11,6 @@ let DB = {
   executionLogs: []
 };
 
-// Carrega do disco se existir
 function loadDb() {
   try {
     if (fs.existsSync(DB_PATH)) {
@@ -23,16 +22,15 @@ function loadDb() {
       console.log('🆕 Banco novo criado');
     }
   } catch (e) {
-    console.error('❌ Erro ao carregar banco:', e.message);
+    console.error('Erro ao carregar banco:', e.message);
   }
 }
 
-// Salva em disco
 function saveDb() {
   try {
     fs.writeFileSync(DB_PATH, JSON.stringify(DB, null, 2), 'utf-8');
   } catch (e) {
-    console.error('❌ Erro ao salvar banco:', e.message);
+    console.error('Erro ao salvar banco:', e.message);
   }
 }
 
