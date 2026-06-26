@@ -18,7 +18,8 @@
       --online: #10b981;
       --offline: #ef4444;
       --maintenance: #f59e0b;
-      --radius: 14px;
+      --development: #8888ff;
+      --radius: 16px;
       --radius-sm: 8px;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -37,11 +38,24 @@
       justify-content: space-between;
       align-items: center;
     }
-    .navbar h1 {
-      font-weight: 800;
-      font-size: 1.3rem;
-      letter-spacing: -0.5px;
+    .navbar h1 { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: #fff;
+      color: #000;
+      transition: 0.2s;
+      font-size: 0.85rem;
     }
+    .btn-outline { background: transparent; border: 1px solid #333; color: #fff; }
+    .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+
     .hero {
       text-align: center;
       padding: 3rem 2rem 1rem;
@@ -54,11 +68,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .hero p {
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-      font-size: 1.1rem;
-    }
+    .hero p { color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem; }
     .code-box {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -77,136 +87,125 @@
     .code-box .dots span:nth-child(3) { background: #777; }
     .code-box code { color: #ccc; line-height: 1.6; }
     .code-box .highlight { color: #fff; }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.7rem 1.5rem;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      background: #fff;
-      color: #000;
-      transition: 0.2s;
-      font-size: 0.95rem;
-    }
-    .btn:hover { background: #e0e0e0; }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #333;
-      color: #fff;
-    }
-    .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
-    .btn-sm {
-      padding: 0.4rem 0.9rem;
-      font-size: 0.8rem;
-    }
 
-    /* Grid de jogos */
-    .games-section {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-    .section-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-    }
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.5rem;
-    }
-    .game-card {
+    /* Seção de scripts */
+    .scripts-section { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .scripts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+
+    /* Card */
+    .script-card {
+      position: relative;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .game-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    .script-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.6), 0 0 20px rgba(99,102,241,0.15);
+    }
+    .card-image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
     }
     .card-image {
       width: 100%;
-      height: 140px;
+      height: 100%;
       background-size: cover;
       background-position: center;
       background-color: #1a1a1a;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.5rem;
-      color: #333;
+      font-size: 3rem;
+      color: #444;
+      transition: transform 0.4s ease, filter 0.4s ease;
     }
-    .card-body {
-      padding: 1rem 1.2rem;
+    .script-card:hover .card-image {
+      transform: scale(1.05);
+      filter: brightness(1.1);
     }
-    .card-title {
+    .card-image-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .card-status-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    .status-icon {
-      display: inline-flex;
-      align-items: center;
       gap: 0.3rem;
-      font-size: 0.75rem;
-      font-weight: 600;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      z-index: 2;
+      color: #fff;
     }
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       display: inline-block;
     }
     .status-online .status-dot { background: var(--online); }
     .status-offline .status-dot { background: var(--offline); }
     .status-maintenance .status-dot { background: var(--maintenance); }
+    .status-development .status-dot { background: var(--development); }
 
-    footer {
-      margin-top: auto;
-      padding: 1.5rem;
-      text-align: center;
-      color: #333;
-      font-size: 0.85rem;
-      border-top: 1px solid var(--border);
+    .card-body { padding: 1rem 1.2rem; }
+    .card-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+    .card-meta span { display: inline-flex; align-items: center; gap: 0.3rem; }
+
+    /* Efeito de brilho no hover */
+    .script-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      transition: left 0.5s;
+      pointer-events: none;
     }
+    .script-card:hover::after {
+      left: 100%;
+    }
+
+    footer { margin-top: auto; padding: 1.5rem; text-align: center; color: #333; font-size: 0.85rem; border-top: 1px solid var(--border); }
 
     @media (max-width: 768px) {
       .hero h2 { font-size: 2rem; }
-      .games-grid { grid-template-columns: 1fr 1fr; }
+      .scripts-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <nav class="navbar">
     <h1>Saturn</h1>
-    <a href="/status" class="btn btn-outline btn-sm">Status</a>
+    <a href="/status" class="btn btn-outline">Status</a>
   </nav>
 
   <section class="hero">
-    <h2>Um Script. Vários Jogos.</h2>
-    <p>Use o mesmo loader para todos os jogos abaixo. Copie e cole no seu executor.</p>
-    <div class="code-box">
-      <div class="dots"><span></span><span></span><span></span></div>
-      <code>loadstring(game:HttpGet("<span class="highlight">https://saturn.example.com/api/load/ID</span>"))()</code>
-    </div>
-    <button class="btn" onclick="copyExampleLoader()">Copiar Loader</button>
+    <h2>Scripts Profissionais</h2>
+    <p>Escolha um script, veja detalhes e execute no seu jogo favorito.</p>
   </section>
 
-  <!-- Seção de jogos suportados -->
-  <section class="games-section">
-    <h2 class="section-title">Jogos Suportados</h2>
-    <div class="games-grid" id="gamesGrid">
-      <!-- Preenchido dinamicamente por JS -->
-    </div>
+  <section class="scripts-section">
+    <h2 class="section-title">Scripts Disponíveis</h2>
+    <div class="scripts-grid" id="scriptsGrid"></div>
   </section>
 
   <footer>
@@ -214,57 +213,103 @@
   </footer>
 
   <script>
-    // Dados de exemplo (mock) — você pode conectar à API pública depois
-    const gamesMock = [
-      { id: 'bloxfruit', name: 'Blox Fruits', status: 'online', image: '' },
-      { id: 'psx', name: 'Pet Simulator X', status: 'online', image: '' },
-      { id: 'jailbreak', name: 'Jailbreak', status: 'offline', image: '' },
-      { id: 'arsenal', name: 'Arsenal', status: 'online', image: '' },
-      { id: 'mm2', name: 'Murder Mystery 2', status: 'maintenance', image: '' },
-      { id: 'adoptme', name: 'Adopt Me!', status: 'online', image: '' }
+    // Dados mockados de exemplo (cada objeto = um script)
+    const scriptsMock = [
+      {
+        id: 'abc123',
+        name: 'Blox Fruits',
+        status: 'online',
+        version: '2.1.0',
+        updated_at: '2026-06-20',
+        image: '' // URL da imagem (se vazia, mostra ícone)
+      },
+      {
+        id: 'def456',
+        name: 'Pet Simulator X',
+        status: 'online',
+        version: '1.5.3',
+        updated_at: '2026-06-18',
+        image: ''
+      },
+      {
+        id: 'ghi789',
+        name: 'Jailbreak',
+        status: 'offline',
+        version: '3.0.1',
+        updated_at: '2026-05-12',
+        image: ''
+      },
+      {
+        id: 'jkl012',
+        name: 'Arsenal',
+        status: 'maintenance',
+        version: '4.2.0',
+        updated_at: '2026-06-22',
+        image: ''
+      },
+      {
+        id: 'mno345',
+        name: 'Adopt Me!',
+        status: 'online',
+        version: '1.0.0',
+        updated_at: '2026-06-01',
+        image: ''
+      },
+      {
+        id: 'pqr678',
+        name: 'Murder Mystery 2',
+        status: 'development',
+        version: '2.0.0-beta',
+        updated_at: '2026-06-25',
+        image: ''
+      }
     ];
 
-    function renderGames(games) {
-      const grid = document.getElementById('gamesGrid');
-      grid.innerHTML = games.map(g => {
-        const statusClass = `status-${g.status}`;
-        const statusLabel = { online: 'Online', offline: 'Offline', maintenance: 'Manutenção' }[g.status] || 'Online';
-        const bgStyle = g.image ? `style="background-image:url(${g.image})"` : '';
+    function renderScripts(scripts) {
+      const grid = document.getElementById('scriptsGrid');
+      grid.innerHTML = scripts.map(s => {
+        const statusClass = `status-${s.status}`;
+        const statusLabels = {
+          online: 'Online',
+          offline: 'Offline',
+          maintenance: 'Manutenção',
+          development: 'Desenvolvimento'
+        };
+        const statusLabel = statusLabels[s.status] || 'Online';
+        const bgStyle = s.image ? `style="background-image:url(${s.image})"` : '';
         return `
-          <div class="game-card">
-            <div class="card-image" ${bgStyle}>
-              ${!g.image ? '🎮' : ''}
+          <div class="script-card" onclick="window.location.href='/get/${s.id}'">
+            <div class="card-image-wrapper">
+              <div class="card-image" ${bgStyle}>
+                ${!s.image ? '🎮' : ''}
+              </div>
+              <div class="card-image-overlay"></div>
+              <div class="card-status-badge ${statusClass}">
+                <span class="status-dot"></span> ${statusLabel}
+              </div>
             </div>
             <div class="card-body">
-              <div class="card-title">
-                <span>${escapeHtml(g.name)}</span>
-                <span class="status-icon ${statusClass}">
-                  <span class="status-dot"></span> ${statusLabel}
-                </span>
+              <div class="card-name">${escapeHtml(s.name)}</div>
+              <div class="card-meta">
+                <span>📦 v${escapeHtml(s.version)}</span>
+                <span>🕒 ${formatDate(s.updated_at)}</span>
               </div>
-              <button class="btn btn-sm" onclick="copyLoaderForGame('${g.id}')">Copiar Loader</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    function copyExampleLoader() {
-      const loader = `loadstring(game:HttpGet("${location.origin}/api/load/ID"))()`;
-      navigator.clipboard.writeText(loader).then(() => alert('Loader de exemplo copiado!'));
-    }
-
-    function copyLoaderForGame(gameId) {
-      // Aqui você poderia buscar o script real vinculado ao jogo, por enquanto usa o mesmo exemplo
-      const loader = `loadstring(game:HttpGet("${location.origin}/api/load/ID_${gameId}"))()`;
-      navigator.clipboard.writeText(loader).then(() => alert('Loader copiado para ' + gameId));
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
     }
 
     function escapeHtml(str) {
       return String(str).replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
     }
 
-    renderGames(gamesMock);
+    renderScripts(scriptsMock);
   </script>
 </body>
 </html>
