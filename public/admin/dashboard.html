@@ -4,15 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saturn — Painel de Controle</title>
-  <!-- Fontes e CDNs -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-  <!-- CodeMirror CSS -->
+  <!-- CodeMirror -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
       --bg: #0a0a0a;
@@ -29,7 +26,6 @@
       --radius-sm: 8px;
       --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', system-ui, sans-serif;
@@ -156,42 +152,6 @@
       font-weight: 700;
     }
 
-    /* === CARDS DE ESTATÍSTICAS === */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      transition: transform var(--transition), box-shadow var(--transition);
-    }
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
-    .stat-label {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      margin-bottom: 0.5rem;
-    }
-    .stat-value {
-      font-size: 2.2rem;
-      font-weight: 800;
-      line-height: 1;
-    }
-    .chart-container {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
     /* === TABELA === */
     .table-wrapper {
       background: var(--surface);
@@ -219,16 +179,31 @@
       font-size: 0.9rem;
     }
     tr:last-child td { border-bottom: none; }
-    .status-badge {
+
+    /* Loader truncado */
+    .loader-cell {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
+      vertical-align: middle;
+      transition: all 0.2s;
+      cursor: default;
     }
-    .status-online { background: rgba(16,185,129,0.15); color: var(--success); }
-    .status-offline { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .loader-cell:hover {
+      max-width: none;
+      overflow: visible;
+      white-space: normal;
+      background: #1a1a1a;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      position: relative;
+      z-index: 5;
+    }
 
     /* === BOTÕES === */
     .btn {
@@ -331,12 +306,6 @@
     .toast.error { background: var(--danger); color: #fff; }
     .toast.success { background: var(--success); color: #fff; }
 
-    /* === ANIMAÇÕES ADICIONAIS === */
-    .fade-in { animation: fadeIn 0.3s ease; }
-    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
-    .pulse { animation: pulse 2s infinite; }
-
-    /* Responsivo */
     @media (max-width: 768px) {
       .sidebar { width: 80px; padding: 1rem 0.5rem; }
       .sidebar-logo span, .sidebar-nav button span { display: none; }
@@ -346,10 +315,8 @@
   </style>
 </head>
 <body>
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <!-- Ícone de planeta (SVG) -->
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
         <ellipse cx="12" cy="12" rx="4" ry="10" fill="none" stroke="currentColor" stroke-width="2"/>
@@ -358,17 +325,9 @@
       <span>Saturn</span>
     </div>
     <nav class="sidebar-nav">
-      <button data-tab="dashboard" class="active">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span>Dashboard</span>
-      </button>
-      <button data-tab="scripts">
+      <button data-tab="scripts" class="active">
         <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         <span>Scripts</span>
-      </button>
-      <button data-tab="logs">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        <span>Logs</span>
       </button>
     </nav>
     <button class="logout-btn" onclick="logout()">
@@ -377,17 +336,8 @@
     </button>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
-    <!-- DASHBOARD -->
-    <div id="tab-dashboard" class="tab-content active">
-      <div class="header"><h1>Dashboard</h1></div>
-      <div class="stats-grid" id="statsCards"></div>
-      <div class="chart-container"><canvas id="execChart" height="80"></canvas></div>
-    </div>
-
-    <!-- SCRIPTS -->
-    <div id="tab-scripts" class="tab-content">
+    <div id="tab-scripts" class="tab-content active">
       <div class="header">
         <h1>Scripts</h1>
         <div style="display:flex; gap:0.5rem;">
@@ -395,39 +345,24 @@
           <button class="btn" onclick="document.getElementById('importFile').click()">Importar</button>
           <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
           <button class="btn btn-primary" onclick="openScriptModal()">+ Novo Script</button>
-          <button class="btn btn-primary" onclick="openBulkModal()">Upload Múltiplo</button>
         </div>
       </div>
       <div class="table-wrapper">
         <table>
-          <thead><tr><th>Nome</th><th>Status</th><th>Execuções</th><th>Link Curto</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Nome</th><th>Execuções</th><th>Link Curto</th><th>Ações</th></tr></thead>
           <tbody id="scriptsTable"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- LOGS -->
-    <div id="tab-logs" class="tab-content">
-      <div class="header"><h1>Logs de Atividade</h1></div>
-      <div class="table-wrapper">
-        <table>
-          <thead><tr><th>Ação</th><th>Detalhes</th><th>IP</th><th>Data</th></tr></thead>
-          <tbody id="logsTable"></tbody>
         </table>
       </div>
     </div>
   </main>
 
-  <!-- MODAIS -->
-  <!-- Script -->
+  <!-- Modal Script -->
   <div id="scriptModal" class="modal">
     <div class="modal-box">
       <h2 id="modalTitle">Novo Script</h2>
       <form id="scriptForm">
         <input type="hidden" id="scriptId">
         <label>Nome</label><input type="text" id="scriptName" required>
-        <label>Status</label>
-        <select id="scriptStatus"><option value="online">Online</option><option value="offline">Offline</option></select>
         <label>Código</label><textarea id="scriptContent" required></textarea>
         <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:flex-end;">
           <button type="button" class="btn btn-danger" onclick="closeModal('scriptModal')">Cancelar</button>
@@ -437,38 +372,11 @@
     </div>
   </div>
 
-  <!-- Bulk Upload -->
-  <div id="bulkModal" class="modal">
-    <div class="modal-box">
-      <h2>Upload de Múltiplos Arquivos</h2>
-      <div class="file-upload" id="bulkDropArea" style="border:2px dashed var(--border); border-radius:var(--radius-sm); padding:2rem; text-align:center; cursor:pointer;">
-        Arraste arquivos .lua ou .txt aqui
-        <input type="file" id="bulkFileInput" accept=".lua,.txt" multiple style="display:none;">
-      </div>
-      <div id="bulkFileList" style="margin-top:1rem; color:var(--success);"></div>
-      <div style="margin-top:1rem; display:flex; gap:1rem; justify-content:flex-end;">
-        <button class="btn btn-danger" onclick="closeModal('bulkModal')">Cancelar</button>
-        <button class="btn btn-primary" id="bulkUploadBtn" disabled>Enviar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Versões -->
-  <div id="versionsModal" class="modal">
-    <div class="modal-box">
-      <h2>Histórico de Versões</h2>
-      <div id="versionsList" style="max-height:400px; overflow-y:auto;"></div>
-      <button class="btn btn-danger" onclick="closeModal('versionsModal')" style="margin-top:1rem;">Fechar</button>
-    </div>
-  </div>
-
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Scripts JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/lua/lua.min.js"></script>
   <script>
-    // -- UTILIDADES --
     const escapeHTML = str => String(str).replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
 
     function showToast(msg, type='success') {
@@ -482,95 +390,57 @@
     }
 
     async function api(url, options={}) {
-      try {
-        const res = await fetch(url, {credentials:'include', ...options});
-        if (res.status === 401) { window.location.href = '/admin'; throw new Error('Unauthorized'); }
-        const ct = res.headers.get('content-type');
-        if (ct && ct.includes('application/json')) {
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error||'Erro na requisição');
-          return data;
-        }
-        return res;
-      } catch(e) { showToast(e.message, 'error'); throw e; }
-    }
-
-    // -- NAVEGAÇÃO --
-    document.querySelectorAll('.sidebar-nav button[data-tab]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        const tab = document.getElementById('tab-'+btn.dataset.tab);
-        if (tab) tab.classList.add('active');
-        if (btn.dataset.tab === 'dashboard') loadDashboard();
-        else if (btn.dataset.tab === 'scripts') loadScripts();
-        else if (btn.dataset.tab === 'logs') loadLogs();
-      });
-    });
-
-    // -- DASHBOARD --
-    async function loadDashboard() {
-      const stats = await api('/api/stats');
-      document.getElementById('statsCards').innerHTML = `
-        <div class="stat-card"><div class="stat-label">Total Scripts</div><div class="stat-value">${stats.totalScripts}</div></div>
-        <div class="stat-card"><div class="stat-label">Online</div><div class="stat-value" style="color:var(--success)">${stats.onlineScripts}</div></div>
-        <div class="stat-card"><div class="stat-label">Execuções Hoje</div><div class="stat-value">${stats.executionsToday}</div></div>
-        <div class="stat-card"><div class="stat-label">Total Execuções</div><div class="stat-value">${stats.totalExecutions}</div></div>
-      `;
-      const execData = await api('/api/stats/executions');
-      const ctx = document.getElementById('execChart').getContext('2d');
-      if (window._chart) window._chart.destroy();
-      window._chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: execData.map(d => d.date.slice(5)),
-          datasets: [{
-            label: 'Execuções',
-            data: execData.map(d => d.count),
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99,102,241,0.1)',
-            fill: true,
-            tension: 0.3
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { color: '#a0a0a0' } }, x: { ticks: { color: '#a0a0a0' } } }
-        }
-      });
+      const res = await fetch(url, {credentials:'include', ...options});
+      if (res.status === 401) { window.location.href = '/admin'; throw new Error('Sessão expirada'); }
+      const ct = res.headers.get('content-type');
+      if (ct && ct.includes('application/json')) {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error||'Erro na requisição');
+        return data;
+      }
+      return res;
     }
 
     // -- SCRIPTS --
     async function loadScripts() {
-      const scripts = await api('/api/scripts');
-      const tbody = document.getElementById('scriptsTable');
-      if (!scripts.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-secondary);">Nenhum script criado.</td></tr>';
-        return;
+      try {
+        const scripts = await api('/api/scripts');
+        const tbody = document.getElementById('scriptsTable');
+        if (!scripts.length) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);">Nenhum script criado.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = scripts.map(s => `
+          <tr>
+            <td><strong>${escapeHTML(s.name)}</strong></td>
+            <td>${s.executions||0}</td>
+            <td><span class="loader-cell" title="${location.origin}/s/${s.short_id}">/s/${s.short_id||'—'}</span></td>
+            <td>
+              <button class="btn btn-sm" onclick="editScript('${s.id}')" title="Editar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="btn btn-sm" onclick="copyLoader('${s.id}')" title="Copiar Loader">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+              <button class="btn btn-sm" onclick="copyShort('${s.short_id}')" title="Link Curto">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteScript('${s.id}')" title="Excluir">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+        showToast('Erro ao carregar scripts.', 'error');
       }
-      tbody.innerHTML = scripts.map(s => `
-        <tr>
-          <td><strong>${escapeHTML(s.name)}</strong></td>
-          <td><span class="status-badge status-${s.status}">${s.status}</span></td>
-          <td>${s.executions||0}</td>
-          <td style="font-family:monospace;">/s/${s.short_id||'—'}</td>
-          <td>
-            <button class="btn btn-sm" onclick="editScript('${s.id}')" title="Editar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-            <button class="btn btn-sm" onclick="copyLoader('${s.id}')" title="Copiar Loader"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-            <button class="btn btn-sm" onclick="copyShort('${s.short_id}')" title="Link Curto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
-            <button class="btn btn-sm" onclick="openVersions('${s.id}')" title="Histórico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button>
-            <button class="btn btn-sm btn-danger" onclick="deleteScript('${s.id}')" title="Excluir"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
-          </td>
-        </tr>
-      `).join('');
     }
 
     function copyLoader(id) { navigator.clipboard.writeText(`${location.origin}/api/load/${id}`); showToast('Loader copiado!'); }
     function copyShort(sid) { navigator.clipboard.writeText(`${location.origin}/s/${sid}`); showToast('Link curto copiado!'); }
 
-    // -- MODAL SCRIPT --
+    // -- Editor --
     let editor;
     function initEditor() {
       if (!editor) {
@@ -593,7 +463,6 @@
         document.getElementById('modalTitle').textContent = 'Editar Script';
         document.getElementById('scriptId').value = script.id;
         document.getElementById('scriptName').value = script.name;
-        document.getElementById('scriptStatus').value = script.status;
         editor.setValue(script.content||'');
       } else {
         document.getElementById('modalTitle').textContent = 'Novo Script';
@@ -623,88 +492,16 @@
       const id = document.getElementById('scriptId').value;
       const name = document.getElementById('scriptName').value.trim();
       const content = editor.getValue();
-      const status = document.getElementById('scriptStatus').value;
       if (!name || !content) return showToast('Nome e conteúdo são obrigatórios.', 'error');
       const url = id ? '/api/scripts/'+id : '/api/scripts';
       const method = id ? 'PUT' : 'POST';
-      await api(url, {method, headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, content, status})});
+      await api(url, {method, headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, content, status: 'online'})});
       closeModal('scriptModal');
       loadScripts();
       showToast(id ? 'Script atualizado!' : 'Script criado!');
     });
 
-    // -- BULK UPLOAD --
-    let bulkFiles = [];
-    function openBulkModal() {
-      document.getElementById('bulkModal').classList.add('show');
-      bulkFiles = [];
-      document.getElementById('bulkFileList').innerHTML = '';
-      document.getElementById('bulkUploadBtn').disabled = true;
-    }
-    document.getElementById('bulkDropArea').addEventListener('click', ()=>document.getElementById('bulkFileInput').click());
-    document.getElementById('bulkFileInput').addEventListener('change', handleBulkFiles);
-    document.getElementById('bulkDropArea').addEventListener('dragover', e=>{e.preventDefault(); e.currentTarget.style.borderColor='#fff';});
-    document.getElementById('bulkDropArea').addEventListener('dragleave', e=>e.currentTarget.style.borderColor='';
-    document.getElementById('bulkDropArea').addEventListener('drop', e=>{
-      e.preventDefault(); e.currentTarget.style.borderColor='';
-      handleBulkFiles({target:{files:e.dataTransfer.files}});
-    });
-
-    async function handleBulkFiles(e) {
-      const files = Array.from(e.target.files||[]);
-      bulkFiles = [];
-      for (const f of files) {
-        if (!f.name.endsWith('.lua')&&!f.name.endsWith('.txt')) continue;
-        const content = await f.text();
-        bulkFiles.push({name: f.name.replace(/\.(lua|txt)$/i,''), content});
-      }
-      document.getElementById('bulkFileList').innerHTML = bulkFiles.map(f=>`<div>${escapeHTML(f.name)}</div>`).join('');
-      document.getElementById('bulkUploadBtn').disabled = bulkFiles.length===0;
-    }
-    document.getElementById('bulkUploadBtn').addEventListener('click', async ()=>{
-      if (!bulkFiles.length) return;
-      await api('/api/scripts/bulk', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({scripts:bulkFiles})});
-      closeModal('bulkModal');
-      loadScripts();
-      showToast(`${bulkFiles.length} scripts criados!`);
-    });
-
-    // -- VERSÕES --
-    async function openVersions(scriptId) {
-      const versions = await api(`/api/scripts/${scriptId}/versions`);
-      const list = document.getElementById('versionsList');
-      if (!versions.length) { list.innerHTML='<p style="color:var(--text-secondary)">Nenhuma versão anterior.</p>'; }
-      else list.innerHTML = versions.map(v=>`
-        <div style="border:1px solid var(--border); border-radius:var(--radius-sm); padding:0.8rem; margin-bottom:0.5rem;">
-          <strong>${escapeHTML(v.name)}</strong> <span class="status-badge status-${v.status}">${v.status}</span>
-          <div style="font-size:0.8rem; color:var(--text-secondary);">${new Date(v.created_at).toLocaleString()}</div>
-          <button class="btn btn-sm btn-primary" style="margin-top:0.3rem;" onclick="restoreVersion('${scriptId}','${v.id}')">Restaurar</button>
-        </div>`).join('');
-      document.getElementById('versionsModal').classList.add('show');
-    }
-    async function restoreVersion(scriptId, versionId) {
-      if (!confirm('Restaurar esta versão? O estado atual será salvo como uma nova versão.')) return;
-      await api(`/api/scripts/${scriptId}/restore`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({versionId})});
-      closeModal('versionsModal');
-      loadScripts();
-      showToast('Versão restaurada!');
-    }
-
-    // -- LOGS --
-    async function loadLogs() {
-      const logs = await api('/api/logs?limit=100');
-      const tbody = document.getElementById('logsTable');
-      if (!logs.length) { tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);">Nenhum log.</td></tr>'; return; }
-      tbody.innerHTML = logs.map(l=>`
-        <tr>
-          <td>${escapeHTML(l.action)}</td>
-          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(l.details)}</td>
-          <td>${l.ip}</td>
-          <td>${new Date(l.created_at).toLocaleString()}</td>
-        </tr>`).join('');
-    }
-
-    // -- EXPORT/IMPORT --
+    // Export / Import
     async function exportData() {
       const data = await api('/api/export');
       const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
@@ -729,13 +526,19 @@
       api('/api/auth/logout', {method:'POST'}).then(() => window.location.href = '/admin');
     }
 
-    // Fechar modais ao clicar fora
     document.querySelectorAll('.modal').forEach(m => {
       m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('show'); });
     });
 
-    // Inicial
-    loadDashboard();
+    // Verifica autenticação ao carregar
+    (async () => {
+      try {
+        await api('/api/auth/me');
+        loadScripts();
+      } catch {
+        window.location.href = '/admin';
+      }
+    })();
   </script>
 </body>
 </html>
