@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 3000;
    CONFIGURAÇÕES
    ============================================================ */
 const JWT_SECRET = process.env.JWT_SECRET;
-const COOKIE_SECRET = process.env.COOKIE_SECRET; // não usado para assinatura, mas mantido como exigência
+const COOKIE_SECRET = process.env.COOKIE_SECRET;
 const ADMIN_ROUTE_SECRET = process.env.ADMIN_ROUTE_SECRET;
 const DYNAMIC_ADMIN_PATH = '/painel';   // rota fixa
 
@@ -152,27 +152,6 @@ const twofaLimiter = rateLimit({ windowMs: 5*60*1000, max: 5, message: { error: 
 const apiLimiter = rateLimit({ windowMs: 1*60*1000, max: 250 });
 const loaderLimiter = rateLimit({ windowMs: 1*60*1000, max: 300 });
 const masterActionLimiter = rateLimit({ windowMs: 5*60*1000, max: 15, message: { error: 'Muitas ações administrativas.' } });
-
-/* ============================================================
-   CSRF (APENAS PARA ROTAS DE API, EXCLUI LOGIN/2FA)
-   ============================================================ */
-function genCsrf() { return crypto.randomBytes(32).toString('hex'); }
-app.get('/api/csrf-token', (req, res) => {
-  const t = genCsrf();
-  res.cookie('csrf_token', t, { httpOnly: false, secure: IS_PRODUCTION, sameSite: 'lax', path: '/', maxAge: 8*3600*1000 });
-  res.json({ csrfToken: t });
-});
-function csrfCheck(req, res, next) {
-  if (['GET','HEAD','OPTIONS'].includes(req.method)) return next();
-  if (['/api/auth/login','/api/auth/verify-2fa'].includes(req.path)) return next();
-  const cookieToken = req.cookies?.csrf_token;
-  const headerToken = req.headers['x-csrf-token'];
-  if (!cookieToken || !headerToken || cookieToken !== headerToken) {
-    return res.status(403).json({ error: 'Proteção CSRF: Token inválido ou cabeçalho ausente' });
-  }
-  next();
-}
-app.use('/api/', csrfCheck);
 
 /* ============================================================
    BLACKLIST OTIMIZADA COM SET (O(1))
@@ -369,7 +348,6 @@ app.get('/api/auth/logout', (req, res) => {
   const t = req.cookies?.token;
   if (t) blacklist(t);
   res.clearCookie('token', { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', path: '/' });
-  res.clearCookie('csrf_token', { secure: IS_PRODUCTION, sameSite: 'lax', path: '/' });
   res.clearCookie('temp_token', { secure: IS_PRODUCTION, sameSite: 'lax', path: '/' });
   return res.redirect(DYNAMIC_ADMIN_PATH);
 });
