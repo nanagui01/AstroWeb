@@ -3,295 +3,399 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Saturn — Scripts</title>
+  <title>Saturn — Painel</title>
+  <!-- CodeMirror CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    :root { 
-      --bg:#0a0a0a; --surface:#151515; --border:#2a2a2a; 
-      --text:#fff; --text2:#a0a0a0; --primary:#6366f1; 
-      --danger:#ef4444; --success:#10b981; --radius:12px; 
-    }
+    :root { --bg:#0a0a0a; --surface:#151515; --border:#2a2a2a; --text:#fff; --text2:#a0a0a0; --primary:#6366f1; --danger:#ef4444; --success:#10b981; --radius:12px; }
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Inter', system-ui, sans-serif; background:var(--bg); color:var(--text); display:flex; height:100vh; }
-    
-    /* Layout */
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); display:flex; height:100vh; }
     .sidebar { width:260px; background:var(--surface); border-right:1px solid var(--border); padding:2rem; display:flex; flex-direction:column; gap:2rem; }
-    .sidebar h2 { font-size:1.5rem; font-weight:800; display:flex; align-items:center; gap:0.5rem;}
-    .logout { margin-top:auto; color:var(--danger); cursor:pointer; font-weight:600; background:none; border:none; text-align:left; font-size:1rem; transition: opacity 0.2s; }
-    .logout:hover { opacity: 0.8; }
-    .main { flex:1; padding:3rem; overflow-y:auto; }
-    
-    /* Header & Buttons */
-    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2.5rem; }
+    .sidebar h2 { font-size:1.5rem; font-weight:800; }
+    .sidebar nav { display:flex; flex-direction:column; gap:0.5rem; flex:1; }
+    .sidebar nav button { background:none; border:none; color:var(--text2); padding:0.7rem 1rem; text-align:left; border-radius:8px; cursor:pointer; font-size:0.95rem; transition:0.2s; }
+    .sidebar nav button:hover,.sidebar nav button.active { background:#1a1a1a; color:#fff; }
+    .logout { margin-top:auto; color:var(--danger); cursor:pointer; font-weight:600; background:none; border:none; text-align:left; font-size:1rem; }
+    .main { flex:1; padding:2rem; overflow-y:auto; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; }
     .header h1 { font-size:2rem; }
-    .header-actions { display:flex; gap:0.8rem; }
-    
-    .btn { padding:0.6rem 1.2rem; border-radius:8px; font-weight:600; cursor:pointer; border:none; background:#fff; color:#000; transition: transform 0.1s, opacity 0.2s; display:inline-flex; align-items:center; justify-content:center; gap:0.4rem; }
-    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
-    .btn-danger { background:transparent; color:var(--danger); border:1px solid var(--danger); }
-    .btn-danger:hover { background:rgba(239, 68, 68, 0.1); }
+    .btn { padding:0.6rem 1.2rem; border-radius:8px; font-weight:600; cursor:pointer; border:none; background:#fff; color:#000; transition:0.2s; display:inline-flex; align-items:center; gap:0.4rem; }
+    .btn:hover { opacity:0.9; }
     .btn-primary { background:var(--primary); color:#fff; }
-    .btn-sm { padding:0.4rem 0.8rem; font-size:0.85rem; }
-    
-    /* Table */
-    .table-container { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
+    .btn-danger { background:transparent; color:var(--danger); border:1px solid var(--danger); }
+    .btn-sm { padding:0.35rem 0.7rem; font-size:0.8rem; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; }
+    .card .label { color:var(--text2); font-size:0.85rem; }
+    .card .value { font-size:2rem; font-weight:800; margin-top:0.3rem; }
+    .table-container { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
     table { width:100%; border-collapse:collapse; }
-    th { background:#111; padding:1rem; text-align:left; font-size:0.85rem; color:var(--text2); text-transform:uppercase; letter-spacing:0.05em; }
-    td { padding:1rem; border-bottom:1px solid var(--border); vertical-align:middle; }
-    tr:last-child td { border-bottom:none; }
-    .status-badge { padding:0.2rem 0.6rem; border-radius:999px; font-size:0.75rem; font-weight:700; text-transform:uppercase; }
-    .status-online { background:rgba(16, 185, 129, 0.15); color:var(--success); }
-    .status-offline { background:rgba(239, 68, 68, 0.15); color:var(--danger); }
-    
-    /* Modal */
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); justify-content:center; align-items:center; opacity:0; transition:opacity 0.2s; z-index: 100; }
-    .modal.show { display:flex; opacity:1; }
-    .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:2rem; width:100%; max-width:550px; transform:scale(0.95); transition:transform 0.2s; }
-    .modal.show .modal-box { transform:scale(1); }
-    .modal-header { margin-bottom: 1.5rem; }
-    
-    /* Forms */
-    label { display:block; margin-top:1.2rem; margin-bottom:0.4rem; color:var(--text2); font-size:0.9rem; }
-    input, select, textarea { width:100%; padding:0.8rem; background:#111; border:1px solid var(--border); border-radius:8px; color:#fff; font-family:inherit; transition:border-color 0.2s; }
-    input:focus, select:focus, textarea:focus { outline:none; border-color:var(--primary); }
-    textarea { height:220px; resize:vertical; font-family:'Fira Code', monospace; font-size: 0.9rem;}
-    
-    /* Toast Notifications */
+    th { background:#111; padding:0.8rem; text-align:left; font-size:0.8rem; color:var(--text2); text-transform:uppercase; }
+    td { padding:0.8rem; border-bottom:1px solid var(--border); }
+    .status-badge { padding:0.2rem 0.6rem; border-radius:999px; font-size:0.75rem; font-weight:700; }
+    .online { background:rgba(16,185,129,0.15); color:var(--success); }
+    .offline { background:rgba(239,68,68,0.15); color:var(--danger); }
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); justify-content:center; align-items:center; z-index:100; }
+    .modal.show { display:flex; }
+    .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:2rem; width:100%; max-width:650px; max-height:85vh; overflow-y:auto; }
+    label { display:block; margin-top:1rem; margin-bottom:0.4rem; color:var(--text2); font-size:0.9rem; }
+    input,select,textarea { width:100%; padding:0.8rem; background:#111; border:1px solid var(--border); border-radius:8px; color:#fff; font-family:inherit; }
+    textarea { font-family:'Fira Code',monospace; }
+    .CodeMirror { border:1px solid var(--border); border-radius:8px; height:300px; }
     .toast-container { position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:200; }
-    .toast { background:#fff; color:#000; padding:1rem 1.5rem; border-radius:8px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.5); transform:translateX(120%); transition:transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); display:flex; align-items:center; gap:0.5rem; }
+    .toast { background:#fff; color:#000; padding:1rem 1.5rem; border-radius:8px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.5); transform:translateX(120%); transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); }
     .toast.show { transform:translateX(0); }
     .toast.error { background:var(--danger); color:#fff; }
     .toast.success { background:var(--success); color:#fff; }
+    .chart-container { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; margin-top:1rem; }
+    .file-upload { border:2px dashed var(--border); border-radius:8px; padding:1.5rem; text-align:center; cursor:pointer; margin-top:0.5rem; color:var(--text2); transition:0.2s; }
+    .file-upload:hover,.file-upload.dragover { border-color:#fff; background:rgba(255,255,255,0.03); }
+    .file-upload input { display:none; }
   </style>
 </head>
 <body>
   <aside class="sidebar">
     <h2>🪐 Saturn</h2>
-    <button class="logout" onclick="logout()">🚪 Sair do Painel</button>
+    <nav>
+      <button data-tab="dashboard" class="active">📊 Dashboard</button>
+      <button data-tab="scripts">📜 Scripts</button>
+      <button data-tab="logs">📋 Logs</button>
+    </nav>
+    <button class="logout" onclick="logout()">🚪 Sair</button>
   </aside>
 
   <main class="main">
-    <div class="header">
-      <h1>Gerenciar Scripts</h1>
-      <div class="header-actions">
-        <button class="btn" onclick="exportData()">📤 Exportar</button>
-        <button class="btn" onclick="document.getElementById('importFile').click()">📥 Importar</button>
-        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-        <button class="btn btn-primary" onclick="openModal()">+ Novo Script</button>
+    <!-- Dashboard -->
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="header"><h1>Dashboard</h1></div>
+      <div class="cards" id="statsCards"></div>
+      <div class="chart-container"><canvas id="execChart" height="80"></canvas></div>
+    </div>
+
+    <!-- Scripts -->
+    <div id="tab-scripts" class="tab-content">
+      <div class="header">
+        <h1>Scripts</h1>
+        <div>
+          <button class="btn" onclick="exportData()">📤 Exportar</button>
+          <button class="btn" onclick="document.getElementById('importFile').click()">📥 Importar</button>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+          <button class="btn btn-primary" onclick="openScriptModal()">+ Novo Script</button>
+          <button class="btn btn-primary" onclick="openBulkModal()">+ Upload Múltiplo</button>
+        </div>
+      </div>
+      <div class="table-container">
+        <table><thead><tr><th>Nome</th><th>Status</th><th>Execuções</th><th>Link Curto</th><th>Ações</th></tr></thead><tbody id="scriptsTable"></tbody></table>
       </div>
     </div>
-    
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Nome</th><th>Status</th><th>Execuções</th><th style="text-align:right;">Ações</th></tr></thead>
-        <tbody id="scriptsTable"></tbody>
-      </table>
+
+    <!-- Logs -->
+    <div id="tab-logs" class="tab-content">
+      <div class="header"><h1>Logs de Execução</h1></div>
+      <div class="table-container">
+        <table><thead><tr><th>Ação</th><th>Detalhes</th><th>IP</th><th>Data</th></tr></thead><tbody id="logsTable"></tbody></table>
+      </div>
     </div>
   </main>
 
-  <div id="modal" class="modal">
+  <!-- Modal Script -->
+  <div id="scriptModal" class="modal">
     <div class="modal-box">
-      <div class="modal-header">
-        <h2 id="modalTitle">Novo Script</h2>
-      </div>
+      <h2 id="modalTitle">Novo Script</h2>
       <form id="scriptForm">
         <input type="hidden" id="scriptId">
-        <label>Nome da feature/script</label>
-        <input type="text" id="scriptName" placeholder="Ex: Aimbot V2" required>
-        
-        <label>Status</label>
-        <select id="scriptStatus">
-          <option value="online">🟢 Online (Ativo)</option>
-          <option value="offline">🔴 Offline (Manutenção)</option>
-        </select>
-        
-        <label>Código-fonte (Conteúdo)</label>
-        <textarea id="scriptContent" placeholder="print('Hello Saturn')" required></textarea>
-        
-        <div style="margin-top:2rem; display:flex; gap:1rem; justify-content:flex-end;">
-          <button type="button" class="btn btn-danger" onclick="closeModal()">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar Script</button>
+        <label>Nome</label><input type="text" id="scriptName" required>
+        <label>Status</label><select id="scriptStatus"><option value="online">Online</option><option value="offline">Offline</option></select>
+        <label>Código</label><textarea id="scriptContent" required></textarea>
+        <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:flex-end;">
+          <button type="button" class="btn btn-danger" onclick="closeModal('scriptModal')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- Modal Bulk Upload -->
+  <div id="bulkModal" class="modal">
+    <div class="modal-box">
+      <h2>Upload de Múltiplos Arquivos</h2>
+      <div class="file-upload" id="bulkDropArea">
+        📁 Arraste vários arquivos .lua ou .txt aqui
+        <input type="file" id="bulkFileInput" accept=".lua,.txt" multiple>
+      </div>
+      <div id="bulkFileList" style="margin-top:1rem; color:var(--success);"></div>
+      <div style="margin-top:1rem; display:flex; gap:1rem; justify-content:flex-end;">
+        <button class="btn btn-danger" onclick="closeModal('bulkModal')">Cancelar</button>
+        <button class="btn btn-primary" id="bulkUploadBtn" disabled>Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Versões -->
+  <div id="versionsModal" class="modal">
+    <div class="modal-box">
+      <h2>Histórico de Versões</h2>
+      <div id="versionsList" style="max-height:400px; overflow-y:auto;"></div>
+      <button class="btn btn-danger" onclick="closeModal('versionsModal')" style="margin-top:1rem;">Fechar</button>
+    </div>
+  </div>
+
   <div class="toast-container" id="toastContainer"></div>
 
-  <script>
-    // --- UTILIDADES ---
-    // Proteção contra XSS: Escapa caracteres HTML para não renderizarem código malicioso no painel
-    const escapeHTML = str => str.replace(/[&<>'"]/g, tag => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-    }[tag] || tag));
+  <!-- CodeMirror JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/lua/lua.min.js"></script>
 
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      toast.innerHTML = (type === 'success' ? '✅ ' : '❌ ') + message;
-      container.appendChild(toast);
-      
-      requestAnimationFrame(() => toast.classList.add('show'));
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
+  <script>
+    const escapeHTML = str => String(str).replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
+
+    let editor;
+    function initEditor() {
+      const ta = document.getElementById('scriptContent');
+      if (!editor) {
+        editor = CodeMirror.fromTextArea(ta, {
+          mode: 'lua',
+          theme: 'material-darker',
+          lineNumbers: true,
+          indentUnit: 2,
+          tabSize: 2
+        });
+        editor.setSize(null, 300);
+      }
     }
 
-    async function api(url, options = {}) {
+    function showToast(msg, type='success') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div'); t.className=`toast ${type}`; t.textContent = msg;
+      c.appendChild(t);
+      requestAnimationFrame(()=>t.classList.add('show'));
+      setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),300); },3000);
+    }
+
+    async function api(url, options={}) {
       try {
-        const res = await fetch(url, { credentials:'include', ...options });
-        if (res.status === 401) window.location.href = '/admin';
-        
-        // Verifica se a resposta é JSON antes de parsear
-        const contentType = res.headers.get("content-type");
-        if (contentType && contentType.indexOf("application/json") !== -1) {
+        const res = await fetch(url, {credentials:'include',...options});
+        if (res.status===401) { window.location.href='/admin'; throw new Error('Unauthorized'); }
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
           const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Erro na requisição');
+          if (!res.ok) throw new Error(data.error||'Erro');
           return data;
         }
         return res;
-      } catch (err) {
-        showToast(err.message, 'error');
-        throw err;
-      }
+      } catch(e) { showToast(e.message,'error'); throw e; }
     }
 
-    // --- LÓGICA DA PÁGINA ---
+    // Navegação
+    document.querySelectorAll('.sidebar nav button[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar nav button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+        document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+        if (btn.dataset.tab==='dashboard') loadDashboard();
+        else if (btn.dataset.tab==='scripts') loadScripts();
+        else if (btn.dataset.tab==='logs') loadLogs();
+      });
+    });
+
+    // DASHBOARD
+    async function loadDashboard() {
+      const stats = await api('/api/stats');
+      document.getElementById('statsCards').innerHTML = `
+        <div class="card"><div class="label">Total Scripts</div><div class="value">${stats.totalScripts}</div></div>
+        <div class="card"><div class="label">Online</div><div class="value" style="color:var(--success)">${stats.onlineScripts}</div></div>
+        <div class="card"><div class="label">Execuções Hoje</div><div class="value">${stats.executionsToday}</div></div>
+        <div class="card"><div class="label">Total Execuções</div><div class="value">${stats.totalExecutions}</div></div>`;
+
+      const execData = await api('/api/stats/executions');
+      const ctx = document.getElementById('execChart').getContext('2d');
+      if (window._chart) window._chart.destroy();
+      window._chart = new Chart(ctx, {
+        type:'line',
+        data:{
+          labels: execData.map(d=>d.date.slice(5)),
+          datasets:[{label:'Execuções',data:execData.map(d=>d.count),borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,0.1)',fill:true,tension:0.3}]
+        },
+        options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{color:'#a0a0a0'}},x:{ticks:{color:'#a0a0a0'}}}}
+      });
+    }
+
+    // SCRIPTS
     async function loadScripts() {
-      try {
-        const scripts = await api('/api/scripts');
-        const tbody = document.getElementById('scriptsTable');
-        
-        if (scripts.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text2);">Nenhum script criado ainda.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = scripts.map(s => {
-          const statusClass = s.status === 'online' ? 'status-online' : 'status-offline';
-          const statusText = s.status === 'online' ? 'Online' : 'Offline';
-          
-          return `
-          <tr>
-            <td><strong>${escapeHTML(s.name)}</strong></td>
-            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-            <td>${s.executions||0}</td>
-            <td style="text-align:right;">
-              <button class="btn btn-sm" onclick="editScript('${s.id}')" title="Editar">✏️</button>
-              <button class="btn btn-sm" onclick="copyLoader('${s.id}')" title="Copiar URL">📋</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteScript('${s.id}')" title="Excluir">🗑️</button>
-            </td>
-          </tr>
-        `}).join('');
-      } catch (e) {
-        console.error(e);
-      }
+      const scripts = await api('/api/scripts');
+      const tbody = document.getElementById('scriptsTable');
+      if (!scripts.length) { tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text2);">Nenhum script.</td></tr>'; return; }
+      tbody.innerHTML = scripts.map(s => `
+        <tr>
+          <td><strong>${escapeHTML(s.name)}</strong></td>
+          <td><span class="status-badge ${s.status}">${s.status}</span></td>
+          <td>${s.executions||0}</td>
+          <td style="font-family:monospace;">/s/${s.short_id||'—'}</td>
+          <td>
+            <button class="btn btn-sm" onclick="editScript('${s.id}')">✏️</button>
+            <button class="btn btn-sm" onclick="copyLoader('${s.id}')">📋</button>
+            <button class="btn btn-sm" onclick="copyShort('${s.short_id}')">🔗</button>
+            <button class="btn btn-sm" onclick="openVersions('${s.id}')">🕒</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteScript('${s.id}')">🗑️</button>
+          </td>
+        </tr>`).join('');
     }
 
-    function copyLoader(id) {
-      navigator.clipboard.writeText(`${location.origin}/api/load/${id}`);
-      showToast('Link do Loader copiado para a área de transferência!');
-    }
+    function copyLoader(id) { navigator.clipboard.writeText(`${location.origin}/api/load/${id}`); showToast('Loader copiado!'); }
+    function copyShort(sid) { navigator.clipboard.writeText(`${location.origin}/s/${sid}`); showToast('Link curto copiado!'); }
 
-    function openModal(script = null) {
-      document.getElementById('modal').classList.add('show');
+    function openScriptModal(script=null) {
+      document.getElementById('scriptModal').classList.add('show');
       document.getElementById('scriptForm').reset();
-      
+      initEditor();
       if (script) {
-        document.getElementById('modalTitle').textContent = 'Editar Script';
-        document.getElementById('scriptId').value = script.id;
-        document.getElementById('scriptName').value = script.name;
-        document.getElementById('scriptStatus').value = script.status;
-        document.getElementById('scriptContent').value = script.content;
+        document.getElementById('modalTitle').textContent='Editar Script';
+        document.getElementById('scriptId').value=script.id;
+        document.getElementById('scriptName').value=script.name;
+        document.getElementById('scriptStatus').value=script.status;
+        editor.setValue(script.content||'');
       } else {
-        document.getElementById('modalTitle').textContent = 'Criar Novo Script';
-        document.getElementById('scriptId').value = '';
+        document.getElementById('modalTitle').textContent='Criar Script';
+        document.getElementById('scriptId').value='';
+        editor.setValue('');
       }
     }
 
-    function closeModal() { 
-      document.getElementById('modal').classList.remove('show'); 
-    }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
     async function editScript(id) {
       const scripts = await api('/api/scripts');
-      const script = scripts.find(s => s.id === id);
-      if(script) openModal(script);
+      const s = scripts.find(s=>s.id===id);
+      if(s) openScriptModal(s);
     }
 
     async function deleteScript(id) {
-      if (confirm('Tem certeza que deseja excluir este script permanentemente?')) { 
-        await api('/api/scripts/'+id, {method:'DELETE'}); 
-        showToast('Script excluído com sucesso.');
-        loadScripts(); 
-      }
+      if (confirm('Excluir permanentemente?')) { await api('/api/scripts/'+id,{method:'DELETE'}); loadScripts(); showToast('Excluído!'); }
     }
 
     document.getElementById('scriptForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('scriptId').value;
       const name = document.getElementById('scriptName').value.trim();
-      const content = document.getElementById('scriptContent').value;
+      const content = editor.getValue();
       const status = document.getElementById('scriptStatus').value;
-      
       const url = id ? '/api/scripts/'+id : '/api/scripts';
       const method = id ? 'PUT' : 'POST';
-      
-      await api(url, { 
-        method, 
-        headers:{'Content-Type':'application/json'}, 
-        body: JSON.stringify({name, content, status}) 
-      });
-      
-      showToast(id ? 'Script atualizado!' : 'Script criado com sucesso!');
-      closeModal();
+      await api(url, {method, headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,content,status})});
+      closeModal('scriptModal');
       loadScripts();
+      showToast(id?'Atualizado!':'Criado!');
     });
 
+    // BULK UPLOAD
+    let bulkFiles = [];
+    function openBulkModal() {
+      document.getElementById('bulkModal').classList.add('show');
+      bulkFiles = [];
+      document.getElementById('bulkFileList').innerHTML = '';
+      document.getElementById('bulkUploadBtn').disabled = true;
+    }
+    document.getElementById('bulkDropArea').addEventListener('click',()=>document.getElementById('bulkFileInput').click());
+    document.getElementById('bulkFileInput').addEventListener('change', handleBulkFiles);
+    document.getElementById('bulkDropArea').addEventListener('dragover',e=>{e.preventDefault();e.currentTarget.classList.add('dragover');});
+    document.getElementById('bulkDropArea').addEventListener('dragleave',e=>e.currentTarget.classList.remove('dragover'));
+    document.getElementById('bulkDropArea').addEventListener('drop',e=>{
+      e.preventDefault(); e.currentTarget.classList.remove('dragover');
+      handleBulkFiles({target:{files:e.dataTransfer.files}});
+    });
+
+    async function handleBulkFiles(e) {
+      const files = Array.from(e.target.files||[]);
+      bulkFiles = [];
+      const list = document.getElementById('bulkFileList');
+      for (const f of files) {
+        if (!f.name.endsWith('.lua')&&!f.name.endsWith('.txt')) continue;
+        const content = await f.text();
+        bulkFiles.push({name:f.name.replace(/\.(lua|txt)$/i,''), content});
+      }
+      list.innerHTML = bulkFiles.map(f=>`<div>📄 ${escapeHTML(f.name)}</div>`).join('');
+      document.getElementById('bulkUploadBtn').disabled = bulkFiles.length===0;
+    }
+
+    document.getElementById('bulkUploadBtn').addEventListener('click', async () => {
+      if (!bulkFiles.length) return;
+      await api('/api/scripts/bulk', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scripts:bulkFiles})});
+      closeModal('bulkModal');
+      loadScripts();
+      showToast(`${bulkFiles.length} scripts criados!`);
+    });
+
+    // VERSÕES
+    async function openVersions(scriptId) {
+      const versions = await api(`/api/scripts/${scriptId}/versions`);
+      const list = document.getElementById('versionsList');
+      if (!versions.length) { list.innerHTML='<p style="color:var(--text2)">Nenhuma versão anterior.</p>'; }
+      else {
+        list.innerHTML = versions.map(v=>`
+          <div style="border:1px solid var(--border);border-radius:8px;padding:0.8rem;margin-bottom:0.5rem;">
+            <strong>${escapeHTML(v.name)}</strong> <span class="status-badge ${v.status}">${v.status}</span>
+            <div style="font-size:0.8rem;color:var(--text2);">${new Date(v.created_at).toLocaleString()}</div>
+            <button class="btn btn-sm btn-primary" style="margin-top:0.3rem;" onclick="restoreVersion('${scriptId}','${v.id}')">Restaurar</button>
+          </div>`).join('');
+      }
+      document.getElementById('versionsModal').classList.add('show');
+    }
+
+    async function restoreVersion(scriptId, versionId) {
+      if (!confirm('Restaurar esta versão? O estado atual será salvo no histórico.')) return;
+      await api(`/api/scripts/${scriptId}/restore`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({versionId})});
+      closeModal('versionsModal');
+      loadScripts();
+      showToast('Versão restaurada!');
+    }
+
+    // LOGS
+    async function loadLogs() {
+      const logs = await api('/api/logs?limit=100');
+      const tbody = document.getElementById('logsTable');
+      if (!logs.length) { tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text2);">Nenhum log.</td></tr>'; return; }
+      tbody.innerHTML = logs.map(l=>`
+        <tr>
+          <td>${l.action}</td>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(l.details)}</td>
+          <td>${l.ip}</td>
+          <td>${new Date(l.created_at).toLocaleString()}</td>
+        </tr>`).join('');
+    }
+
+    // EXPORT/IMPORT
     async function exportData() {
       const data = await api('/api/export');
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `saturn_backup_${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      showToast('Backup exportado com sucesso!');
+      const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download=`saturn_backup_${new Date().toISOString().split('T')[0]}.json`; a.click();
+      showToast('Exportado!');
     }
 
     async function importData(event) {
       const file = event.target.files[0];
       if (!file) return;
-      
-      try {
-        const text = await file.text();
-        const data = JSON.parse(text);
-        const res = await api('/api/import', { 
-          method:'POST', 
-          headers:{'Content-Type':'application/json'}, 
-          body: JSON.stringify(data) 
-        });
-        showToast(`Importação concluída! ${res.imported} scripts carregados.`);
-        loadScripts();
-      } catch (err) {
-        showToast('Erro ao ler o arquivo de backup.', 'error');
-      }
-      event.target.value = ''; // Reseta o input
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const res = await api('/api/import',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      loadScripts();
+      showToast(`${res.imported} scripts importados!`);
+      event.target.value='';
     }
 
-    function logout() { 
-      api('/api/auth/logout', {method:'POST'}).then(() => window.location.href='/admin'); 
-    }
+    function logout() { api('/api/auth/logout',{method:'POST'}).then(()=>window.location.href='/admin'); }
 
-    // Fecha o modal clicando fora dele
-    window.onclick = function(event) {
-      const modal = document.getElementById('modal');
-      if (event.target == modal) { closeModal(); }
-    }
+    // Fecha modais ao clicar fora
+    document.querySelectorAll('.modal').forEach(m=>{ m.addEventListener('click',(e)=>{ if(e.target===m) m.classList.remove('show'); }); });
 
-    loadScripts();
+    // Init
+    loadDashboard();
   </script>
 </body>
 </html>
