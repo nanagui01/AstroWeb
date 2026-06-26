@@ -211,11 +211,7 @@
 <body>
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
-        <ellipse cx="12" cy="12" rx="4" ry="10" fill="none" stroke="currentColor" stroke-width="2"/>
-        <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/>
-      </svg>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><ellipse cx="12" cy="12" rx="4" ry="10" fill="none" stroke="currentColor" stroke-width="2"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/></svg>
       <span>Astro</span>
     </div>
     <nav class="sidebar-nav">
@@ -326,8 +322,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/lua/lua.min.js"></script>
   <script>
-    const ADMIN_PATH = localStorage.getItem('astro_admin_path') || '/painel';
-
+    const ADMIN_PATH = '/painel';
     const escapeHTML = str => String(str).replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
 
     function showToast(msg, type='success') {
@@ -341,7 +336,6 @@
     }
 
     let csrfToken = '';
-
     async function getCsrfToken() {
       if (!csrfToken) {
         const res = await fetch('/api/csrf-token', { credentials: 'include' });
@@ -353,21 +347,15 @@
 
     async function api(url, options = {}) {
       if (!csrfToken) await getCsrfToken();
-
       const res = await fetch(url, {
         credentials: 'include',
-        headers: {
-          ...options.headers,
-          'X-CSRF-Token': csrfToken
-        },
+        headers: { ...options.headers, 'X-CSRF-Token': csrfToken },
         ...options
       });
-
       if (res.status === 401) {
-        window.location.href = ADMIN_PATH || '/';
+        window.location.href = ADMIN_PATH;
         throw new Error('Sessão expirada');
       }
-
       const ct = res.headers.get('content-type');
       if (ct && ct.includes('application/json')) {
         const data = await res.json();
@@ -399,9 +387,7 @@
           <div class="stat-card"><div class="stat-label">Offline</div><div class="stat-value" style="color:var(--danger)">${stats.offlineScripts||0}</div></div>
           <div class="stat-card"><div class="stat-label">Total Execuções</div><div class="stat-value">${stats.totalExecutions}</div></div>
         `;
-      } catch (e) {
-        showToast('Erro ao carregar dashboard', 'error');
-      }
+      } catch (e) { showToast('Erro ao carregar dashboard', 'error'); }
     }
 
     async function loadScripts() {
@@ -432,4 +418,216 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               </button>
               <button class="btn btn-sm btn-danger" onclick="deleteScript('${s.id}')" title="Excluir">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) { showToast('Erro ao carregar scripts', 'error'); }
+    }
+
+    function copyLoader(id) {
+      navigator.clipboard.writeText(`loadstring(game:HttpGet("${location.origin}/s/${id}"))()`);
+      showToast('Loader copiado!');
+    }
+    function copyShort(sid) {
+      navigator.clipboard.writeText(`${location.origin}/s/${sid}`);
+      showToast('Link curto copiado!');
+    }
+
+    let editor;
+    function initEditor() {
+      if (!editor) {
+        editor = CodeMirror.fromTextArea(document.getElementById('scriptContent'), {
+          mode: 'lua', theme: 'material-darker', lineNumbers: true, indentUnit: 2, tabSize: 2
+        });
+        editor.setSize(null, 300);
+      }
+    }
+
+    function openScriptModal(script = null) {
+      document.getElementById('scriptModal').classList.add('show');
+      document.getElementById('scriptForm').reset();
+      initEditor();
+      if (script) {
+        document.getElementById('modalTitle').textContent = 'Editar Script';
+        document.getElementById('scriptId').value = script.id;
+        document.getElementById('scriptName').value = script.name;
+        document.getElementById('scriptSandbox').checked = script.sandbox || false;
+        editor.setValue(script.content || '');
+      } else {
+        document.getElementById('modalTitle').textContent = 'Novo Script';
+        document.getElementById('scriptId').value = '';
+        document.getElementById('scriptSandbox').checked = false;
+        editor.setValue('');
+      }
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    async function editScript(id) {
+      try {
+        const script = await api('/api/scripts/' + id);
+        if (script) openScriptModal(script);
+      } catch (e) { showToast('Erro ao carregar script', 'error'); }
+    }
+
+    async function deleteScript(id) {
+      if (!confirm('Tem certeza que deseja excluir este script?')) return;
+      try { await api('/api/scripts/' + id, { method: 'DELETE' }); loadScripts(); showToast('Script excluído.'); }
+      catch (e) { showToast('Erro ao excluir script', 'error'); }
+    }
+
+    document.getElementById('scriptForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('scriptId').value;
+      const name = document.getElementById('scriptName').value.trim();
+      const content = editor.getValue();
+      const sandbox = document.getElementById('scriptSandbox').checked;
+      if (!name || !content) return showToast('Nome e conteúdo são obrigatórios.', 'error');
+      try {
+        const url = id ? '/api/scripts/' + id : '/api/scripts';
+        const method = id ? 'PUT' : 'POST';
+        await api(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, content, sandbox }) });
+        closeModal('scriptModal'); loadScripts();
+        showToast(id ? 'Script atualizado!' : 'Script criado!');
+      } catch (e) { showToast('Erro ao salvar script', 'error'); }
+    });
+
+    function openChangelog(scriptId) {
+      document.getElementById('changelogScriptId').value = scriptId;
+      document.getElementById('changelogTitle').value = '';
+      document.getElementById('changelogDesc').value = '';
+      document.getElementById('changelogBanner').value = '';
+      document.getElementById('changelogThumb').value = '';
+      document.getElementById('changelogModal').classList.add('show');
+    }
+
+    document.getElementById('changelogForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('changelogScriptId').value;
+      const body = {
+        title: document.getElementById('changelogTitle').value.trim(),
+        description: document.getElementById('changelogDesc').value.trim(),
+        banner: document.getElementById('changelogBanner').value.trim(),
+        thumbnail: document.getElementById('changelogThumb').value.trim()
+      };
+      try {
+        await api(`/api/scripts/${id}/changelog`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        closeModal('changelogModal'); showToast('Changelog enviado ao Discord!');
+      } catch (e) { showToast('Erro ao enviar changelog', 'error'); }
+    });
+
+    async function exportData() {
+      try {
+        const data = await api('/api/export');
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `astro_backup_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        showToast('Backup exportado!');
+      } catch (e) { showToast('Erro ao exportar', 'error'); }
+    }
+
+    async function importBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        const res = await api('/api/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, confirmation: 'IMPORTAR' }) });
+        loadScripts(); showToast(`${res.imported} scripts importados!`);
+      } catch (e) { showToast('Erro ao importar backup', 'error'); }
+      event.target.value = '';
+    }
+
+    async function importTxtFilesHandler(event) {
+      const files = Array.from(event.target.files);
+      if (!files.length) return;
+      const scriptsToCreate = [];
+      for (const file of files) {
+        if (!file.name.endsWith('.txt')) continue;
+        const content = await file.text();
+        if (!content.trim()) continue;
+        scriptsToCreate.push({ name: file.name.replace(/\.txt$/i, ''), content });
+      }
+      if (!scriptsToCreate.length) return showToast('Nenhum arquivo .txt com conteúdo.', 'error');
+      try {
+        await api('/api/scripts/bulk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scripts: scriptsToCreate }) });
+        loadScripts(); showToast(`${scriptsToCreate.length} script(s) criado(s)!`);
+      } catch (e) { showToast('Erro ao importar arquivos', 'error'); }
+      event.target.value = '';
+    }
+
+    async function loadSecurity() {
+      try {
+        const me = await api('/api/auth/me');
+        const statusEl = document.getElementById('twofaStatus');
+        const actionsEl = document.getElementById('twofaActions');
+        if (me.twofa_enabled) {
+          statusEl.innerHTML = '<span style="color:var(--success);">✅ 2FA ativado</span>';
+          actionsEl.innerHTML = '<button class="btn btn-danger" onclick="showDisable2FA()">Desativar 2FA</button>';
+        } else {
+          statusEl.innerHTML = '<span style="color:var(--danger);">❌ 2FA desativado</span>';
+          actionsEl.innerHTML = '<button class="btn btn-primary" onclick="setup2FA()">Configurar 2FA</button>';
+        }
+      } catch (e) { showToast('Erro ao carregar segurança', 'error'); }
+    }
+
+    async function setup2FA() {
+      try {
+        const data = await api('/api/auth/2fa/setup');
+        document.getElementById('qrCodeContainer').innerHTML = `<img src="${data.qrCode}" alt="QR Code">`;
+        document.getElementById('qrCodeContainer').style.display = 'flex';
+        document.getElementById('twofaCodeInput').style.display = 'block';
+        document.getElementById('twofaActions').innerHTML = '';
+      } catch (e) { showToast('Erro ao gerar 2FA', 'error'); }
+    }
+
+    async function verifyAndEnable2FA() {
+      const code = document.getElementById('twofaVerifyCode').value.trim();
+      if (!code) return showToast('Digite o código', 'error');
+      try {
+        await api('/api/auth/2fa/enable', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+        document.getElementById('qrCodeContainer').style.display = 'none';
+        document.getElementById('twofaCodeInput').style.display = 'none';
+        showToast('2FA ativado com sucesso!');
+        loadSecurity();
+      } catch (e) { showToast('Código inválido', 'error'); }
+    }
+
+    function showDisable2FA() {
+      document.getElementById('twofaDisableInput').style.display = 'block';
+    }
+
+    async function disable2FA() {
+      const code = document.getElementById('twofaDisableCode').value.trim();
+      if (!code) return showToast('Digite o código', 'error');
+      try {
+        await api('/api/auth/2fa/disable', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+        document.getElementById('twofaDisableInput').style.display = 'none';
+        showToast('2FA desativado.');
+        loadSecurity();
+      } catch (e) { showToast('Código inválido', 'error'); }
+    }
+
+    async function logout() {
+      window.location.href = '/api/auth/logout';
+    }
+
+    document.querySelectorAll('.modal').forEach(m => {
+      m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('show'); });
+    });
+
+    (async () => {
+      try {
+        await api('/api/auth/me');
+        loadDashboard();
+      } catch {
+        window.location.href = ADMIN_PATH;
+      }
+    })();
+  </script>
+</body>
+</html>
