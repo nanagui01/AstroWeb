@@ -3,330 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astro — Painel</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+  <title>Astro — Diagnóstico</title>
   <style>
-    :root {
-      --bg: #0a0a0a;
-      --surface: #111111;
-      --border: #1f1f1f;
-      --text: #ffffff;
-      --text2: #a0a0a0;
-      --primary: #6366f1;
-      --danger: #ef4444;
-      --success: #10b981;
-      --radius: 14px;
-      --radius-sm: 8px;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .sidebar {
-      width: 260px;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 2rem 1.2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-    .sidebar-logo { display: flex; align-items: center; gap: 0.6rem; font-size: 1.4rem; font-weight: 800; }
-    .sidebar-nav { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
-    .sidebar-nav button {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      background: transparent;
-      border: none;
-      color: var(--text2);
-      padding: 0.75rem 1rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: left;
-      width: 100%;
-    }
-    .sidebar-nav button:hover { background: rgba(255,255,255,0.05); color: #fff; }
-    .sidebar-nav button.active { background: var(--primary); color: #fff; }
-    .logout-btn { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 0.7rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto; }
-    .main { flex: 1; padding: 2rem; overflow-y: auto; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .header h1 { font-size: 2rem; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
-    .stat-label { font-size: 0.85rem; color: var(--text2); margin-bottom: 0.5rem; }
-    .stat-value { font-size: 2.2rem; font-weight: 800; }
-    .table-wrapper { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #18181b; padding: 0.9rem 1rem; text-align: left; font-weight: 600; font-size: 0.8rem; color: var(--text2); text-transform: uppercase; }
-    td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-    .btn { padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; border: none; background: #fff; color: #000; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
-    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 100; }
-    .modal.show { display: flex; }
-    .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; width: 100%; max-width: 700px; max-height: 85vh; overflow-y: auto; }
-    .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 200; }
-    .toast { background: #fff; color: #000; padding: 1rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600; }
-    .error-message { color: var(--danger); text-align: center; padding: 2rem; }
+    body { background: #0a0a0a; color: #fff; font-family: monospace; padding: 2rem; }
+    .ok { color: #10b981; }
+    .error { color: #ef4444; }
+    pre { background: #111; padding: 1rem; border-radius: 8px; overflow-x: auto; }
   </style>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-      <span>Astro</span>
-    </div>
-    <nav class="sidebar-nav">
-      <button data-tab="dashboard" class="active">📊 Dashboard</button>
-      <button data-tab="scripts">📜 Scripts</button>
-    </nav>
-    <button class="logout-btn" onclick="window.location.href='/api/auth/logout'">🚪 Sair</button>
-  </aside>
+  <h1>Diagnóstico do Dashboard</h1>
+  <div id="results"></div>
 
-  <main class="main">
-    <div id="tab-dashboard" class="tab-content active">
-      <div class="header"><h1>Dashboard</h1></div>
-      <div class="stats-grid" id="statsCards">Carregando...</div>
-    </div>
-    <div id="tab-scripts" class="tab-content">
-      <div class="header">
-        <h1>Scripts</h1>
-        <div style="display:flex; gap:0.5rem;">
-          <button class="btn" onclick="exportData()">Exportar</button>
-          <button class="btn" onclick="document.getElementById('importBackupFile').click()">Importar</button>
-          <input type="file" id="importBackupFile" accept=".json" style="display:none" onchange="importBackup(event)">
-          <button class="btn btn-primary" onclick="openScriptModal()">+ Novo Script</button>
-        </div>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <thead><tr><th>Nome</th><th>Execuções</th><th>Link Curto</th><th>Sandbox</th><th>Ações</th></tr></thead>
-          <tbody id="scriptsTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </main>
-
-  <div id="scriptModal" class="modal">
-    <div class="modal-box">
-      <h2 id="modalTitle">Novo Script</h2>
-      <form id="scriptForm">
-        <input type="hidden" id="scriptId">
-        <label>Nome</label><input type="text" id="scriptName" required>
-        <label>Código</label><textarea id="scriptContent" required></textarea>
-        <label style="display:flex;align-items:center;gap:0.5rem;margin-top:1rem;"><input type="checkbox" id="scriptSandbox"> Modo Sandbox</label>
-        <div style="margin-top:1.5rem;display:flex;gap:1rem;justify-content:flex-end;">
-          <button type="button" class="btn btn-danger" onclick="closeModal('scriptModal')">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="toast-container" id="toastContainer"></div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/lua/lua.min.js"></script>
   <script>
     const ADMIN_PATH = '/painel';
-    const escapeHTML = str => String(str).replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]||tag));
+    const output = document.getElementById('results');
 
-    function showToast(msg, type='success') {
-      const container = document.getElementById('toastContainer');
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.textContent = msg;
-      container.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
+    function log(msg, type = 'info') {
+      const color = type === 'ok' ? 'ok' : type === 'error' ? 'error' : '';
+      output.innerHTML += `<p class="${color}">${msg}</p>`;
     }
 
-    async function api(url, options = {}) {
+    async function test(url, label) {
       try {
-        const res = await fetch(url, {
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json', ...options.headers },
-          ...options
-        });
-        if (res.status === 401) {
-          window.location.href = ADMIN_PATH;
-          throw new Error('Sessão expirada');
+        const res = await fetch(url, { credentials: 'include' });
+        const text = await res.text();
+        log(`${label}: Status ${res.status}`, res.ok ? 'ok' : 'error');
+        if (!res.ok) {
+          log(`<pre>${escapeHtml(text.slice(0, 200))}</pre>`);
+        } else {
+          try {
+            const json = JSON.parse(text);
+            log(`Dados recebidos (${Array.isArray(json) ? json.length : Object.keys(json).length} itens)`, 'ok');
+          } catch (e) {
+            log(`Resposta não é JSON: ${text.slice(0, 100)}`, 'error');
+          }
         }
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Erro na requisição');
-        return data;
       } catch (e) {
-        showToast(e.message, 'error');
-        throw e;
+        log(`${label}: Erro de rede - ${e.message}`, 'error');
       }
     }
 
-    document.querySelectorAll('.sidebar-nav button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-        if (btn.dataset.tab === 'dashboard') loadDashboard();
-        else if (btn.dataset.tab === 'scripts') loadScripts();
-      });
-    });
-
-    async function loadDashboard() {
-      const container = document.getElementById('statsCards');
-      try {
-        const stats = await api('/api/stats');
-        container.innerHTML = `
-          <div class="stat-card"><div class="stat-label">Total Scripts</div><div class="stat-value">${stats.totalScripts}</div></div>
-          <div class="stat-card"><div class="stat-label">Online</div><div class="stat-value" style="color:var(--success)">${stats.onlineScripts}</div></div>
-          <div class="stat-card"><div class="stat-label">Offline</div><div class="stat-value" style="color:var(--danger)">${stats.offlineScripts||0}</div></div>
-          <div class="stat-card"><div class="stat-label">Total Execuções</div><div class="stat-value">${stats.totalExecutions}</div></div>
-        `;
-      } catch (e) {
-        container.innerHTML = '<div class="error-message">Erro ao carregar estatísticas</div>';
-      }
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[m]);
     }
-
-    async function loadScripts() {
-      const tbody = document.getElementById('scriptsTable');
-      try {
-        const scripts = await api('/api/scripts');
-        if (!scripts.length) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text2);">Nenhum script criado.</td></tr>';
-          return;
-        }
-        tbody.innerHTML = scripts.map(s => `
-          <tr>
-            <td><strong>${escapeHTML(s.name)}</strong></td>
-            <td>${s.executions||0}</td>
-            <td><span style="font-family:monospace;">/s/${s.short_id||'—'}</span></td>
-            <td>${s.sandbox ? '🔒' : '—'}</td>
-            <td>
-              <button class="btn btn-sm" onclick="editScript('${s.id}')">✏️</button>
-              <button class="btn btn-sm" onclick="copyLoader('${s.id}')">📋</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteScript('${s.id}')">🗑️</button>
-            </td>
-          </tr>
-        `).join('');
-      } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="5" class="error-message">Erro ao carregar scripts</td></tr>';
-      }
-    }
-
-    function copyLoader(id) {
-      navigator.clipboard.writeText(`loadstring(game:HttpGet("${location.origin}/s/${id}"))()`);
-      showToast('Loader copiado!');
-    }
-
-    let editor;
-    function initEditor() {
-      if (!editor) {
-        editor = CodeMirror.fromTextArea(document.getElementById('scriptContent'), {
-          mode: 'lua', theme: 'material-darker', lineNumbers: true, indentUnit: 2, tabSize: 2
-        });
-        editor.setSize(null, 300);
-      }
-    }
-
-    function openScriptModal(script = null) {
-      document.getElementById('scriptModal').classList.add('show');
-      document.getElementById('scriptForm').reset();
-      initEditor();
-      if (script) {
-        document.getElementById('modalTitle').textContent = 'Editar Script';
-        document.getElementById('scriptId').value = script.id;
-        document.getElementById('scriptName').value = script.name;
-        document.getElementById('scriptSandbox').checked = script.sandbox || false;
-        editor.setValue(script.content || '');
-      } else {
-        document.getElementById('modalTitle').textContent = 'Novo Script';
-        document.getElementById('scriptId').value = '';
-        document.getElementById('scriptSandbox').checked = false;
-        editor.setValue('');
-      }
-    }
-
-    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
-    async function editScript(id) {
-      try {
-        const script = await api('/api/scripts/' + id);
-        if (script) openScriptModal(script);
-      } catch (e) { showToast('Erro ao carregar script', 'error'); }
-    }
-
-    async function deleteScript(id) {
-      if (!confirm('Tem certeza que deseja excluir este script?')) return;
-      try { await api('/api/scripts/' + id, { method: 'DELETE' }); loadScripts(); showToast('Script excluído.'); }
-      catch (e) { showToast('Erro ao excluir script', 'error'); }
-    }
-
-    document.getElementById('scriptForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const id = document.getElementById('scriptId').value;
-      const name = document.getElementById('scriptName').value.trim();
-      const content = editor.getValue();
-      const sandbox = document.getElementById('scriptSandbox').checked;
-      if (!name || !content) return showToast('Nome e conteúdo são obrigatórios.', 'error');
-      try {
-        const url = id ? '/api/scripts/' + id : '/api/scripts';
-        const method = id ? 'PUT' : 'POST';
-        await api(url, { method, body: JSON.stringify({ name, content, sandbox }) });
-        closeModal('scriptModal'); loadScripts();
-        showToast(id ? 'Script atualizado!' : 'Script criado!');
-      } catch (e) { showToast('Erro ao salvar script', 'error'); }
-    });
-
-    async function exportData() {
-      try {
-        const data = await api('/api/export');
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `astro_backup_${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        showToast('Backup exportado!');
-      } catch (e) { showToast('Erro ao exportar', 'error'); }
-    }
-
-    async function importBackup(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const data = JSON.parse(text);
-        const res = await api('/api/import', { method: 'POST', body: JSON.stringify({ ...data, confirmation: 'IMPORTAR' }) });
-        loadScripts(); showToast(`${res.imported} scripts importados!`);
-      } catch (e) { showToast('Erro ao importar backup', 'error'); }
-      event.target.value = '';
-    }
-
-    document.querySelectorAll('.modal').forEach(m => {
-      m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('show'); });
-    });
 
     (async () => {
-      try {
-        await api('/api/auth/me');
-        loadDashboard();
-      } catch {
-        window.location.href = ADMIN_PATH;
-      }
+      log('Iniciando testes...');
+
+      // Testa se o cookie de sessão existe (pode não estar acessível via JS, mas o fetch incluirá)
+      log('Cookie document.cookie: ' + (document.cookie || '(vazio)'));
+
+      await test('/api/auth/me', 'GET /api/auth/me');
+      await test('/api/stats', 'GET /api/stats');
+      await test('/api/scripts', 'GET /api/scripts');
+
+      log('Testes concluídos.');
     })();
   </script>
 </body>
