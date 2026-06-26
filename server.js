@@ -32,7 +32,10 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
 const COOKIE_SECRET = process.env.COOKIE_SECRET;
 const ADMIN_ROUTE_SECRET = process.env.ADMIN_ROUTE_SECRET;
-const DYNAMIC_ADMIN_PATH = '/e2c2b1f5c8e9d6b3a7f0c4e1d8b5f2a9c6d3e0b7a4f1c8d5e2b9f6a3c0d7'; 
+
+// 🔧 ROTA FIXA (troque por '/painel' se quiser evitar o hash)
+const DYNAMIC_ADMIN_PATH = '/painel';
+
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
 const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
@@ -153,12 +156,12 @@ const loaderLimiter = rateLimit({ windowMs: 1*60*1000, max: 300 });
 const masterActionLimiter = rateLimit({ windowMs: 5*60*1000, max: 15, message: { error: 'Muitas ações administrativas.' } });
 
 /* ============================================================
-   CSRF CORRIGIDO
+   CSRF (COM LAX)
    ============================================================ */
 function genCsrf() { return crypto.randomBytes(32).toString('hex'); }
 app.get('/api/csrf-token', (req, res) => {
   const t = genCsrf();
-  res.cookie('csrf_token', t, { httpOnly: false, secure: IS_PRODUCTION, sameSite: 'strict', path: '/', maxAge: 8*3600*1000 });
+  res.cookie('csrf_token', t, { httpOnly: false, secure: IS_PRODUCTION, sameSite: 'lax', path: '/', maxAge: 8*3600*1000 });
   res.json({ csrfToken: t });
 });
 function csrfCheck(req, res, next) {
@@ -223,7 +226,6 @@ function addLog(req, action, target) {
   deferredSave();
 }
 
-// Controle de flood de execuções em memória
 const executionCooldowns = new Map();
 setInterval(() => executionCooldowns.clear(), 10000);
 
@@ -248,19 +250,19 @@ async function discordEmbed({ title, description, banner, thumbnail, scriptName 
 
 async function auth(req, res, next) {
   const t = req.signedCookies?.token; if (!t) return res.status(401).json({ error: 'Token ausente' });
-  if (isBlacklisted(t)) { res.clearCookie('token', { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'strict', path: '/', signed: true }); return res.status(401).json({ error: 'Token inválido' }); }
+  if (isBlacklisted(t)) { res.clearCookie('token', { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', path: '/', signed: true }); return res.status(401).json({ error: 'Token inválido' }); }
   try { 
     const decoded = jwt.verify(t, JWT_SECRET); 
     const admin = DB.admins.find(a => a.id === decoded.id);
     if (!admin) return res.status(401).json({ error: 'Administrador inválido.' });
     if (admin.passwordChangedAt && (decoded.iat * 1000) < admin.passwordChangedAt) {
-      res.clearCookie('token', { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'strict', path: '/', signed: true });
+      res.clearCookie('token', { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', path: '/', signed: true });
       return res.status(401).json({ error: 'Sessão revogada. Uma nova senha foi configurada.' });
     }
     req.user = decoded; 
     next(); 
   } catch { 
-    res.clearCookie('token', { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'strict', path: '/', signed: true }); 
+    res.clearCookie('token', { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', path: '/', signed: true }); 
     res.status(401).json({ error: 'Sessão expirada' }); 
   }
 }
@@ -303,7 +305,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
   admin.failedAttempts = 0; admin.lockUntil = null; deferredSave();
   if (admin.twofa_enabled) return res.json({ require2FA: true, tempToken: jwt.sign({ id: admin.id, username, require2FA: true }, JWT_SECRET, { expiresIn: '5m' }) });
   const token = jwt.sign({ id: admin.id, username, role: admin.role || 'admin' }, JWT_SECRET, { expiresIn: '8h' });
-  res.cookie('token', token, { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'strict', path: '/', signed: true, maxAge: 8*3600*1000 });
+  res.cookie('token', token, { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', path: '/', signed: true, maxAge: 8*3600*1000 });
   addLog(req, 'login', username);
   res.json({ success: true, redirectPath: `${DYNAMIC_ADMIN_PATH}/dashboard` });
 });
@@ -315,11 +317,11 @@ app.post('/api/auth/verify-2fa', twofaLimiter, (req, res) => {
   if (!admin?.twofa_secret) return res.status(400).json({ error: '2FA não configurado' });
   if (!speakeasy.totp.verify({ secret: admin.twofa_secret, encoding: 'base32', token: code, window: 1 })) return res.status(401).json({ error: 'Código inválido' });
   const token = jwt.sign({ id: admin.id, username: admin.username, role: admin.role || 'admin' }, JWT_SECRET, { expiresIn: '8h' });
-  res.cookie('token', token, { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'strict', path: '/', signed: true, maxAge: 8*3600*1000 });
+  res.cookie('token', token, { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', path: '/', signed: true, maxAge: 8*3600*1000 });
   res.json({ success: true, redirectPath: `${DYNAMIC_ADMIN_PATH}/dashboard` });
 });
 
-app.post('/api/auth/logout', (req, res) => { const t = req.signedCookies?.token; if (t) blacklist(t); res.clearCookie('token', { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'strict', path: '/', signed: true }); res.clearCookie('csrf_token', { secure: IS_PRODUCTION, sameSite: 'strict', path: '/' }); res.json({ success: true, redirectPath: DYNAMIC_ADMIN_PATH }); });
+app.post('/api/auth/logout', (req, res) => { const t = req.signedCookies?.token; if (t) blacklist(t); res.clearCookie('token', { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', path: '/', signed: true }); res.clearCookie('csrf_token', { secure: IS_PRODUCTION, sameSite: 'lax', path: '/' }); res.json({ success: true, redirectPath: DYNAMIC_ADMIN_PATH }); });
 app.get('/api/auth/me', auth, (req, res) => res.json({ username: req.user.username, role: req.user.role || 'admin', twofa_enabled: DB.admins.find(a => a.id === req.user.id)?.twofa_enabled || false }));
 
 // 2FA
@@ -340,7 +342,7 @@ app.post('/api/auth/2fa/disable', auth, twofaLimiter, (req, res) => {
 });
 
 /* ============================================================
-   ENDPOINT PARA TROCAR SENHA (INVALIDA SESSÕES)
+   ENDPOINT PARA TROCAR SENHA
    ============================================================ */
 app.post('/api/auth/change-password', auth, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
@@ -356,12 +358,11 @@ app.post('/api/auth/change-password', auth, async (req, res) => {
   admin.password_hash = await bcrypt.hash(newPassword, 10);
   admin.passwordChangedAt = Date.now();
   
-  // Invalida todas as sessões ativas
   const token = req.signedCookies?.token;
   if (token) blacklist(token);
   
   addLog(req, 'change_password', req.user.username);
-  saveDb(); // Persistência imediata
+  saveDb();
   res.json({ success: true, message: 'Senha alterada. Todas as sessões foram invalidadas.' });
 });
 
