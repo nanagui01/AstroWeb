@@ -4,33 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saturn — Scripts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root { --bg:#0a0a0a; --text:#fff; --text2:#a0a0a0; }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; display:flex; flex-direction:column; min-height:100vh; }
-    .navbar { border-bottom:1px solid #1f1f1f; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; }
+    .navbar { border-bottom:1px solid #1f1f1f; padding:1.2rem 2rem; display:flex; justify-content:space-between; align-items:center; }
     .navbar h1 { font-weight:800; font-size:1.3rem; letter-spacing:-0.5px; }
     .hero { flex:1; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem; }
-    .hero-content { max-width:600px; }
+    .hero-content { max-width:650px; width:100%; }
     .hero h2 { font-size:3rem; font-weight:900; margin-bottom:1rem; background:linear-gradient(135deg,#fff,#888); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
     .hero p { color:var(--text2); margin-bottom:2rem; font-size:1.1rem; }
-    .code-box { background:#111; border:1px solid #1f1f1f; border-radius:12px; padding:1.5rem; text-align:left; margin:0 auto 2rem; max-width:450px; font-family:'Fira Code',monospace; font-size:0.9rem; }
+    .code-box { background:#111; border:1px solid #1f1f1f; border-radius:12px; padding:1.5rem; text-align:left; margin:0 auto 2rem; max-width:500px; font-family:'Fira Code',monospace; font-size:0.9rem; word-break:break-all; }
     .code-box .dots { display:flex; gap:6px; margin-bottom:1rem; }
     .code-box .dots span { width:10px; height:10px; border-radius:50%; background:#333; }
     .code-box .dots span:nth-child(2) { background:#555; }
     .code-box .dots span:nth-child(3) { background:#777; }
-    .btn { display:inline-block; padding:0.8rem 2rem; background:#fff; color:#000; border-radius:8px; font-weight:600; text-decoration:none; transition:0.2s; }
+    .code-box code { color:#ccc; line-height:1.6; }
+    .code-box .highlight { color:#fff; }
+    .btn { display:inline-block; padding:0.8rem 2rem; background:#fff; color:#000; border-radius:8px; font-weight:600; text-decoration:none; transition:0.2s; border:none; cursor:pointer; font-size:1rem; }
     .btn:hover { background:#e0e0e0; }
+    .btn-outline { background:transparent; border:1px solid #333; color:#fff; }
+    .btn-outline:hover { border-color:#fff; background:rgba(255,255,255,0.05); }
+    .buttons { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
     footer { padding:1.5rem; text-align:center; color:#333; font-size:0.85rem; border-top:1px solid #1f1f1f; }
-    /* Admin link escondido (só visível no hover de uma área específica) */
     .admin-link { position:fixed; bottom:10px; right:10px; opacity:0; transition:opacity 0.3s; font-size:0.7rem; color:#222; }
     .admin-link:hover { opacity:1; }
   </style>
 </head>
 <body>
   <nav class="navbar">
-    <h1>🪐 Saturn</h1>
-    <a href="/status" style="color:var(--text2);text-decoration:none;">Status</a>
+    <h1>Saturn</h1>
+    <div></div> <!-- espaço vazio, sem link de status -->
   </nav>
 
   <section class="hero">
@@ -40,10 +47,13 @@
 
       <div class="code-box">
         <div class="dots"><span></span><span></span><span></span></div>
-        <code style="color:#ccc;">loadstring(game:HttpGet("<span style="color:#fff;">https://saturn.example.com/api/load/ID</span>"))()</code>
+        <code>loadstring(game:HttpGet("<span class="highlight">https://saturn.example.com/api/load/ID</span>"))()</code>
       </div>
 
-      <a href="/status" class="btn">Ver Status</a>
+      <div class="buttons">
+        <button class="btn" onclick="copyExample()">Copiar Exemplo</button>
+        <a href="/status" class="btn btn-outline">Ver Status</a>
+      </div>
     </div>
   </section>
 
@@ -51,7 +61,16 @@
     <p>Saturn &copy; 2026 — Scripts para Roblox</p>
   </footer>
 
-  <!-- Link admin escondido no canto -->
   <a href="/admin" class="admin-link">.</a>
+
+  <script>
+    function copyExample() {
+      navigator.clipboard.writeText('loadstring(game:HttpGet("https://saturn.example.com/api/load/ID"))()').then(() => {
+        const btn = document.querySelector('.btn');
+        btn.textContent = 'Copiado!';
+        setTimeout(() => btn.textContent = 'Copiar Exemplo', 2000);
+      });
+    }
+  </script>
 </body>
 </html>
