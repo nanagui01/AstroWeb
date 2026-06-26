@@ -33,10 +33,7 @@
       opacity: 0;
       animation: bodyFadeIn 0.6s ease forwards;
     }
-    @keyframes bodyFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    @keyframes bodyFadeIn { from { opacity: 0; } to { opacity: 1; } }
     .navbar {
       border-bottom: 1px solid var(--border);
       padding: 1.2rem 2rem;
@@ -45,22 +42,15 @@
       align-items: center;
       animation: slideDown 0.5s ease forwards;
     }
-    @keyframes slideDown {
-      from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
+    @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .navbar h1 { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; }
-
     .hero {
       text-align: center;
       padding: 3rem 2rem 1rem;
       animation: slideUp 0.6s ease 0.1s forwards;
       opacity: 0;
     }
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .hero h2 {
       font-size: 2.5rem;
       font-weight: 900;
@@ -70,8 +60,6 @@
       -webkit-text-fill-color: transparent;
     }
     .hero p { color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem; }
-
-    /* Seção de scripts */
     .scripts-section { max-width: 700px; margin: 0 auto; padding: 2rem; }
     .section-title {
       font-size: 1.8rem;
@@ -80,13 +68,7 @@
       animation: slideUp 0.5s ease 0.2s forwards;
       opacity: 0;
     }
-    .scripts-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    /* Card */
+    .scripts-list { display: flex; flex-direction: column; gap: 1rem; }
     .script-card {
       position: relative;
       background: var(--surface);
@@ -104,10 +86,7 @@
     }
     .script-card:nth-child(1) { animation-delay: 0.15s; }
     .script-card:nth-child(2) { animation-delay: 0.25s; }
-
-    @keyframes cardRise {
-      to { transform: translateY(0); opacity: 1; }
-    }
+    @keyframes cardRise { to { transform: translateY(0); opacity: 1; } }
     .script-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 35px rgba(0,0,0,0.6), 0 0 20px rgba(99,102,241,0.15);
@@ -124,10 +103,7 @@
       transition: left 0.6s;
       pointer-events: none;
     }
-    .script-card:hover::after {
-      left: 100%;
-    }
-
+    .script-card:hover::after { left: 100%; }
     .card-image {
       width: 60px;
       height: 60px;
@@ -137,53 +113,17 @@
       background-color: #1a1a1a;
       flex-shrink: 0;
     }
-    .card-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .card-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.3rem;
-    }
-    .card-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      align-items: center;
-    }
-    .card-meta-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-    .card-meta-item svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-    }
-    .status-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      font-weight: 600;
-      font-size: 0.75rem;
-    }
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      display: inline-block;
-    }
+    .card-info { flex: 1; min-width: 0; }
+    .card-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 0.8rem; font-size: 0.8rem; color: var(--text-secondary); align-items: center; }
+    .card-meta-item { display: inline-flex; align-items: center; gap: 0.3rem; }
+    .card-meta-item svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .status-indicator { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 600; font-size: 0.75rem; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
     .status-online .status-dot { background: var(--online); }
     .status-offline .status-dot { background: var(--offline); }
     .status-maintenance .status-dot { background: var(--maintenance); }
     .status-development .status-dot { background: var(--development); }
-
     footer {
       margin-top: auto;
       padding: 1.5rem;
@@ -194,7 +134,6 @@
       animation: slideUp 0.5s ease 0.5s forwards;
       opacity: 0;
     }
-
     @media (max-width: 768px) {
       .hero h2 { font-size: 2rem; }
       .script-card { padding: 1.2rem; }
@@ -221,7 +160,7 @@
   </footer>
 
   <script>
-    // Dados fixos dos dois scripts
+    // ⚠️ Substitua pelas URLs DIRETAS das suas imagens (ex: https://i.imgur.com/xxxxx.png)
     const scriptsMock = [
       {
         id: 'growagarden2',
@@ -229,7 +168,7 @@
         status: 'online',
         version: '1.0.0',
         updated_at: '2026-06-20',
-        image: 'https://imgur.com/a/1qZoEca' // placeholder
+        image: 'https://i.imgur.com/3n7kRkL.jpg' // exemplo – troque pelo link direto
       },
       {
         id: 'musclelegends',
@@ -237,7 +176,7 @@
         status: 'online',
         version: '1.0.0',
         updated_at: '2026-06-18',
-        image: 'https://imgur.com/a/8IW6tEg' // placeholder
+        image: 'https://i.imgur.com/8fFk9aH.jpg' // exemplo – troque pelo link direto
       }
     ];
 
