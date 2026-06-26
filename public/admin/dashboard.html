@@ -5,43 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saturn Storage — Dashboard</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
   <style>
     body {
       margin: 0;
-      font-family: Inter, sans-serif;
+      font-family: Arial;
       background: #0b0d10;
-      color: #e8eef5;
+      color: #fff;
       display: flex;
-      height: 100vh;
     }
 
     .sidebar {
       width: 240px;
-      background: #11151b;
+      background: #111;
       padding: 20px;
-      border-right: 1px solid #222;
-    }
-
-    .sidebar h2 {
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
-
-    .sidebar button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      background: transparent;
-      border: 1px solid #333;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .sidebar button:hover {
-      background: #1a1f27;
     }
 
     .main {
@@ -50,67 +26,171 @@
     }
 
     .card {
-      background: #11151b;
-      padding: 20px;
-      border-radius: 10px;
-      border: 1px solid #222;
-      margin-bottom: 15px;
+      background: #151515;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
     }
 
-    h1 {
-      margin: 0;
+    .row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .box {
+      background: #151515;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .muted {
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    button {
+      background: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="sidebar">
-    <h2>⚡ Saturn Panel</h2>
-    <button onclick="loadPage('home')">Home</button>
-    <button onclick="loadPage('scripts')">Scripts</button>
-    <button onclick="loadPage('keys')">Keys</button>
+<div class="sidebar">
+  <h3>Saturn Panel</h3>
+  <p class="muted">Admin Dashboard</p>
+
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="main">
+
+  <h2>Dashboard</h2>
+
+  <div class="row">
+    <div class="box" id="statScripts">Scripts: ...</div>
+    <div class="box" id="statKeys">Keys: ...</div>
+    <div class="box" id="statExec">Executions: ...</div>
   </div>
 
-  <div class="main" id="content">
-    <div class="card">
-      <h1>🔥 Dashboard funcionando</h1>
-      <p>Seu painel carregou corretamente.</p>
-    </div>
-  </div>
+  <h3>Scripts</h3>
+  <div id="scripts"></div>
 
-  <script>
-    function loadPage(page) {
-      const content = document.getElementById('content');
+  <h3>Keys</h3>
+  <div id="keys"></div>
 
-      if (page === 'home') {
-        content.innerHTML = `
-          <div class="card">
-            <h1>Home</h1>
-            <p>Bem-vindo ao painel Saturn.</p>
-          </div>
-        `;
-      }
+</div>
 
-      if (page === 'scripts') {
-        content.innerHTML = `
-          <div class="card">
-            <h1>Scripts</h1>
-            <p>Aqui você vai listar scripts via API depois.</p>
-          </div>
-        `;
-      }
+<script>
+async function checkAuth() {
+  const r = await fetch("/api/auth/me", {
+    credentials: "include"
+  });
 
-      if (page === 'keys') {
-        content.innerHTML = `
-          <div class="card">
-            <h1>Keys</h1>
-            <p>Aqui você vai listar keys via API depois.</p>
-          </div>
-        `;
-      }
+  if (!r.ok) {
+    window.location.href = "/admin";
+  }
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch("/api/stats", {
+      credentials: "include"
+    });
+
+    const d = await r.json();
+
+    document.getElementById("statScripts").innerText = "Scripts: " + d.scripts;
+    document.getElementById("statKeys").innerText = "Keys: " + d.keys;
+    document.getElementById("statExec").innerText = "Executions: " + d.executions;
+
+  } catch {
+    console.log("stats error");
+  }
+}
+
+async function loadScripts() {
+  const box = document.getElementById("scripts");
+
+  try {
+    const r = await fetch("/api/scripts", {
+      credentials: "include"
+    });
+
+    const data = await r.json();
+
+    if (!data.length) {
+      box.innerHTML = "<p class='muted'>Nenhum script</p>";
+      return;
     }
-  </script>
+
+    box.innerHTML = data.map(s => `
+      <div class="card">
+        <b>${s.name}</b><br>
+        <span class="muted">Exec: ${s.executions || 0}</span>
+      </div>
+    `).join("");
+
+  } catch {
+    box.innerHTML = "<p class='muted'>Erro ao carregar scripts</p>";
+  }
+}
+
+async function loadKeys() {
+  const box = document.getElementById("keys");
+
+  try {
+    const r = await fetch("/api/keys", {
+      credentials: "include"
+    });
+
+    const data = await r.json();
+
+    if (!data.length) {
+      box.innerHTML = "<p class='muted'>Nenhuma key</p>";
+      return;
+    }
+
+    box.innerHTML = data.map(k => `
+      <div class="card">
+        🔑 ${k.key}
+      </div>
+    `).join("");
+
+  } catch {
+    box.innerHTML = "<p class='muted'>Erro ao carregar keys</p>";
+  }
+}
+
+function logout() {
+  fetch("/api/auth/logout", { credentials: "include" })
+    .then(() => window.location.href = "/admin");
+}
+
+// INIT
+async function init() {
+  await checkAuth();
+
+  loadStats();
+  loadScripts();
+  loadKeys();
+
+  // 🔥 LIVE UPDATE (KeyAuth style)
+  setInterval(() => {
+    loadStats();
+    loadScripts();
+    loadKeys();
+  }, 5000);
+}
+
+init();
+</script>
 
 </body>
 </html>
