@@ -23,6 +23,9 @@ const RESET_SECRET = process.env.RESET_SECRET || 'reset_admin_secret_2024';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 🔥 Confia no proxy do Render (remove o warning do rate-limit)
+app.set('trust proxy', 1);
+
 // -------------------------------------------------------
 // MIDDLEWARES
 // -------------------------------------------------------
@@ -35,7 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // RATE LIMITING
 // -------------------------------------------------------
 const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100,
   message: { error: 'Muitas requisições, tente novamente mais tarde' }
 });
@@ -48,7 +51,7 @@ const loginLimiter = rateLimit({
 });
 
 const loaderLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
+  windowMs: 1 * 60 * 1000, // 1 minuto
   max: 30,
   message: 'Rate limit exceeded'
 });
@@ -65,7 +68,7 @@ function securityLog(action, details, ip = 'unknown') {
     created_at: new Date().toISOString()
   };
   DB.securityLogs.push(entry);
-  if (DB.securityLogs.length > 1000) DB.securityLogs.shift();
+  if (DB.securityLogs.length > 1000) DB.securityLogs.shift(); // mantém apenas os últimos 1000
   saveDb();
   console.log(`[SECURITY] ${action}: ${details} (IP: ${ip})`);
 }
@@ -173,7 +176,7 @@ app.get('/api/reset-admin', (req, res) => {
 });
 
 // -------------------------------------------------------
-// SCRIPTS (CRUD)
+// SCRIPTS (CRUD com validação)
 // -------------------------------------------------------
 app.get('/api/scripts', authMiddleware, (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -234,6 +237,7 @@ app.put('/api/scripts/:id', authMiddleware, (req, res) => {
   const script = DB.scripts.find(s => s.id === req.params.id);
   if (!script) return res.status(404).json({ error: 'Script não encontrado' });
 
+  // Salva versão anterior no histórico
   DB.versions.push({
     id: uuidv4(),
     script_id: script.id,
@@ -260,6 +264,29 @@ app.delete('/api/scripts/:id', authMiddleware, (req, res) => {
   DB.keys = DB.keys.filter(k => k.script_id !== req.params.id);
   saveDb();
   return res.json({ success: true });
+});
+
+app.post('/api/scripts/:id/duplicate', authMiddleware, (req, res) => {
+  const original = DB.scripts.find(s => s.id === req.params.id);
+  if (!original) return res.status(404).json({ error: 'Script não encontrado' });
+  const newScript = {
+    ...original,
+    id: uuidv4(),
+    name: original.name + ' (Cópia)',
+    executions: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  DB.scripts.push(newScript);
+  saveDb();
+  return res.status(201).json(newScript);
+});
+
+app.get('/api/scripts/:id/versions', authMiddleware, (req, res) => {
+  const versions = DB.versions
+    .filter(v => v.script_id === req.params.id)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  return res.json(versions);
 });
 
 // -------------------------------------------------------
@@ -358,7 +385,7 @@ app.get('/api/load/:scriptId', loaderLimiter, (req, res) => {
 });
 
 // -------------------------------------------------------
-// PÁGINAS
+// PÁGINAS ESTÁTICAS
 // -------------------------------------------------------
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html')));
