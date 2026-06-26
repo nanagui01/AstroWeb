@@ -1,44 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saturn Storage - Admin Login</title>
+
   <style>
-    body { background: #000; color: #fff; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    form { background: #111; padding: 2rem; border-radius: 8px; width: 300px; }
-    input { width: 100%; padding: 0.7rem; margin: 0.5rem 0; background: #222; border: 1px solid #333; color: #fff; border-radius: 4px; }
-    button { width: 100%; padding: 0.7rem; background: #fff; color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-    .error { color: red; font-size: 0.9rem; display: none; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    form {
+      background: #111;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 320px;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      background: #222;
+      border: 1px solid #333;
+      color: #fff;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .error {
+      color: #ff4d4d;
+      font-size: 0.9rem;
+      display: none;
+      margin-top: 10px;
+    }
+
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
   </style>
 </head>
+
 <body>
   <form id="loginForm">
     <h2>Saturn Admin</h2>
+
     <input type="text" id="username" placeholder="Usuário" required>
     <input type="password" id="password" placeholder="Senha" required>
+
     <p class="error" id="error">Credenciais inválidas</p>
-    <button type="submit">Entrar</button>
+
+    <button type="submit" id="btn">Entrar</button>
   </form>
 
   <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    const form = document.getElementById("loginForm");
+    const error = document.getElementById("error");
+    const btn = document.getElementById("btn");
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
 
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-        credentials: 'include'
-      });
+      error.style.display = "none";
+      btn.innerText = "Entrando...";
+      btn.classList.add("loading");
 
-      if (res.ok) {
-        window.location.href = '/admin/dashboard';
-      } else {
-        document.getElementById('error').style.display = 'block';
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok) {
+          throw new Error(data?.error || "Erro no login");
+        }
+
+        // 🔥 sucesso real
+        window.location.href = "/admin/dashboard";
+
+      } catch (err) {
+        error.innerText = err.message || "Credenciais inválidas";
+        error.style.display = "block";
       }
+
+      btn.innerText = "Entrar";
+      btn.classList.remove("loading");
     });
   </script>
 </body>
