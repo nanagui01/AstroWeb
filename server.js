@@ -32,7 +32,7 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
 const COOKIE_SECRET = process.env.COOKIE_SECRET;
 const ADMIN_ROUTE_SECRET = process.env.ADMIN_ROUTE_SECRET;
-const DYNAMIC_ADMIN_PATH = '/' + crypto.createHash('sha256').update(ADMIN_ROUTE_SECRET).digest('hex');
+const DYNAMIC_ADMIN_PATH = '/e2c2b1f5c8e9d6b3a7f0c4e1d8b5f2a9c6d3e0b7a4f1c8d5e2b9f6a3c0d7'; 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
 const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
