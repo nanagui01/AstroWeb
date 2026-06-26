@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 // ============================================================
-// VALIDAÇÃO OBRIGATÓRIA DE AMBIENTE (SEM VALORES PADRÃO)
+// VALIDAÇÃO OBRIGATÓRIA DE AMBIENTE
 // ============================================================
 if (!process.env.JWT_SECRET) {
   console.error('❌ ERRO FATAL: JWT_SECRET não definido no arquivo .env');
@@ -38,22 +38,23 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 /* ============================================================
-   CONFIGURAÇÕES (TODAS OBRIGATÓRIAS)
+   CONFIGURAÇÕES
    ============================================================ */
 const JWT_SECRET = process.env.JWT_SECRET;
+const COOKIE_SECRET = process.env.COOKIE_SECRET || crypto.randomBytes(32).toString('hex');
 const ADMIN_ROUTE_SECRET = process.env.ADMIN_ROUTE_SECRET;
 const DYNAMIC_ADMIN_PATH = '/' + crypto.createHash('sha256').update(ADMIN_ROUTE_SECRET).digest('hex');
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
 const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true';
 
-// Só mostra a rota admin em ambiente de desenvolvimento
 if (process.env.NODE_ENV !== 'production') {
   console.log(`\n[DEV] URL administrativa: http://localhost:${PORT}${DYNAMIC_ADMIN_PATH}\n`);
 }
 
 /* ============================================================
-   CONTENT SECURITY POLICY (ATIVADO)
+   SEGURANÇA BÁSICA
    ============================================================ */
+app.set('trust proxy', 1);
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -69,7 +70,14 @@ app.use(helmet({
 }));
 
 /* ============================================================
-   MIDDLEWARE DE VALIDAÇÃO DE ENTRADA (ANTI-XSS)
+   PARSERS DE BODY (PRIMEIRO)
+   ============================================================ */
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cookieParser(COOKIE_SECRET)); // cookies assinados
+
+/* ============================================================
+   MIDDLEWARE DE SANITIZAÇÃO (DEPOIS DOS PARSERS)
    ============================================================ */
 function sanitizeInput(str) {
   if (typeof str !== 'string') return str;
@@ -82,10 +90,12 @@ function sanitizeInput(str) {
     .replace(/\//g, '&#x2F;');
 }
 
-// Middleware global para sanitizar campos de texto
 app.use((req, res, next) => {
   if (req.body && typeof req.body === 'object') {
     for (const key in req.body) {
+      // NUNCA sanitizar o campo 'content' (código Lua)
+      if (key === 'content') continue;
+      // Sanitizar campos de texto visíveis
       if (key === 'name' || key === 'title' || key === 'description') {
         req.body[key] = sanitizeInput(req.body[key]);
       }
@@ -95,21 +105,20 @@ app.use((req, res, next) => {
 });
 
 /* ============================================================
-   SEGURANÇA BÁSICA
-   ============================================================ */
-app.set('trust proxy', 1);
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-/* ============================================================
-   RATE LIMIT (AGRESSIVO)
+   RATE LIMIT
    ============================================================ */
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 3,
   message: { error: 'Muitas tentativas. Conta bloqueada por 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const twofaLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 5,
+  message: { error: 'Muitas tentativas de 2FA. Tente novamente em 5 minutos.' },
   standardHeaders: true,
   legacyHeaders: false
 });
@@ -127,7 +136,7 @@ const loaderLimiter = rateLimit({
 });
 
 /* ============================================================
-   PROTEÇÃO CSRF (TOKEN POR SESSÃO)
+   PROTEÇÃO CSRF
    ============================================================ */
 function generateCsrfToken() {
   return crypto.randomBytes(32).toString('hex');
@@ -138,8 +147,9 @@ app.get('/api/csrf-token', (req, res) => {
   res.cookie('csrf_token', token, {
     httpOnly: false,
     secure: true,
-    sameSite: 'strict', // ← STRICT
+    sameSite: 'strict',
     path: '/',
+    signed: true,
     maxAge: 8 * 60 * 60 * 1000
   });
   res.json({ csrfToken: token });
@@ -147,7 +157,7 @@ app.get('/api/csrf-token', (req, res) => {
 
 function csrfProtection(req, res, next) {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
-  const cookieToken = req.cookies['csrf_token'];
+  const cookieToken = req.signedCookies?.['csrf_token'];
   const headerToken = req.headers['x-csrf-token'];
   if (!cookieToken || !headerToken || cookieToken !== headerToken) {
     return res.status(403).json({ error: 'Token CSRF inválido.' });
@@ -158,26 +168,30 @@ function csrfProtection(req, res, next) {
 app.use('/api/', csrfProtection);
 
 /* ============================================================
-   BLACKLIST DE TOKENS (INVALIDAÇÃO APÓS LOGOUT)
+   BLACKLIST DE TOKENS (CORRIGIDA)
    ============================================================ */
 DB.tokenBlacklist = DB.tokenBlacklist || [];
 
-function isTokenBlacklisted(token) {
-  // Remove tokens expirados da blacklist (limpeza automática)
+function cleanBlacklist() {
   DB.tokenBlacklist = DB.tokenBlacklist.filter(t => {
     try {
       jwt.verify(t.token, JWT_SECRET);
-      return false; // ainda é válido, mas está na blacklist
-    } catch (e) {
-      return false; // expirado, remove da blacklist
+      return true; // ainda é válido → mantém na blacklist
+    } catch (err) {
+      // Token expirou ou é inválido → remove da blacklist
+      return false;
     }
   });
+  saveDb();
+}
+
+function isTokenBlacklisted(token) {
+  cleanBlacklist();
   return DB.tokenBlacklist.some(t => t.token === token);
 }
 
 function blacklistToken(token) {
   DB.tokenBlacklist.push({ token, blacklistedAt: Date.now() });
-  // Mantém apenas os últimos 100 tokens
   if (DB.tokenBlacklist.length > 100) DB.tokenBlacklist = DB.tokenBlacklist.slice(-100);
   saveDb();
 }
@@ -189,7 +203,6 @@ DB.scripts = DB.scripts || [];
 DB.admins = DB.admins || [];
 DB.versions = DB.versions || [];
 
-// Garante campos de segurança nos admins
 DB.admins.forEach(a => {
   a.twofa_secret = a.twofa_secret || null;
   a.twofa_enabled = a.twofa_enabled || false;
@@ -201,7 +214,7 @@ DB.admins.forEach(a => {
    FUNÇÕES AUXILIARES
    ============================================================ */
 function generateShortId() {
-  return crypto.randomBytes(8).toString('hex'); // 16 caracteres (antes 8)
+  return crypto.randomBytes(8).toString('hex');
 }
 
 function sendChangelogWebhook({ title, description, banner, thumbnail, scriptName }) {
@@ -219,12 +232,11 @@ function sendChangelogWebhook({ title, description, banner, thumbnail, scriptNam
 }
 
 function authMiddleware(req, res, next) {
-  const token = req.cookies?.token;
+  const token = req.signedCookies?.token;
   if (!token) return res.status(401).json({ error: 'Token ausente' });
 
-  // Verifica se o token está na blacklist
   if (isTokenBlacklisted(token)) {
-    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
+    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/', signed: true });
     return res.status(401).json({ error: 'Token inválido (logout anterior).' });
   }
 
@@ -232,7 +244,7 @@ function authMiddleware(req, res, next) {
     req.user = jwt.verify(token, JWT_SECRET);
     next();
   } catch {
-    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
+    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/', signed: true });
     res.status(401).json({ error: 'Sessão expirada' });
   }
 }
@@ -245,7 +257,7 @@ function masterOnly(req, res, next) {
 }
 
 /* ============================================================
-   AUTENTICAÇÃO (COM LOGIN LOCK)
+   AUTENTICAÇÃO
    ============================================================ */
 app.post('/api/auth/login', loginLimiter, (req, res) => {
   const { username, password } = req.body;
@@ -255,7 +267,6 @@ app.post('/api/auth/login', loginLimiter, (req, res) => {
     return res.status(401).json({ error: 'Credenciais inválidas' });
   }
 
-  // Verifica se a conta está bloqueada
   if (admin.lockUntil && admin.lockUntil > Date.now()) {
     const minutesLeft = Math.ceil((admin.lockUntil - Date.now()) / 60000);
     return res.status(423).json({
@@ -265,10 +276,9 @@ app.post('/api/auth/login', loginLimiter, (req, res) => {
   }
 
   if (!bcrypt.compareSync(password, admin.password_hash)) {
-    // Incrementa tentativas falhas
     admin.failedAttempts = (admin.failedAttempts || 0) + 1;
     if (admin.failedAttempts >= 5) {
-      admin.lockUntil = Date.now() + 15 * 60 * 1000; // 15 minutos
+      admin.lockUntil = Date.now() + 15 * 60 * 1000;
       admin.failedAttempts = 0;
       saveDb();
       return res.status(423).json({
@@ -280,12 +290,10 @@ app.post('/api/auth/login', loginLimiter, (req, res) => {
     return res.status(401).json({ error: 'Credenciais inválidas' });
   }
 
-  // Login bem-sucedido: reseta tentativas
   admin.failedAttempts = 0;
   admin.lockUntil = null;
   saveDb();
 
-  // Se 2FA estiver ativo, gera token temporário
   if (admin.twofa_enabled) {
     const tempToken = jwt.sign(
       { id: admin.id, username, require2FA: true },
@@ -303,14 +311,15 @@ app.post('/api/auth/login', loginLimiter, (req, res) => {
   res.cookie('token', token, {
     httpOnly: true,
     secure: true,
-    sameSite: 'strict', // ← STRICT
+    sameSite: 'strict',
     path: '/',
+    signed: true,
     maxAge: 8 * 60 * 60 * 1000
   });
   res.json({ success: true, redirectPath: `${DYNAMIC_ADMIN_PATH}/dashboard` });
 });
 
-app.post('/api/auth/verify-2fa', (req, res) => {
+app.post('/api/auth/verify-2fa', twofaLimiter, (req, res) => {
   const { tempToken, code } = req.body;
   let payload;
   try {
@@ -343,18 +352,19 @@ app.post('/api/auth/verify-2fa', (req, res) => {
     secure: true,
     sameSite: 'strict',
     path: '/',
+    signed: true,
     maxAge: 8 * 60 * 60 * 1000
   });
   res.json({ success: true, redirectPath: `${DYNAMIC_ADMIN_PATH}/dashboard` });
 });
 
 app.post('/api/auth/logout', (req, res) => {
-  const token = req.cookies?.token;
+  const token = req.signedCookies?.token;
   if (token) {
-    blacklistToken(token); // Invalida o token
+    blacklistToken(token);
   }
-  res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/' });
-  res.clearCookie('csrf_token', { secure: true, sameSite: 'strict', path: '/' });
+  res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'strict', path: '/', signed: true });
+  res.clearCookie('csrf_token', { secure: true, sameSite: 'strict', path: '/', signed: true });
   res.json({ success: true, redirectPath: DYNAMIC_ADMIN_PATH });
 });
 
@@ -404,17 +414,13 @@ app.post('/api/auth/2fa/disable', authMiddleware, (req, res) => {
 });
 
 /* ============================================================
-   ROTA PÚBLICA DE SCRIPTS (PÁGINA INICIAL)
+   ROTA PÚBLICA DE SCRIPTS
    ============================================================ */
 app.get('/api/public/scripts', (req, res) => {
   const scripts = DB.scripts.map(s => ({
-    id: s.id,
-    name: s.name,
-    status: s.status,
-    image: s.image || '',
-    short_id: s.short_id,
-    version: s.version || '1.0.0',
-    updated_at: s.updated_at
+    id: s.id, name: s.name, status: s.status,
+    image: s.image || '', short_id: s.short_id,
+    version: s.version || '1.0.0', updated_at: s.updated_at
   }));
   res.json(scripts);
 });
@@ -538,14 +544,22 @@ app.post('/api/scripts/:id/changelog', authMiddleware, async (req, res) => {
 });
 
 /* ============================================================
-   EXPORT / IMPORT (APENAS MASTER)
+   EXPORT / IMPORT (APENAS MASTER + CONFIRMAÇÃO)
    ============================================================ */
 app.get('/api/export', authMiddleware, masterOnly, (req, res) => {
   res.json({ scripts: DB.scripts, versions: DB.versions });
 });
 
 app.post('/api/import', authMiddleware, masterOnly, (req, res) => {
-  const { scripts, versions } = req.body;
+  const { scripts, versions, confirmation } = req.body;
+  
+  // Exige confirmação explícita
+  if (confirmation !== 'IMPORTAR') {
+    return res.status(400).json({ 
+      error: 'Confirmação necessária. Envie { confirmation: "IMPORTAR" } para prosseguir.' 
+    });
+  }
+
   if (!Array.isArray(scripts)) return res.status(400).json({ error: 'Formato inválido' });
   DB.scripts = scripts;
   DB.versions = Array.isArray(versions) ? versions : [];
@@ -578,7 +592,7 @@ app.get('/api/load/:id', loaderLimiter, (req, res) => {
   const script = DB.scripts.find(s => s.id === req.params.id);
   if (!script || script.status !== 'online') return res.status(404).send('Script indisponível.');
   if (script.sandbox) {
-    const token = req.cookies?.token;
+    const token = req.signedCookies?.token;
     try { jwt.verify(token, JWT_SECRET); } catch { return res.status(403).send('Acesso restrito.'); }
   }
   script.executions = (script.executions || 0) + 1;
@@ -617,7 +631,7 @@ app.get(`${DYNAMIC_ADMIN_PATH}/dashboard`, authMiddleware, (req, res) => res.sen
 app.get('/admin', (req, res) => res.status(404).send('Cannot GET /admin'));
 
 /* ============================================================
-   ADMIN INICIAL (SENHA OBRIGATÓRIA DO .env)
+   ADMIN INICIAL
    ============================================================ */
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
