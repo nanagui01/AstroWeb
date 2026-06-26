@@ -3,21 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Saturn — Scripts</title>
+  <title>Saturn — Script Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0a0a0a;
-      --surface: #111;
+      --surface: #111111;
       --border: #1f1f1f;
-      --text: #fff;
-      --text2: #a0a0a0;
+      --text: #ffffff;
+      --text-secondary: #a0a0a0;
+      --primary: #6366f1;
       --online: #10b981;
       --offline: #ef4444;
       --maintenance: #f59e0b;
-      --development: #6366f1;
+      --radius: 14px;
+      --radius-sm: 8px;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -53,44 +55,92 @@
       -webkit-text-fill-color: transparent;
     }
     .hero p {
-      color: var(--text2);
+      color: var(--text-secondary);
       margin-bottom: 2rem;
       font-size: 1.1rem;
     }
+    .code-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: left;
+      margin: 0 auto 2rem;
+      max-width: 550px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      word-break: break-all;
+    }
+    .code-box .dots { display: flex; gap: 6px; margin-bottom: 1rem; }
+    .code-box .dots span { width: 10px; height: 10px; border-radius: 50%; background: #333; }
+    .code-box .dots span:nth-child(2) { background: #555; }
+    .code-box .dots span:nth-child(3) { background: #777; }
+    .code-box code { color: #ccc; line-height: 1.6; }
+    .code-box .highlight { color: #fff; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: #fff;
+      color: #000;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+    .btn:hover { background: #e0e0e0; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #333;
+      color: #fff;
+    }
+    .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+    .btn-sm {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+    }
 
-    /* Grid de Scripts */
-    .scripts-grid {
+    /* Grid de jogos */
+    .games-section {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem;
+    }
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+    .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 1.5rem;
     }
-
-    .script-card {
+    .game-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: var(--radius);
       overflow: hidden;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-    .script-card:hover {
+    .game-card:hover {
       transform: translateY(-4px);
       box-shadow: 0 12px 30px rgba(0,0,0,0.5);
     }
     .card-image {
       width: 100%;
-      height: 160px;
+      height: 140px;
       background-size: cover;
       background-position: center;
       background-color: #1a1a1a;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 2.5rem;
       color: #333;
-      font-size: 3rem;
-      font-weight: 200;
     }
     .card-body {
       padding: 1rem 1.2rem;
@@ -99,7 +149,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
     }
@@ -107,37 +157,18 @@
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
     }
     .status-dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       display: inline-block;
     }
     .status-online .status-dot { background: var(--online); }
     .status-offline .status-dot { background: var(--offline); }
     .status-maintenance .status-dot { background: var(--maintenance); }
-    .status-development .status-dot { background: var(--development); }
-
-    .card-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.8rem;
-    }
-    .btn-sm {
-      padding: 0.4rem 0.9rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      background: #fff;
-      color: #000;
-      transition: 0.2s;
-    }
-    .btn-sm:hover { background: #e0e0e0; }
 
     footer {
       margin-top: auto;
@@ -147,97 +178,93 @@
       font-size: 0.85rem;
       border-top: 1px solid var(--border);
     }
-    .admin-link {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 0.7rem;
-      color: #222;
+
+    @media (max-width: 768px) {
+      .hero h2 { font-size: 2rem; }
+      .games-grid { grid-template-columns: 1fr 1fr; }
     }
-    .admin-link:hover { opacity: 1; }
   </style>
 </head>
 <body>
   <nav class="navbar">
     <h1>Saturn</h1>
+    <a href="/status" class="btn btn-outline btn-sm">Status</a>
   </nav>
 
   <section class="hero">
-    <h2>Scripts Disponíveis</h2>
-    <p>Escolha um script, copie o loader e execute no seu jogo.</p>
+    <h2>Um Script. Vários Jogos.</h2>
+    <p>Use o mesmo loader para todos os jogos abaixo. Copie e cole no seu executor.</p>
+    <div class="code-box">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <code>loadstring(game:HttpGet("<span class="highlight">https://saturn.example.com/api/load/ID</span>"))()</code>
+    </div>
+    <button class="btn" onclick="copyExampleLoader()">Copiar Loader</button>
   </section>
 
-  <!-- Grade de scripts -->
-  <div class="scripts-grid" id="scriptsGrid">
-    <!-- Preenchido dinamicamente -->
-  </div>
+  <!-- Seção de jogos suportados -->
+  <section class="games-section">
+    <h2 class="section-title">Jogos Suportados</h2>
+    <div class="games-grid" id="gamesGrid">
+      <!-- Preenchido dinamicamente por JS -->
+    </div>
+  </section>
 
   <footer>
     <p>Saturn &copy; 2026 — Scripts para Roblox</p>
   </footer>
 
-  <a href="/admin" class="admin-link">.</a>
-
   <script>
-    async function loadPublicScripts() {
-      try {
-        // Tenta buscar da API (precisa de rota pública, veja instruções abaixo)
-        const res = await fetch('/api/scripts');
-        if (!res.ok) throw new Error('API não disponível');
-        const scripts = await res.json();
-        renderScripts(scripts);
-      } catch (e) {
-        // Dados de exemplo enquanto a API não está pronta
-        const demoScripts = [
-          { id: '1', name: 'Blox Fruits AutoFarm', status: 'online', image: '', short_id: 'abc123' },
-          { id: '2', name: 'Pet Simulator X', status: 'online', image: '', short_id: 'def456' },
-          { id: '3', name: 'Jailbreak ESP', status: 'offline', image: '', short_id: 'ghi789' },
-          { id: '4', name: 'Arsenal Aimbot', status: 'maintenance', image: '', short_id: 'jkl012' }
-        ];
-        renderScripts(demoScripts);
-      }
-    }
+    // Dados de exemplo (mock) — você pode conectar à API pública depois
+    const gamesMock = [
+      { id: 'bloxfruit', name: 'Blox Fruits', status: 'online', image: '' },
+      { id: 'psx', name: 'Pet Simulator X', status: 'online', image: '' },
+      { id: 'jailbreak', name: 'Jailbreak', status: 'offline', image: '' },
+      { id: 'arsenal', name: 'Arsenal', status: 'online', image: '' },
+      { id: 'mm2', name: 'Murder Mystery 2', status: 'maintenance', image: '' },
+      { id: 'adoptme', name: 'Adopt Me!', status: 'online', image: '' }
+    ];
 
-    function renderScripts(scripts) {
-      const grid = document.getElementById('scriptsGrid');
-      grid.innerHTML = scripts.map(s => {
-        const statusClass = `status-${s.status}`;
-        const statusLabel = { online: 'Online', offline: 'Offline', maintenance: 'Manutenção', development: 'Desenvolvimento' }[s.status] || 'Online';
-        const bgImage = s.image ? `style="background-image:url(${s.image})"` : '';
+    function renderGames(games) {
+      const grid = document.getElementById('gamesGrid');
+      grid.innerHTML = games.map(g => {
+        const statusClass = `status-${g.status}`;
+        const statusLabel = { online: 'Online', offline: 'Offline', maintenance: 'Manutenção' }[g.status] || 'Online';
+        const bgStyle = g.image ? `style="background-image:url(${g.image})"` : '';
         return `
-          <div class="script-card">
-            <div class="card-image" ${bgImage}>
-              ${!s.image ? '🎮' : ''}
+          <div class="game-card">
+            <div class="card-image" ${bgStyle}>
+              ${!g.image ? '🎮' : ''}
             </div>
             <div class="card-body">
               <div class="card-title">
-                <span>${escapeHtml(s.name)}</span>
+                <span>${escapeHtml(g.name)}</span>
                 <span class="status-icon ${statusClass}">
                   <span class="status-dot"></span> ${statusLabel}
                 </span>
               </div>
-              <div class="card-actions">
-                <button class="btn-sm" onclick="copyLoaderDirect('${s.id}')">Copiar Loader</button>
-                <button class="btn-sm" onclick="window.location.href='/get/${s.id}'">Detalhes</button>
-              </div>
+              <button class="btn btn-sm" onclick="copyLoaderForGame('${g.id}')">Copiar Loader</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    function copyLoaderDirect(id) {
-      const loader = `loadstring(game:HttpGet("${location.origin}/api/load/${id}"))()`;
-      navigator.clipboard.writeText(loader).then(() => alert('Loader copiado!'));
+    function copyExampleLoader() {
+      const loader = `loadstring(game:HttpGet("${location.origin}/api/load/ID"))()`;
+      navigator.clipboard.writeText(loader).then(() => alert('Loader de exemplo copiado!'));
+    }
+
+    function copyLoaderForGame(gameId) {
+      // Aqui você poderia buscar o script real vinculado ao jogo, por enquanto usa o mesmo exemplo
+      const loader = `loadstring(game:HttpGet("${location.origin}/api/load/ID_${gameId}"))()`;
+      navigator.clipboard.writeText(loader).then(() => alert('Loader copiado para ' + gameId));
     }
 
     function escapeHtml(str) {
-      return String(str).replace(/[&<>'"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+      return String(str).replace(/[&<>'"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
     }
 
-    loadPublicScripts();
+    renderGames(gamesMock);
   </script>
 </body>
 </html>
