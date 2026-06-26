@@ -4,200 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saturn Storage — Painel</title>
-  <link rel="icon" href="data:,">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Fira+Code&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0a0a0a;
-      --surface: #111111;
+      --surface: #111;
       --border: #1f1f1f;
-      --text: #ffffff;
-      --text-secondary: #a0a0a0;
-      --accent: #ffffff;
+      --text: #fff;
+      --text2: #a0a0a0;
       --radius: 12px;
-      --transition: 0.2s ease;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .sidebar {
-      width: 260px;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-    .sidebar h2 {
-      font-weight: 800;
-      font-size: 1.3rem;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .sidebar nav { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
-    .sidebar nav button {
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      padding: 0.7rem 1rem;
-      text-align: left;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-    .sidebar nav button:hover, .sidebar nav button.active { background: #1a1a1a; color: #fff; }
-    .logout-btn { margin-top: auto; color: #f44 !important; font-weight: 600; }
-    .main {
-      flex: 1;
-      padding: 2rem;
-      overflow-y: auto;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-    }
-    .header h1 { font-size: 1.8rem; font-weight: 700; }
-    .actions { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
-    .btn {
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      font-size: 0.9rem;
-      transition: all var(--transition);
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .btn-primary { background: #fff; color: #000; border: none; }
-    .btn-primary:hover { background: #e0e0e0; }
-    .btn-danger { color: #f44; border-color: #f44; background: transparent; }
-    .btn-danger:hover { background: rgba(255,68,68,0.1); }
-    .btn-sm { padding: 0.35rem 0.8rem; font-size: 0.8rem; }
-    .search-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.6rem 1rem;
-      color: #fff;
-      width: 200px;
-      font-size: 0.9rem;
-    }
-    .search-box:focus { outline: none; border-color: #555; }
-    .table-container {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #1a1a1a; padding: 0.8rem; text-align: left; font-weight: 600; color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; }
-    td { padding: 0.8rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-    tr:last-child td { border-bottom: none; }
-    .badge {
-      display: inline-block;
-      padding: 0.2rem 0.7rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .online { background: rgba(0,204,102,0.15); color: #00cc66; }
-    .offline { background: rgba(255,68,68,0.15); color: #ff4444; }
-    .maintenance { background: rgba(255,170,0,0.15); color: #ffaa00; }
-    .development { background: rgba(100,100,255,0.15); color: #8888ff; }
-    .active { background: rgba(0,204,102,0.15); color: #00cc66; }
-    .expired { background: rgba(255,68,68,0.15); color: #ff4444; }
-    .revoked { background: rgba(255,170,0,0.15); color: #ffaa00; }
-    .tags { display: flex; gap: 0.3rem; flex-wrap: wrap; }
-    .tag { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 4px; padding: 0.15rem 0.5rem; font-size: 0.7rem; }
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.8);
-      z-index: 100;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-overlay.show { display: flex; }
-    .modal {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      width: 600px;
-      max-width: 90%;
-      max-height: 85vh;
-      overflow-y: auto;
-    }
-    .modal h2 { margin-bottom: 1.5rem; }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; margin-bottom: 0.3rem; color: var(--text-secondary); font-size: 0.85rem; }
-    .form-group input, .form-group textarea, .form-group select {
-      width: 100%;
-      padding: 0.7rem;
-      background: #1a1a1a;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: #fff;
-      font-family: inherit;
-      font-size: 0.9rem;
-    }
-    .form-group textarea { height: 200px; resize: vertical; font-family: 'Fira Code', monospace; }
-    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #555; }
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #00cc66;
-      color: #000;
-      padding: 0.8rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 600;
-      z-index: 200;
-      animation: slideIn 0.3s ease;
-    }
-    @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .empty-state { text-align: center; padding: 3rem; color: var(--text-secondary); }
-    .flex { display: flex; }
-    .justify-between { justify-content: space-between; }
-    .items-center { align-items: center; }
-    .gap-2 { gap: 0.5rem; }
-    .mt-2 { margin-top: 1rem; }
-    .mb-2 { margin-bottom: 1rem; }
-    .file-upload-area {
-      border: 2px dashed var(--border);
-      border-radius: 8px;
-      padding: 1rem;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s;
-      margin-top: 0.5rem;
-      color: var(--text-secondary);
-    }
-    .file-upload-area:hover { border-color: #fff; }
-    .file-upload-area.dragover { border-color: #fff; background: rgba(255,255,255,0.05); }
-    .file-upload-area input[type="file"] { display: none; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); display:flex; height:100vh; }
+    .sidebar { width:240px; background:var(--surface); border-right:1px solid var(--border); padding:1.5rem; display:flex; flex-direction:column; gap:2rem; }
+    .sidebar h2 { font-weight:800; font-size:1.2rem; display:flex; align-items:center; gap:0.5rem; }
+    .sidebar nav { display:flex; flex-direction:column; gap:0.5rem; flex:1; }
+    .sidebar button { background:none; border:none; color:var(--text2); padding:0.7rem 1rem; text-align:left; border-radius:8px; cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:0.5rem; }
+    .sidebar button:hover, .sidebar button.active { background:#1a1a1a; color:#fff; }
+    .logout { color:#f44 !important; font-weight:600; margin-top:auto; }
+    .main { flex:1; padding:2rem; overflow-y:auto; }
+    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; }
+    .header h1 { font-size:1.8rem; font-weight:700; }
+    .btn { padding:0.6rem 1.2rem; border-radius:8px; font-weight:600; cursor:pointer; border:none; font-size:0.9rem; transition:0.2s; display:inline-flex; align-items:center; gap:0.4rem; background:var(--surface); color:var(--text); border:1px solid var(--border); }
+    .btn-primary { background:#fff; color:#000; border:none; }
+    .btn-primary:hover { background:#e0e0e0; }
+    .btn-danger { color:#f44; border-color:#f44; background:transparent; }
+    .btn-danger:hover { background:rgba(255,68,68,0.1); }
+    .btn-sm { padding:0.3rem 0.7rem; font-size:0.8rem; }
+    .table-container { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    table { width:100%; border-collapse:collapse; }
+    th { background:#1a1a1a; padding:0.8rem; text-align:left; font-weight:600; color:var(--text2); font-size:0.8rem; text-transform:uppercase; }
+    td { padding:0.8rem; border-bottom:1px solid var(--border); font-size:0.9rem; }
+    tr:last-child td { border-bottom:none; }
+    .badge { padding:0.15rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:600; }
+    .online { background:rgba(0,204,102,0.15); color:#0c6; }
+    .offline { background:rgba(255,68,68,0.15); color:#f44; }
+    .active { background:rgba(0,204,102,0.15); color:#0c6; }
+    .expired { background:rgba(255,68,68,0.15); color:#f44; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:2rem; width:550px; max-width:90%; max-height:85vh; overflow-y:auto; }
+    .form-group { margin-bottom:1rem; }
+    .form-group label { display:block; margin-bottom:0.3rem; color:var(--text2); font-size:0.85rem; }
+    .form-group input, .form-group textarea, .form-group select { width:100%; padding:0.7rem; background:#1a1a1a; border:1px solid var(--border); border-radius:8px; color:#fff; font-family:inherit; }
+    .form-group textarea { height:200px; resize:vertical; font-family:'Fira Code',monospace; }
+    .toast { position:fixed; bottom:20px; right:20px; background:#0c6; color:#000; padding:0.8rem 1.5rem; border-radius:8px; font-weight:600; z-index:200; animation:slideIn 0.3s; }
+    @keyframes slideIn { from { opacity:0; transform:translateY(50px); } to { opacity:1; transform:translateY(0); } }
+    .empty { text-align:center; padding:3rem; color:var(--text2); }
+    .file-upload { border:2px dashed var(--border); border-radius:8px; padding:1rem; text-align:center; cursor:pointer; margin-top:0.5rem; color:var(--text2); }
+    .file-upload:hover { border-color:#fff; }
+    .file-upload input { display:none; }
   </style>
 </head>
 <body>
@@ -207,45 +63,29 @@
       <button data-tab="scripts" class="active">📜 Scripts</button>
       <button data-tab="keys">🔑 Keys</button>
     </nav>
-    <button class="logout-btn" onclick="logout()">🚪 Sair</button>
+    <button class="logout" onclick="logout()">🚪 Sair</button>
   </aside>
 
   <main class="main">
-    <!-- Aba Scripts -->
+    <!-- Scripts -->
     <div id="tab-scripts" class="tab-content">
       <div class="header">
         <h1>Scripts</h1>
-        <div class="actions">
-          <input type="text" id="searchScripts" class="search-box" placeholder="🔍 Buscar..." oninput="renderScripts()">
-          <select id="statusFilter" class="form-group select" style="width:auto; padding:0.5rem; background:var(--surface); border:1px solid var(--border); color:#fff; border-radius:8px;" onchange="renderScripts()">
-            <option value="">Todos</option>
-            <option value="online">Online</option>
-            <option value="offline">Offline</option>
-            <option value="maintenance">Maintenance</option>
-            <option value="development">Development</option>
-          </select>
-          <button class="btn btn-primary" onclick="openScriptModal()">+ Novo Script</button>
-        </div>
+        <button class="btn btn-primary" onclick="openScriptModal()">+ Novo Script</button>
       </div>
       <div class="table-container">
-        <table>
-          <thead><tr><th>Nome</th><th>Status</th><th>Tags</th><th>Execuções</th><th>Ações</th></tr></thead>
-          <tbody id="scriptsTable"></tbody>
-        </table>
+        <table><thead><tr><th>Nome</th><th>Status</th><th>Execuções</th><th>Ações</th></tr></thead><tbody id="scriptsTable"></tbody></table>
       </div>
     </div>
 
-    <!-- Aba Keys -->
+    <!-- Keys -->
     <div id="tab-keys" class="tab-content hidden">
       <div class="header">
         <h1>Keys</h1>
         <button class="btn btn-primary" onclick="openKeyModal()">+ Nova Key</button>
       </div>
       <div class="table-container">
-        <table>
-          <thead><tr><th>Key</th><th>Script</th><th>HWID</th><th>Expira</th><th>Status</th><th>Ações</th></tr></thead>
-          <tbody id="keysTable"></tbody>
-        </table>
+        <table><thead><tr><th>Key</th><th>Script</th><th>HWID</th><th>Status</th><th>Ações</th></tr></thead><tbody id="keysTable"></tbody></table>
       </div>
     </div>
   </main>
@@ -257,18 +97,17 @@
       <form id="scriptForm">
         <input type="hidden" id="scriptId">
         <div class="form-group"><label>Nome</label><input type="text" id="scriptName" required></div>
-        <div class="form-group"><label>Status</label><select id="scriptStatus"><option value="online">Online</option><option value="offline">Offline</option><option value="maintenance">Maintenance</option><option value="development">Development</option></select></div>
-        <div class="form-group"><label>Tags (separadas por vírgula)</label><input type="text" id="scriptTags" placeholder="farm, auto"></div>
+        <div class="form-group"><label>Status</label><select id="scriptStatus"><option value="online">Online</option><option value="offline">Offline</option></select></div>
         <div class="form-group"><label>Conteúdo</label><textarea id="scriptContent" required></textarea></div>
         <div class="form-group">
-          <label>Ou envie um arquivo .lua / .txt</label>
-          <div class="file-upload-area" id="fileDropArea">
-            📁 Clique ou arraste um arquivo aqui
+          <label>Ou envie .lua / .txt</label>
+          <div class="file-upload" id="fileDropArea">
+            📁 Arraste ou clique aqui
             <input type="file" id="fileInput" accept=".lua,.txt">
-            <div id="fileName" style="margin-top:0.5rem; color:#4ade80;"></div>
+            <div id="fileName" style="color:#4ade80;margin-top:0.25rem;"></div>
           </div>
         </div>
-        <div class="flex gap-2 mt-2">
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
           <button type="submit" class="btn btn-primary">Salvar</button>
           <button type="button" class="btn" onclick="closeModal('scriptModal')">Cancelar</button>
         </div>
@@ -279,151 +118,106 @@
   <!-- Modal Key -->
   <div id="keyModal" class="modal-overlay">
     <div class="modal">
-      <h2 id="keyModalTitle">Nova Key</h2>
+      <h2>Nova Key</h2>
       <form id="keyForm">
-        <input type="hidden" id="keyId">
         <div class="form-group"><label>Script (opcional)</label><select id="keyScriptId"><option value="">Nenhum</option></select></div>
-        <div class="form-group"><label>HWID (opcional)</label><input type="text" id="keyHwid" placeholder="Deixe vazio para livre"></div>
-        <div class="form-group"><label>Dias de expiração (vazio = nunca)</label><input type="number" id="keyExpiryDays" placeholder="30"></div>
-        <div class="flex gap-2 mt-2">
-          <button type="submit" class="btn btn-primary">Gerar Key</button>
+        <div class="form-group"><label>HWID (opcional)</label><input type="text" id="keyHwid"></div>
+        <div class="form-group"><label>Expiração (dias)</label><input type="number" id="keyExpiryDays" placeholder="Vazio = nunca"></div>
+        <div style="display:flex; gap:0.8rem; margin-top:1rem;">
+          <button type="submit" class="btn btn-primary">Gerar</button>
           <button type="button" class="btn" onclick="closeModal('keyModal')">Cancelar</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal Preview -->
-  <div id="previewModal" class="modal-overlay">
-    <div class="modal" style="max-width:700px;">
-      <h2 id="previewTitle">Preview</h2>
-      <pre style="background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:1rem;color:#ddd;max-height:400px;overflow:auto;font-family:'Fira Code',monospace;" id="previewContent"></pre>
-      <button class="btn mt-2" onclick="closeModal('previewModal')">Fechar</button>
-    </div>
-  </div>
-
   <script>
-    // ---------- API helper ----------
     async function api(url, options = {}) {
-      const res = await fetch(url, { credentials: 'include', ...options });
+      const res = await fetch(url, { credentials:'include', ...options });
       if (res.status === 401) { window.location.href = '/admin'; throw new Error('Unauthorized'); }
       return res;
     }
 
-    // ---------- Verifica autenticação ----------
-    (async () => {
-      try { await api('/api/auth/me'); } catch { window.location.href = '/admin'; }
-      loadScriptsForSelect();
-      renderScripts();
-    })();
-
-    // ---------- Navegação por abas ----------
+    // Navegação
     document.querySelectorAll('.sidebar button[data-tab]').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.sidebar button[data-tab]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const tab = btn.dataset.tab;
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById('tab-' + tab).classList.remove('hidden');
-        if (tab === 'scripts') renderScripts();
-        else if (tab === 'keys') renderKeys();
+        document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+        if (btn.dataset.tab === 'scripts') loadScripts();
+        else if (btn.dataset.tab === 'keys') loadKeys();
       });
     });
 
-    // ---------- SCRIPTS ----------
-    let allScripts = [];
-    async function renderScripts() {
-      try {
-        const res = await api('/api/scripts?limit=100');
-        const data = await res.json();
-        allScripts = data.data || [];
-        const search = document.getElementById('searchScripts')?.value?.toLowerCase() || '';
-        const status = document.getElementById('statusFilter')?.value || '';
-        const filtered = allScripts.filter(s => {
-          const matchName = s.name.toLowerCase().includes(search);
-          const matchStatus = !status || s.status === status;
-          return matchName && matchStatus;
-        });
-        const tbody = document.getElementById('scriptsTable');
-        if (filtered.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="empty-state">Nenhum script encontrado</td></tr>`;
-          return;
-        }
-        tbody.innerHTML = filtered.map(s => `
-          <tr>
-            <td><strong>${escapeHtml(s.name)}</strong></td>
-            <td><span class="badge ${s.status}">${s.status}</span></td>
-            <td><div class="tags">${(s.tags||[]).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</div></td>
-            <td>${s.executions||0}</td>
-            <td>
-              <button class="btn btn-sm" onclick="previewScript('${s.id}')">👁️</button>
-              <button class="btn btn-sm" onclick="editScript('${s.id}')">✏️</button>
-              <button class="btn btn-sm" onclick="duplicateScript('${s.id}')">📄</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteScript('${s.id}')">🗑️</button>
-              <button class="btn btn-sm" onclick="copyLoader('${s.id}')">📋</button>
-            </td>
-          </tr>
-        `).join('');
-      } catch(e) { console.error(e); }
+    // SCRIPTS
+    async function loadScripts() {
+      const res = await api('/api/scripts');
+      const scripts = await res.json();
+      const tbody = document.getElementById('scriptsTable');
+      if (scripts.length === 0) tbody.innerHTML = `<tr><td colspan="4" class="empty">Nenhum script</td></tr>`;
+      else tbody.innerHTML = scripts.map(s => `
+        <tr>
+          <td><strong>${escapeHtml(s.name)}</strong></td>
+          <td><span class="badge ${s.status}">${s.status}</span></td>
+          <td>${s.executions||0}</td>
+          <td>
+            <button class="btn btn-sm" onclick="editScript('${s.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteScript('${s.id}')">🗑️</button>
+            <button class="btn btn-sm" onclick="copyLoader('${s.id}')">📋</button>
+          </td>
+        </tr>
+      `).join('');
     }
 
     function copyLoader(id) {
-      const loader = `KEY = "SUA_KEY_AQUI"\nloadstring(game:HttpGet("${window.location.origin}/api/load/${id}?key=" .. KEY))()`;
+      const loader = `KEY = "SUA_KEY_AQUI"\nloadstring(game:HttpGet("${location.origin}/api/load/${id}?key=" .. KEY))()`;
       navigator.clipboard.writeText(loader).then(() => showToast('✅ Loader copiado!'));
     }
 
     function openScriptModal(script = null) {
       document.getElementById('scriptModal').classList.add('show');
+      document.getElementById('scriptForm').reset();
+      document.getElementById('scriptId').value = '';
+      document.getElementById('fileName').textContent = '';
       if (script) {
         document.getElementById('scriptModalTitle').textContent = 'Editar Script';
         document.getElementById('scriptId').value = script.id;
         document.getElementById('scriptName').value = script.name;
         document.getElementById('scriptStatus').value = script.status;
-        document.getElementById('scriptTags').value = (script.tags||[]).join(', ');
         document.getElementById('scriptContent').value = script.content;
       } else {
         document.getElementById('scriptModalTitle').textContent = 'Novo Script';
-        document.getElementById('scriptForm').reset();
-        document.getElementById('scriptId').value = '';
-        document.getElementById('fileName').textContent = '';
       }
     }
 
     async function editScript(id) {
       const res = await api('/api/scripts/' + id);
-      const script = await res.json();
-      openScriptModal(script);
+      openScriptModal(await res.json());
+    }
+
+    async function deleteScript(id) {
+      if (confirm('Excluir script?')) { await api('/api/scripts/' + id, {method:'DELETE'}); loadScripts(); loadScriptSelect(); showToast('🗑️ Script excluído'); }
     }
 
     // Upload de arquivo
-    const fileDropArea = document.getElementById('fileDropArea');
+    const fileDrop = document.getElementById('fileDropArea');
     const fileInput = document.getElementById('fileInput');
-    const fileName = document.getElementById('fileName');
-
-    fileDropArea.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) readFile(file);
-    });
-    fileDropArea.addEventListener('dragover', (e) => {
+    fileDrop.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => { if (e.target.files[0]) readFile(e.target.files[0]); });
+    fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.style.borderColor = '#fff'; });
+    fileDrop.addEventListener('dragleave', () => fileDrop.style.borderColor = '' );
+    fileDrop.addEventListener('drop', e => {
       e.preventDefault();
-      fileDropArea.classList.add('dragover');
-    });
-    fileDropArea.addEventListener('dragleave', () => fileDropArea.classList.remove('dragover'));
-    fileDropArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      fileDropArea.classList.remove('dragover');
+      fileDrop.style.borderColor = '';
       const file = e.dataTransfer.files[0];
-      if (file && (file.name.endsWith('.lua') || file.name.endsWith('.txt'))) {
-        readFile(file);
-      }
+      if (file && (file.name.endsWith('.lua') || file.name.endsWith('.txt'))) readFile(file);
     });
-
     function readFile(file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = e => {
         document.getElementById('scriptContent').value = e.target.result;
-        fileName.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        document.getElementById('fileName').textContent = `📄 ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
       };
       reader.readAsText(file);
     }
@@ -432,73 +226,38 @@
       e.preventDefault();
       const id = document.getElementById('scriptId').value;
       const name = document.getElementById('scriptName').value.trim();
-      const status = document.getElementById('scriptStatus').value;
-      const tags = document.getElementById('scriptTags').value.split(',').map(t => t.trim()).filter(Boolean);
       const content = document.getElementById('scriptContent').value;
-
-      const url = id ? `/api/scripts/${id}` : '/api/scripts';
+      const status = document.getElementById('scriptStatus').value;
+      if (!name || !content) return alert('Preencha nome e conteúdo');
+      const url = id ? '/api/scripts/' + id : '/api/scripts';
       const method = id ? 'PUT' : 'POST';
-      await api(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name, status, tags, content }) });
+      await api(url, { method, headers:{'Content-Type':'application/json'}, body: JSON.stringify({name,content,status}) });
       closeModal('scriptModal');
-      renderScripts();
-      loadScriptsForSelect();
-      showToast(id ? '✅ Atualizado!' : '✅ Criado!');
+      loadScripts();
+      loadScriptSelect();
+      showToast(id ? '✅ Script atualizado!' : '✅ Script criado!');
     });
 
-    async function deleteScript(id) {
-      if (!confirm('Tem certeza?')) return;
-      await api('/api/scripts/' + id, { method: 'DELETE' });
-      renderScripts();
-      loadScriptsForSelect();
-      showToast('🗑️ Excluído');
-    }
-
-    async function duplicateScript(id) {
-      await api(`/api/scripts/${id}/duplicate`, { method: 'POST' });
-      renderScripts();
-      showToast('✅ Duplicado');
-    }
-
-    function previewScript(id) {
-      const script = allScripts.find(s => s.id === id);
-      if (!script) return;
-      document.getElementById('previewTitle').textContent = script.name;
-      document.getElementById('previewContent').textContent = script.content;
-      document.getElementById('previewModal').classList.add('show');
-    }
-
-    // ---------- KEYS ----------
-    async function renderKeys() {
-      try {
-        const res = await api('/api/keys');
-        const keys = await res.json();
-        const tbody = document.getElementById('keysTable');
-        if (keys.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Nenhuma key criada</td></tr>`;
-          return;
-        }
-        tbody.innerHTML = keys.map(k => `
-          <tr>
-            <td style="font-family:'Fira Code',monospace;">${k.key}</td>
-            <td>${k.script_id || '-'}</td>
-            <td>${k.hwid || 'Livre'}</td>
-            <td>${k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Nunca'}</td>
-            <td><span class="badge ${k.status}">${k.status}</span></td>
-            <td>
-              <button class="btn btn-sm btn-danger" onclick="deleteKey(${k.id})">🗑️</button>
-            </td>
-          </tr>
-        `).join('');
-      } catch(e) {
-        console.error(e);
-        document.getElementById('keysTable').innerHTML = `<tr><td colspan="6" class="empty-state">Erro ao carregar keys</td></tr>`;
-      }
+    // KEYS
+    async function loadKeys() {
+      const res = await api('/api/keys');
+      const keys = await res.json();
+      const tbody = document.getElementById('keysTable');
+      if (keys.length === 0) tbody.innerHTML = `<tr><td colspan="5" class="empty">Nenhuma key</td></tr>`;
+      else tbody.innerHTML = keys.map(k => `
+        <tr>
+          <td style="font-family:'Fira Code',monospace;">${k.key}</td>
+          <td>${k.script_name || '—'}</td>
+          <td>${k.hwid || 'Livre'}</td>
+          <td><span class="badge ${k.status}">${k.status}</span></td>
+          <td><button class="btn btn-sm btn-danger" onclick="deleteKey(${k.id})">🗑️</button></td>
+        </tr>
+      `).join('');
     }
 
     function openKeyModal() {
       document.getElementById('keyModal').classList.add('show');
       document.getElementById('keyForm').reset();
-      document.getElementById('keyId').value = '';
     }
 
     document.getElementById('keyForm').addEventListener('submit', async (e) => {
@@ -507,48 +266,37 @@
       const hwid = document.getElementById('keyHwid').value.trim();
       const days = parseInt(document.getElementById('keyExpiryDays').value) || null;
       const expiresAt = days ? new Date(Date.now() + days*86400000).toISOString() : null;
-
-      await api('/api/keys', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ scriptId, hwid, expiresAt })
-      });
+      await api('/api/keys', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({scriptId, hwid, expiresAt}) });
       closeModal('keyModal');
-      renderKeys();
+      loadKeys();
       showToast('✅ Key gerada!');
     });
 
     async function deleteKey(id) {
-      if (!confirm('Excluir key?')) return;
-      await api('/api/keys/' + id, { method: 'DELETE' });
-      renderKeys();
-      showToast('🗑️ Key excluída');
+      if (confirm('Excluir key?')) { await api('/api/keys/' + id, {method:'DELETE'}); loadKeys(); showToast('🗑️ Key excluída'); }
     }
 
-    // ---------- UTILS ----------
+    async function loadScriptSelect() {
+      const res = await api('/api/scripts');
+      const scripts = await res.json();
+      const sel = document.getElementById('keyScriptId');
+      sel.innerHTML = '<option value="">Nenhum</option>' + scripts.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+    }
+
     function showToast(msg) {
-      const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = msg;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
+      const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2500);
     }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
     function escapeHtml(s) { return String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[m]); }
     function logout() { api('/api/auth/logout', {method:'POST'}).finally(() => window.location.href='/admin'); }
 
-    async function loadScriptsForSelect() {
-      try {
-        const res = await api('/api/scripts?limit=100');
-        const data = await res.json();
-        const scripts = data.data || [];
-        const select = document.getElementById('keyScriptId');
-        select.innerHTML = '<option value="">Nenhum</option>' + scripts.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
-      } catch(e) {}
-    }
+    // Fechar modal ao clicar fora
+    document.querySelectorAll('.modal-overlay').forEach(ov => ov.addEventListener('click', (e) => { if (e.target === ov) ov.classList.remove('show'); }));
 
-    // Fechar modais ao clicar fora
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
-    });
+    // Init
+    (async () => { try { await api('/api/auth/me'); } catch { window.location.href = '/admin'; } loadScripts(); loadScriptSelect(); })();
   </script>
 </body>
 </html>
