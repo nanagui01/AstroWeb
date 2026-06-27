@@ -1,24 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ACCESS DENIED - Saturn Security</title>
+  <title>Astro — Acesso Bloqueado</title>
   <style>
-    body { background: #000; color: #fff; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .box { text-align: center; }
-    .lock { font-size: 4rem; margin-bottom: 1rem; }
-    h1 { margin: 0; font-size: 2rem; }
-    p { color: #aaa; }
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Inter', system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+    .container {
+      background: #111;
+      border: 1px solid #1f1f1f;
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 400px;
+      width: 90%;
+    }
+    .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    h1 { margin-bottom: 0.5rem; }
+    p { color: #a0a0a0; font-size: 0.95rem; }
+    .footer {
+      margin-top: 1.5rem;
+      color: #444;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
-  <div class="box">
-    <div class="lock">🔒</div>
-    <h1>ACCESS DENIED</h1>
-    <p>This content is protected.</p>
-    <p>Unauthorized access is prohibited.</p>
-    <p style="color:#555;">Saturn Security System</p>
+  <div class="container">
+    <div class="icon">🔒</div>
+    <h1>Acesso Negado</h1>
+    <p>Este conteúdo é protegido e não pode ser acessado diretamente pelo navegador.</p>
+    <p>Utilize o loader fornecido pelo administrador.</p>
+    <div class="footer">Astro Security System</div>
   </div>
 </body>
 </html>
