@@ -20,12 +20,16 @@
       --info: #3b82f6;
       --radius: 14px;
       --radius-sm: 8px;
-      --transition: 0.2s ease;
+      --transition: 0.25s ease;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
+    
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at top left, rgba(99,102,241,0.08), transparent 40%),
+        radial-gradient(circle at bottom right, rgba(16,185,129,0.06), transparent 40%),
+        #0a0a0a;
       color: var(--text);
       display: flex;
       height: 100vh;
@@ -35,7 +39,8 @@
     /* Sidebar */
     .sidebar {
       width: 260px;
-      background: var(--surface);
+      background: rgba(17, 17, 17, 0.6);
+      backdrop-filter: blur(12px);
       border-right: 1px solid var(--border);
       padding: 2rem 1.2rem;
       display: flex;
@@ -51,8 +56,9 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      color: #fff;
     }
-    .sidebar-logo svg { width: 32px; height: 32px; }
+    .sidebar-logo svg { width: 32px; height: 32px; color: var(--primary); }
     .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
     .sidebar-nav button {
       display: flex;
@@ -71,7 +77,8 @@
       width: 100%;
     }
     .sidebar-nav button:hover { background: rgba(255,255,255,0.05); color: #fff; }
-    .sidebar-nav button.active { background: var(--primary); color: #fff; }
+    .sidebar-nav button.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+    
     .logout-btn {
       background: none;
       border: 1px solid var(--danger);
@@ -83,9 +90,9 @@
       text-align: center;
       transition: all var(--transition);
     }
-    .logout-btn:hover { background: rgba(239,68,68,0.1); }
+    .logout-btn:hover { background: rgba(239,68,68,0.1); transform: translateY(-2px); }
 
-    /* Hamburger */
+    /* Hamburger Menu para Mobile */
     .hamburger {
       display: none;
       position: fixed;
@@ -100,20 +107,30 @@
       cursor: pointer;
     }
 
-    /* Main */
+    /* Main Container */
     .main { flex: 1; padding: 2rem; overflow-y: auto; }
     .tab { display: none; }
-    .tab.active { display: block; }
+    
+    /* Animação suave nas Abas */
+    .tab.active { 
+      display: block; 
+      animation: fadeUp 0.25s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 2rem;
+      gap: 1rem;
     }
     .header h1 { font-size: 1.8rem; font-weight: 700; }
 
-    /* Skeleton */
+    /* Skeletons */
     .skeleton {
       background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
       background-size: 200% 100%;
@@ -122,68 +139,118 @@
     }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-    /* Stats */
+    /* Stats Grid & Cards com Glow */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
       margin-bottom: 2rem;
     }
     .stat-card {
-      background: var(--surface);
+      background: rgba(17, 17, 17, 0.7);
+      backdrop-filter: blur(10px);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1.2rem;
-      transition: transform var(--transition), box-shadow var(--transition);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
     }
-    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-    .stat-label { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
-    .stat-value { font-size: 1.8rem; font-weight: 700; }
+    .stat-card:hover { 
+      transform: translateY(-4px);
+      border-color: rgba(99,102,241,0.5);
+      box-shadow:
+        0 0 20px rgba(99,102,241,0.15),
+        0 10px 30px rgba(0,0,0,0.4);
+    }
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .stat-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .stat-value { font-size: 2rem; font-weight: 700; font-family: 'Inter', sans-serif; }
 
-    /* Table */
+    /* Gráficos em Vidro (Glassmorphism) */
+    .chart-container {
+      background: rgba(17, 17, 17, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .chart-container h3 { margin-bottom: 1rem; font-size: 1.1rem; color: #fff; }
+
+    /* Tabelas mais Bonitas */
     .table-wrapper {
-      background: var(--surface);
+      background: rgba(17, 17, 17, 0.6);
+      backdrop-filter: blur(10px);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
     }
     table { width: 100%; border-collapse: collapse; }
     th {
-      background: #18181b;
-      padding: 0.8rem 1rem;
+      background: rgba(24, 24, 27, 0.8);
+      padding: 1rem;
       text-align: left;
       font-weight: 600;
       color: var(--text-secondary);
       font-size: 0.8rem;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
     }
-    td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); }
+    td { padding: 1rem; border-bottom: 1px solid var(--border); color: #e4e4e7; }
+    tbody tr {
+      transition: background 0.2s;
+    }
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
     tr:last-child td { border-bottom: none; }
 
+    /* Badges */
     .badge {
-      padding: 0.2rem 0.6rem;
+      padding: 0.25rem 0.6rem;
       border-radius: 999px;
       font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
+      display: inline-block;
     }
-    .badge-online { background: rgba(16,185,129,0.15); color: var(--success); }
-    .badge-offline { background: rgba(239,68,68,0.15); color: var(--danger); }
-    .badge-maintenance { background: rgba(245,158,11,0.15); color: var(--warning); }
-    .badge-development { background: rgba(59,130,246,0.15); color: var(--info); }
+    .badge-online { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
+    .badge-offline { background: rgba(239,68,68,0.12); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+    .badge-maintenance { background: rgba(245,158,11,0.12); color: var(--warning); border: 1px solid rgba(245,158,11,0.2); }
+    .badge-development { background: rgba(59,130,246,0.12); color: var(--info); border: 1px solid rgba(59,130,246,0.2); }
 
+    /* Inputs & Search Box */
     .search-box {
-      background: var(--surface);
+      background: rgba(20, 20, 20, 0.8);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       padding: 0.6rem 1rem;
       color: #fff;
       width: 250px;
       font-size: 0.9rem;
+      transition: all var(--transition);
     }
     .search-box::placeholder { color: var(--text-secondary); }
-    .search-box:focus { outline: none; border-color: var(--primary); }
+    .search-box:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(99,102,241,0.2); }
 
+    /* Botões Modernos */
     .btn {
       padding: 0.6rem 1.2rem;
       border: none;
@@ -191,82 +258,82 @@
       font-weight: 600;
       cursor: pointer;
       font-size: 0.9rem;
-      transition: all var(--transition);
+      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
       background: #fff;
       color: #000;
     }
-    .btn:hover { opacity: 0.9; }
+    .btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      opacity: 0.95;
+    }
+    .btn:active { transform: translateY(0); }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
-    .btn-danger:hover { background: rgba(239,68,68,0.1); }
-    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); color: var(--danger); }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; }
 
     /* Modal */
     .modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
       justify-content: center;
       align-items: center;
       z-index: 100;
     }
     .modal.active { display: flex; }
     .modal-box {
-      background: var(--surface);
+      background: #121212;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 2rem;
       width: 100%;
       max-width: 600px;
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     }
-    .modal-box h2 { margin-bottom: 1.5rem; }
-    label { display: block; margin-bottom: 0.4rem; color: var(--text-secondary); font-size: 0.9rem; }
+    .modal-box h2 { margin-bottom: 1.5rem; font-weight: 700; }
+    label { display: block; margin-bottom: 0.4rem; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; }
     input, textarea, select {
       width: 100%;
-      padding: 0.7rem;
-      margin-bottom: 1rem;
-      background: #1a1a1a;
+      padding: 0.75rem;
+      margin-bottom: 1.2rem;
+      background: #161616;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       color: #fff;
       font-family: inherit;
       font-size: 0.9rem;
+      transition: border var(--transition);
     }
-    textarea { height: 200px; resize: vertical; font-family: 'Fira Code', monospace; }
+    textarea { height: 180px; resize: vertical; font-family: 'Fira Code', monospace; }
     input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
-    .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+    .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
 
+    /* Toasts */
     .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 200; }
     .toast {
       background: var(--surface); border: 1px solid var(--border); color: #fff;
       padding: 0.8rem 1.2rem; border-radius: var(--radius-sm); font-weight: 500;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5); animation: slideIn 0.3s ease;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex; align-items: center; gap: 0.5rem;
     }
-    .toast.success { border-left: 3px solid var(--success); }
-    .toast.error { border-left: 3px solid var(--danger); }
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-    .chart-container {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error { border-left: 4px solid var(--danger); }
+    @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
     @media (max-width: 768px) {
-      .sidebar { position: fixed; left: -280px; height: 100vh; }
+      .sidebar { position: fixed; left: -280px; height: 100vh; background: #0a0a0a; }
       .sidebar.open { left: 0; transform: none; }
       .hamburger { display: block; }
-      .main { padding: 1rem; }
+      .main { padding: 5rem 1.5rem 1.5rem 1.5rem; }
     }
   </style>
 </head>
@@ -298,18 +365,21 @@
   </aside>
 
   <main class="main">
-    <!-- Dashboard -->
     <div id="tab-dashboard" class="tab active">
       <div class="header"><h1>Dashboard</h1></div>
+      
       <div class="stats-grid" id="statsCards">
-        <div class="stat-card"><div class="stat-label">Carregando...</div><div class="stat-value"><div class="skeleton" style="height:2rem;width:80%;"></div></div></div>
+        <div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div>
+        <div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div>
+        <div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div>
+        <div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div>
       </div>
+      
       <div class="chart-container"><canvas id="dailyChart" height="100"></canvas></div>
       <div class="chart-container"><h3>Execuções por Hora</h3><canvas id="hourlyChart" height="80"></canvas></div>
       <div class="chart-container" id="popularScripts"><h3>Scripts Mais Populares</h3><div class="skeleton" style="height:2rem;margin-bottom:0.5rem;"></div></div>
     </div>
 
-    <!-- Scripts -->
     <div id="tab-scripts" class="tab">
       <div class="header">
         <h1>Scripts</h1>
@@ -331,7 +401,6 @@
       </div>
     </div>
 
-    <!-- Segurança -->
     <div id="tab-security" class="tab">
       <div class="header"><h1>Segurança</h1></div>
       <div class="table-wrapper">
@@ -340,14 +409,13 @@
           <tbody id="blockedIPsTable"></tbody>
         </table>
       </div>
-      <div style="margin-top:1rem;">
-        <input type="text" id="newIP" placeholder="192.168.1.1" style="width:200px; display:inline; margin-right:0.5rem;">
+      <div style="margin-top:1.5rem; display:flex; gap:0.5rem; align-items:center;">
+        <input type="text" id="newIP" placeholder="192.168.1.1" style="width:240px; margin-bottom:0;">
         <button class="btn btn-primary" onclick="blockIP()">Bloquear IP</button>
       </div>
     </div>
   </main>
 
-  <!-- Modal Script -->
   <div id="scriptModal" class="modal">
     <div class="modal-box">
       <h2 id="modalTitle">Novo Script</h2>
@@ -400,18 +468,55 @@
     async function loadDashboard() {
       try {
         const stats = await api('/api/stats');
+        
+        // Renderização dos cards com SVGs e layout em cabeçalho interno
         document.getElementById('statsCards').innerHTML = `
-          <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value">${stats.totalScripts}</div></div>
-          <div class="stat-card"><div class="stat-label">Online</div><div class="stat-value" style="color:var(--success)">${stats.onlineScripts}</div></div>
-          <div class="stat-card"><div class="stat-label">Offline</div><div class="stat-value" style="color:var(--danger)">${stats.offlineScripts}</div></div>
-          <div class="stat-card"><div class="stat-label">Execuções</div><div class="stat-value">${stats.totalExecutions}</div></div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-label">Total Scripts</div>
+              <div class="stat-icon" style="color:var(--primary)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+              </div>
+            </div>
+            <div class="stat-value">${stats.totalScripts}</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-label">Online</div>
+              <div class="stat-icon" style="color:var(--success)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 11 15 16 9"></polyline></svg>
+              </div>
+            </div>
+            <div class="stat-value" style="color:var(--success)">${stats.onlineScripts}</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-label">Offline</div>
+              <div class="stat-icon" style="color:var(--danger)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+              </div>
+            </div>
+            <div class="stat-value" style="color:var(--danger)">${stats.offlineScripts}</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-label">Execuções</div>
+              <div class="stat-icon" style="color:var(--warning)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              </div>
+            </div>
+            <div class="stat-value">${stats.totalExecutions}</div>
+          </div>
         `;
 
         const ctx1 = document.getElementById('dailyChart').getContext('2d');
         if (dailyChart) dailyChart.destroy();
         const gradient1 = ctx1.createLinearGradient(0, 0, 0, 200);
         gradient1.addColorStop(0, 'rgba(99,102,241,0.4)');
-        gradient1.addColorStop(1, 'rgba(99,102,241,0.05)');
+        gradient1.addColorStop(1, 'rgba(99,102,241,0.01)');
         dailyChart = new Chart(ctx1, {
           type: 'bar',
           data: {
@@ -421,7 +526,7 @@
               data: stats.daily.map(d => d.count),
               backgroundColor: gradient1,
               borderColor: '#6366f1',
-              borderWidth: 1,
+              borderWidth: 1.5,
               borderRadius: 6,
               borderSkipped: false,
             }]
@@ -430,7 +535,7 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              y: { beginAtZero: true, ticks: { color: '#a0a0a0' }, grid: { color: '#1f1f1f' } },
+              y: { beginAtZero: true, ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.05)' } },
               x: { ticks: { color: '#a0a0a0' }, grid: { display: false } }
             }
           }
@@ -440,7 +545,7 @@
         if (hourlyChart) hourlyChart.destroy();
         const gradient2 = ctx2.createLinearGradient(0, 0, 0, 150);
         gradient2.addColorStop(0, 'rgba(16,185,129,0.3)');
-        gradient2.addColorStop(1, 'rgba(16,185,129,0.02)');
+        gradient2.addColorStop(1, 'rgba(16,185,129,0.01)');
         hourlyChart = new Chart(ctx2, {
           type: 'line',
           data: {
@@ -452,7 +557,7 @@
               backgroundColor: gradient2,
               fill: true,
               tension: 0.4,
-              pointRadius: 2,
+              pointRadius: 3,
               pointBackgroundColor: '#10b981',
             }]
           },
@@ -460,7 +565,7 @@
             responsive: true,
             plugins: { legend: { display: false } },
             scales: {
-              y: { beginAtZero: true, ticks: { color: '#a0a0a0' }, grid: { color: '#1f1f1f' } },
+              y: { beginAtZero: true, ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.05)' } },
               x: { ticks: { color: '#a0a0a0', maxTicksLimit: 12 }, grid: { display: false } }
             }
           }
@@ -468,11 +573,11 @@
 
         const popDiv = document.getElementById('popularScripts');
         popDiv.innerHTML = '<h3>Scripts Mais Populares</h3>' + stats.popular.map(s => `
-          <div style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid var(--border);">
-            <span>${escapeHtml(s.name)}</span>
-            <span style="color:var(--success);">${s.executions||0} execuções</span>
+          <div style="display:flex; justify-content:space-between; padding:0.75rem 0; border-bottom:1px solid var(--border);">
+            <span style="font-weight:500;">${escapeHtml(s.name)}</span>
+            <span style="color:var(--success); font-weight:600;">${s.executions||0} execuções</span>
           </div>
-        `).join('') || '<p>Nenhum script ainda.</p>';
+        `).join('') || '<p style="color:var(--text-secondary); padding:0.5rem 0;">Nenhum script ainda.</p>';
       } catch(e) { showToast('Erro ao carregar dashboard', 'error'); }
     }
 
@@ -486,22 +591,21 @@
 
     function renderScripts(scripts) {
       const tbody = document.getElementById('scriptsTable');
-      if (!scripts.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhum script.</td></tr>'; return; }
+      if (!scripts.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-secondary);">Nenhum script encontrado.</td></tr>'; return; }
       tbody.innerHTML = scripts.map(s => `
         <tr>
           <td><strong>${escapeHtml(s.name)}</strong></td>
-          <td>${s.executions||0}</td>
+          <td><span style="font-weight: 500;">${s.executions||0}</span></td>
           <td><span class="badge badge-${s.status||'online'}">${s.status}</span></td>
           <td>
-            <button class="btn btn-sm edit-btn" data-id="${s.id}">✏️</button>
-            <button class="btn btn-sm duplicate-btn" data-id="${s.id}">📄</button>
-            <button class="btn btn-sm copy-btn" data-short="${s.short_id}" data-token="${s.token}">📋</button>
-            <button class="btn btn-sm btn-danger delete-btn" data-id="${s.id}">🗑️</button>
+            <button class="btn btn-sm edit-btn" data-id="${s.id}" title="Editar">✏️</button>
+            <button class="btn btn-sm duplicate-btn" data-id="${s.id}" title="Duplicar">📄</button>
+            <button class="btn btn-sm copy-btn" data-short="${s.short_id}" data-token="${s.token}" title="Copiar Loader">📋</button>
+            <button class="btn btn-sm btn-danger delete-btn" data-id="${s.id}" title="Excluir">🗑️</button>
           </td>
         </tr>
       `).join('');
 
-      // Adicionar event listeners diretamente em cada botão (forma mais confiável)
       tbody.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           const id = this.getAttribute('data-id');
@@ -672,7 +776,7 @@
       catch(e) { showToast('Erro ao remover IP', 'error'); }
     }
 
-    // Navegação
+    // Navegação entre abas
     document.querySelectorAll('.sidebar-nav button').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
