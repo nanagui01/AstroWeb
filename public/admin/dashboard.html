@@ -2,48 +2,103 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astro — Acesso Bloqueado</title>
+  <title>Astro — Scripts</title>
   <style>
-    body {
-      background: #0a0a0a;
-      color: #fff;
-      font-family: 'Inter', system-ui, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      text-align: center;
-    }
-    .container {
-      background: #111;
-      border: 1px solid #1f1f1f;
-      border-radius: 16px;
-      padding: 3rem;
-      max-width: 400px;
-      width: 90%;
-    }
-    .icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-    h1 { margin-bottom: 0.5rem; }
-    p { color: #a0a0a0; font-size: 0.95rem; }
-    .footer {
-      margin-top: 1.5rem;
-      color: #444;
-      font-size: 0.8rem;
-    }
+    body { background: #0a0a0a; color: #fff; font-family: system-ui, sans-serif; padding: 2rem; }
+    button { padding: 0.6rem 1.2rem; background: #6366f1; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 1rem; }
+    table { width: 100%; border-collapse: collapse; background: #111; border-radius: 12px; overflow: hidden; }
+    th { background: #1a1a1a; padding: 0.8rem; text-align: left; color: #aaa; font-size: 0.8rem; text-transform: uppercase; }
+    td { padding: 0.8rem; border-bottom: 1px solid #1f1f1f; }
+    .empty { text-align: center; color: #aaa; padding: 2rem; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; }
+    .modal.active { display: flex; }
+    .modal-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 2rem; width: 500px; }
+    input, textarea { width: 100%; padding: 0.5rem; margin-bottom: 1rem; background: #0a0a0a; border: 1px solid #333; color: #fff; border-radius: 6px; }
+    textarea { height: 200px; font-family: monospace; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="icon">🔒</div>
-    <h1>Acesso Negado</h1>
-    <p>Este conteúdo é protegido e não pode ser acessado diretamente pelo navegador.</p>
-    <p>Utilize o loader fornecido pelo administrador.</p>
-    <div class="footer">Astro Security System</div>
+  <h1>📜 Scripts</h1>
+  <button onclick="openCreateModal()">+ Novo Script</button>
+  <div id="scriptsContainer">Carregando scripts...</div>
+
+  <div id="createModal" class="modal">
+    <div class="modal-box">
+      <h2>Novo Script</h2>
+      <input type="text" id="scriptName" placeholder="Nome do script">
+      <textarea id="scriptContent" placeholder="Código Lua"></textarea>
+      <button onclick="createScript()">Salvar</button>
+      <button onclick="closeCreateModal()" style="background:#444;">Cancelar</button>
+    </div>
   </div>
+
+  <script>
+    const ADMIN_PATH = '/painel';
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function loadScripts() {
+      fetch('/api/scripts', { credentials: 'include' })
+        .then(res => res.json())
+        .then(scripts => {
+          const container = document.getElementById('scriptsContainer');
+          if (!scripts.length) {
+            container.innerHTML = '<div class="empty">Nenhum script criado ainda.</div>';
+            return;
+          }
+          let html = '<table><thead><tr><th>Nome</th><th>Execuções</th><th>Ações</th></tr></thead><tbody>';
+          scripts.forEach(s => {
+            html += `<tr>
+              <td><strong>${escapeHtml(s.name)}</strong></td>
+              <td>${s.executions || 0}</td>
+              <td>
+                <button onclick="deleteScript('${s.id}')">🗑️</button>
+                <button onclick="copyLoader('${s.short_id}', '${s.token}')">📋 Copiar Loader</button>
+              </td>
+            </tr>`;
+          });
+          html += '</tbody></table>';
+          container.innerHTML = html;
+        })
+        .catch(() => {
+          document.getElementById('scriptsContainer').innerHTML = '<div class="empty">Erro ao carregar scripts.</div>';
+        });
+    }
+
+    function copyLoader(shortId, token) {
+      const loader = `loadstring(game:HttpGet("${location.origin}/api/load/${shortId}/${token}"))()`;
+      navigator.clipboard.writeText(loader).then(() => alert('Loader copiado!'));
+    }
+
+    function deleteScript(id) {
+      if (!confirm('Excluir este script?')) return;
+      fetch('/api/scripts/' + id, { method: 'DELETE', credentials: 'include' })
+        .then(() => loadScripts());
+    }
+
+    function openCreateModal() { document.getElementById('createModal').classList.add('active'); }
+    function closeCreateModal() { document.getElementById('createModal').classList.remove('active'); }
+
+    function createScript() {
+      const name = document.getElementById('scriptName').value.trim();
+      const content = document.getElementById('scriptContent').value;
+      if (!name || !content) return alert('Preencha todos os campos');
+      fetch('/api/scripts', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, content })
+      })
+      .then(res => res.json())
+      .then(() => {
+        closeCreateModal();
+        loadScripts();
+      });
+    }
+
+    loadScripts();
+  </script>
 </body>
 </html>
