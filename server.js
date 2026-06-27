@@ -17,21 +17,17 @@ const JWT_SECRET = process.env.JWT_SECRET || 'segredo_super_seguro';
 const ADMIN_USER = process.env.ADMIN_USER || 'nanagui';
 const ADMIN_PASS = process.env.ADMIN_PASS || '001010GGZEHEN';
 
-// Segurança básica
 app.disable('x-powered-by');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rate limit simples
 const limiter = rateLimit({ windowMs: 60 * 1000, max: 200 });
 app.use('/api/', limiter);
 
-// Banco de dados
 DB.scripts = DB.scripts || [];
 DB.admins = DB.admins || [];
-DB.versions = DB.versions || [];
 
 // ------------------- HELPERS -------------------
 function shortId() { return crypto.randomBytes(8).toString('hex'); }
@@ -66,7 +62,7 @@ app.get('/api/auth/logout', (req, res) => {
   res.redirect('/painel');
 });
 
-app.get('/api/auth/me', auth, (req, res) => res.json({ username: req.user.username, role: req.user.role }));
+app.get('/api/auth/me', auth, (req, res) => res.json({ username: req.user.username }));
 
 // ------------------- SCRIPTS CRUD -------------------
 app.get('/api/scripts', auth, (req, res) => res.json(DB.scripts));
@@ -113,8 +109,14 @@ app.get('/api/stats', auth, (req, res) => {
   res.json({ totalScripts: total, onlineScripts: online, offlineScripts: total - online, totalExecutions: exec });
 });
 
-// ------------------- LOADER PROTEGIDO -------------------
+// ------------------- LOADER PROTEGIDO (COM BLOQUEIO) -------------------
 app.get('/api/load/:shortId/:token', (req, res) => {
+  const ua = (req.get('User-Agent') || '').toLowerCase();
+  // Permite apenas User-Agents que contenham "roblox" (ou vazio para compatibilidade)
+  if (ua && !ua.includes('roblox')) {
+    return res.status(403).sendFile(path.join(__dirname, 'public', 'blocked.html'));
+  }
+
   const s = DB.scripts.find(s => s.short_id === req.params.shortId);
   if (!s || s.status !== 'online' || s.token !== req.params.token) {
     return res.status(404).send('Script indisponível.');
