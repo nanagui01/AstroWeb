@@ -2,323 +2,69 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astro — Painel</title>
+  <title>Astro — Teste Abas</title>
   <style>
-    :root {
-      --bg: #0a0a0a;
-      --surface: #111111;
-      --border: #1f1f1f;
-      --text: #ffffff;
-      --text-secondary: #a0a0a0;
-      --primary: #6366f1;
-      --primary-hover: #5558e6;
-      --danger: #ef4444;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --radius: 14px;
-      --radius-sm: 8px;
-      --transition: 0.2s ease;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 260px;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      padding: 2rem 1.2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      z-index: 10;
-    }
-    .sidebar-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-size: 1.4rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-    .sidebar-logo svg { width: 32px; height: 32px; fill: #fff; }
-    .sidebar-nav { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
-    .sidebar-nav button {
-      display: flex; align-items: center; gap: 0.8rem;
-      background: transparent; border: none;
-      color: var(--text-secondary); padding: 0.75rem 1rem;
-      border-radius: var(--radius-sm); font-size: 0.95rem;
-      font-weight: 500; cursor: pointer; transition: all var(--transition);
-      text-align: left; width: 100%;
-    }
-    .sidebar-nav button:hover { background: rgba(255,255,255,0.05); color: #fff; }
-    .sidebar-nav button.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
-    .logout-btn {
-      background: none; border: 1px solid var(--danger); color: var(--danger);
-      padding: 0.7rem; border-radius: var(--radius-sm); font-weight: 600;
-      cursor: pointer; transition: all var(--transition);
-      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-    }
-    .logout-btn:hover { background: rgba(239,68,68,0.1); }
-
-    /* Main */
-    .main { flex: 1; padding: 2rem 2.5rem; overflow-y: auto; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .header h1 { font-size: 2rem; font-weight: 700; }
-
-    /* Stats */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
-    .stat-label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
-    .stat-value { font-size: 2.2rem; font-weight: 800; }
-
-    /* Table */
-    .table-wrapper { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #18181b; padding: 0.9rem 1rem; text-align: left; font-weight: 600; font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; }
-    td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-    tr:last-child td { border-bottom: none; }
-
-    /* Buttons */
-    .btn {
-      padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;
-      border: none; background: #fff; color: #000; transition: all var(--transition);
-      display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9rem;
-    }
-    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
-    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
-
-    /* Modal */
-    .modal {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 100;
-    }
-    .modal.show { display: flex; }
-    .modal-box {
-      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 2rem; width: 100%; max-width: 700px; max-height: 85vh; overflow-y: auto;
-    }
-    .modal h2 { margin-bottom: 1.5rem; }
-    label { display: block; margin-top: 1rem; margin-bottom: 0.4rem; color: var(--text-secondary); font-size: 0.9rem; }
-    input, textarea { width: 100%; padding: 0.8rem; background: #1a1a1a; border: 1px solid var(--border); border-radius: var(--radius-sm); color: #fff; font-family: inherit; }
-    textarea { height: 200px; resize: vertical; font-family: 'Fira Code', monospace; }
-    .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 200; }
-    .toast { background: #fff; color: #000; padding: 1rem 1.5rem; border-radius: var(--radius-sm); font-weight: 600; }
+    body { background: #0a0a0a; color: #fff; font-family: sans-serif; display: flex; height: 100vh; margin: 0; }
+    .sidebar { width: 200px; background: #111; padding: 1rem; }
+    .sidebar button { display: block; width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; background: #222; border: none; color: #fff; cursor: pointer; }
+    .main { flex: 1; padding: 2rem; }
+    .error { color: #f44; }
   </style>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><ellipse cx="12" cy="12" rx="4" ry="10" fill="none" stroke="currentColor" stroke-width="2"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/></svg>
-      <span>Astro</span>
-    </div>
-    <nav class="sidebar-nav">
-      <button data-tab="dashboard" class="active">📊 Dashboard</button>
-      <button data-tab="scripts">📜 Scripts</button>
-    </nav>
-    <button class="logout-btn" onclick="window.location.href='/api/auth/logout'">🚪 Sair</button>
-  </aside>
-
-  <main class="main">
-    <div id="tab-dashboard" class="tab-content active">
-      <div class="header"><h1>Dashboard</h1></div>
-      <div class="stats-grid" id="statsCards">Carregando...</div>
-    </div>
-    <div id="tab-scripts" class="tab-content">
-      <div class="header">
-        <h1>Scripts</h1>
-        <button class="btn btn-primary" onclick="openScriptModal()">+ Novo Script</button>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <thead><tr><th>Nome</th><th>Execuções</th><th>Status</th><th>Ações</th></tr></thead>
-          <tbody id="scriptsTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </main>
-
-  <!-- Modal -->
-  <div id="scriptModal" class="modal">
-    <div class="modal-box">
-      <h2 id="modalTitle">Novo Script</h2>
-      <form id="scriptForm">
-        <input type="hidden" id="scriptId">
-        <label>Nome</label><input type="text" id="scriptName" required>
-        <label>Código Lua</label><textarea id="scriptContent" required></textarea>
-        <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:flex-end;">
-          <button type="button" class="btn btn-danger" onclick="closeModal()">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar</button>
-        </div>
-      </form>
-    </div>
+  <div class="sidebar">
+    <button id="btnDashboard">Dashboard</button>
+    <button id="btnScripts">Scripts</button>
+  </div>
+  <div class="main">
+    <div id="content">Selecione uma aba</div>
   </div>
 
-  <div class="toast-container" id="toastContainer"></div>
-
   <script>
-    const ADMIN_PATH = '/painel';
+    var ADMIN_PATH = '/painel';
 
-    function showToast(msg, type) {
-      var toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.textContent = msg;
-      document.getElementById('toastContainer').appendChild(toast);
-      setTimeout(function() { toast.remove(); }, 3000);
-    }
-
-    // API helper usando XMLHttpRequest (compatível, sem fetch)
-    function api(method, url, body, callback) {
-      var xhr = new XMLHttpRequest();
-      xhr.open(method, url, true);
-      xhr.withCredentials = true;
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.onload = function() {
-        if (xhr.status === 401) { window.location.href = ADMIN_PATH; return; }
-        var data = null;
-        try { data = JSON.parse(xhr.responseText); } catch (e) {}
-        if (xhr.status >= 200 && xhr.status < 300) {
-          callback(null, data);
-        } else {
-          callback(data ? data.error : 'Erro ' + xhr.status, null);
-        }
-      };
-      xhr.onerror = function() { callback('Falha de rede', null); };
-      xhr.send(body ? JSON.stringify(body) : undefined);
-    }
-
-    function loadDashboard() {
-      api('GET', '/api/stats', null, function(err, stats) {
-        if (err) {
-          document.getElementById('statsCards').innerHTML = '<div class="stat-card"><div class="stat-label">Erro</div><div class="stat-value">Falha ao carregar</div></div>';
-          return;
-        }
-        document.getElementById('statsCards').innerHTML =
-          '<div class="stat-card"><div class="stat-label">Total Scripts</div><div class="stat-value">' + (stats.totalScripts||0) + '</div></div>' +
-          '<div class="stat-card"><div class="stat-label">Online</div><div class="stat-value" style="color:var(--success)">' + (stats.onlineScripts||0) + '</div></div>' +
-          '<div class="stat-card"><div class="stat-label">Offline</div><div class="stat-value" style="color:var(--danger)">' + (stats.offlineScripts||0) + '</div></div>' +
-          '<div class="stat-card"><div class="stat-label">Execuções</div><div class="stat-value">' + (stats.totalExecutions||0) + '</div></div>';
-      });
+    function showError(msg) {
+      document.getElementById('content').innerHTML = '<div class="error">' + msg + '</div>';
     }
 
     function loadScripts() {
-      api('GET', '/api/scripts', null, function(err, scripts) {
-        var tbody = document.getElementById('scriptsTable');
-        if (err) {
-          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--danger);">Erro ao carregar scripts.</td></tr>';
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/api/scripts', true);
+      xhr.withCredentials = true;
+      xhr.onload = function() {
+        if (xhr.status === 401) {
+          window.location.href = ADMIN_PATH;
           return;
         }
-        if (!scripts.length) {
-          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);">Nenhum script criado. Clique em "+ Novo Script".</td></tr>';
-          return;
+        var data = JSON.parse(xhr.responseText);
+        if (Array.isArray(data)) {
+          var html = '<h2>Scripts (' + data.length + ')</h2>';
+          data.forEach(function(s) {
+            html += '<p>' + s.name + ' - ' + (s.executions||0) + ' execuções</p>';
+          });
+          document.getElementById('content').innerHTML = html;
+        } else {
+          showError('Resposta inesperada');
         }
-        tbody.innerHTML = scripts.map(function(s) {
-          return '<tr>' +
-            '<td><strong>' + escapeHtml(s.name) + '</strong></td>' +
-            '<td>' + (s.executions||0) + '</td>' +
-            '<td>' + escapeHtml(s.status||'—') + '</td>' +
-            '<td>' +
-              '<button class="btn btn-sm" onclick="editScript(\'' + s.id + '\')">✏️</button> ' +
-              '<button class="btn btn-sm" onclick="copyLoader(\'' + s.id + '\')">📋</button> ' +
-              '<button class="btn btn-sm btn-danger" onclick="deleteScript(\'' + s.id + '\')">🗑️</button>' +
-            '</td>' +
-          '</tr>';
-        }).join('');
-      });
+      };
+      xhr.onerror = function() { showError('Erro de rede'); };
+      xhr.send();
     }
 
-    function openScriptModal(script) {
-      document.getElementById('scriptModal').classList.add('show');
-      document.getElementById('scriptForm').reset();
-      if (script) {
-        document.getElementById('modalTitle').textContent = 'Editar Script';
-        document.getElementById('scriptId').value = script.id;
-        document.getElementById('scriptName').value = script.name;
-        document.getElementById('scriptContent').value = script.content || '';
-      } else {
-        document.getElementById('modalTitle').textContent = 'Novo Script';
-        document.getElementById('scriptId').value = '';
-      }
+    function loadDashboard() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/api/stats', true);
+      xhr.withCredentials = true;
+      xhr.onload = function() {
+        if (xhr.status === 401) { window.location.href = ADMIN_PATH; return; }
+        var data = JSON.parse(xhr.responseText);
+        document.getElementById('content').innerHTML = '<h2>Dashboard</h2><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+      };
+      xhr.send();
     }
 
-    function closeModal() { document.getElementById('scriptModal').classList.remove('show'); }
-
-    function editScript(id) {
-      api('GET', '/api/scripts/' + id, null, function(err, script) {
-        if (err) { showToast('Erro ao carregar script', 'error'); return; }
-        openScriptModal(script);
-      });
-    }
-
-    function deleteScript(id) {
-      if (!confirm('Tem certeza que deseja excluir este script?')) return;
-      api('DELETE', '/api/scripts/' + id, null, function(err) {
-        if (err) { showToast('Erro ao excluir', 'error'); return; }
-        showToast('Script excluído!');
-        loadScripts();
-        loadDashboard();
-      });
-    }
-
-    function copyLoader(id) {
-      var url = window.location.origin + '/s/' + id;
-      navigator.clipboard.writeText('loadstring(game:HttpGet("' + url + '"))()').then(function() {
-        showToast('Loader copiado!');
-      });
-    }
-
-    document.getElementById('scriptForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      var id = document.getElementById('scriptId').value;
-      var name = document.getElementById('scriptName').value.trim();
-      var content = document.getElementById('scriptContent').value;
-      if (!name || !content) { showToast('Nome e código são obrigatórios', 'error'); return; }
-
-      var method = id ? 'PUT' : 'POST';
-      var url = id ? '/api/scripts/' + id : '/api/scripts';
-
-      api(method, url, { name: name, content: content, status: 'online' }, function(err) {
-        if (err) { showToast('Erro ao salvar', 'error'); return; }
-        closeModal();
-        showToast(id ? 'Script atualizado!' : 'Script criado!');
-        loadScripts();
-        loadDashboard();
-      });
-    });
-
-    function escapeHtml(str) {
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
-    // Navegação
-    document.querySelectorAll('.sidebar-nav button').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.sidebar-nav button').forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-        if (btn.dataset.tab === 'dashboard') loadDashboard();
-        else if (btn.dataset.tab === 'scripts') loadScripts();
-      });
-    });
-
-    // Inicial
-    api('GET', '/api/auth/me', null, function(err) {
-      if (err) { window.location.href = ADMIN_PATH; return; }
-      loadDashboard();
-    });
+    document.getElementById('btnScripts').addEventListener('click', loadScripts);
+    document.getElementById('btnDashboard').addEventListener('click', loadDashboard);
   </script>
 </body>
 </html>
