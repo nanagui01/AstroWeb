@@ -35,14 +35,13 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
 
-// Conexão com PostgreSQL — força IPv4 e configura SSL
+// Conexão com PostgreSQL (Render)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-  family: 4, // 🔥 Resolve o erro ENETUNREACH (IPv6 → IPv4)
+  ssl: IS_PRODUCTION ? { rejectUnauthorized: false } : false,
   max: 10,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  connectionTimeoutMillis: 15000,
 });
 
 /* ============================================================
@@ -263,10 +262,7 @@ app.use(async (req, res, next) => {
   try {
     const result = await pool.query('SELECT ip FROM blocked_ips WHERE ip = $1', [ip]);
     if (result.rows.length > 0) return res.status(403).send('Acesso bloqueado.');
-  } catch (err) {
-    // Se o banco falhar, permite o acesso
-    console.error('Erro ao verificar IP bloqueado:', err.message);
-  }
+  } catch (err) { /* falha silenciosa */ }
   next();
 });
 
@@ -726,11 +722,11 @@ app.get('/painel/dashboard', auth, (req, res) => res.sendFile(path.join(__dirnam
       await pool.query('INSERT INTO admins (username, password_hash, role) VALUES ($1, $2, $3)', [ADMIN_USER, hash, 'master']);
       console.log(`✅ Admin master criado: ${ADMIN_USER}`);
     }
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🪐 Astro rodando na porta ${PORT}`);
-    });
   } catch (err) {
-    console.error('❌ Falha ao conectar ao PostgreSQL:', err.message);
-    process.exit(1);
+    console.error('⚠️ PostgreSQL indisponível:', err.message);
+    console.error('O servidor continuará rodando, mas sem banco de dados.');
   }
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🪐 Astro rodando na porta ${PORT}`);
+  });
 })();
