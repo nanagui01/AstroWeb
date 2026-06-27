@@ -2,69 +2,419 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Astro — Scripts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astro — Painel de Controle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    body { background: #0a0a0a; color: #fff; font-family: system-ui, sans-serif; padding: 2rem; }
-    button { padding: 0.6rem 1.2rem; background: #6366f1; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 1rem; }
-    table { width: 100%; border-collapse: collapse; background: #111; border-radius: 12px; overflow: hidden; }
-    th { background: #1a1a1a; padding: 0.8rem; text-align: left; color: #aaa; font-size: 0.8rem; text-transform: uppercase; }
-    td { padding: 0.8rem; border-bottom: 1px solid #1f1f1f; }
-    .empty { text-align: center; color: #aaa; padding: 2rem; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; }
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1f1f1f;
+      --text: #ffffff;
+      --text-secondary: #a0a0a0;
+      --primary: #6366f1;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --transition: 0.2s ease;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 2rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .sidebar-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sidebar-logo svg { width: 32px; height: 32px; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+    .sidebar-nav button {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: left;
+      width: 100%;
+    }
+    .sidebar-nav button:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .sidebar-nav button.active { background: var(--primary); color: #fff; }
+    .logout-btn {
+      background: none;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 0.7rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--transition);
+    }
+    .logout-btn:hover { background: rgba(239,68,68,0.1); }
+
+    /* Main */
+    .main { flex: 1; padding: 2rem; overflow-y: auto; }
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .header h1 { font-size: 1.8rem; font-weight: 700; }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+    .stat-label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+    .stat-value { font-size: 2rem; font-weight: 700; }
+
+    /* Table */
+    .table-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      background: #18181b;
+      padding: 0.8rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+    td { padding: 0.8rem 1rem; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+
+    /* Buttons */
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #fff;
+      color: #000;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+    .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
     .modal.active { display: flex; }
-    .modal-box { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 2rem; width: 500px; }
-    input, textarea { width: 100%; padding: 0.5rem; margin-bottom: 1rem; background: #0a0a0a; border: 1px solid #333; color: #fff; border-radius: 6px; }
-    textarea { height: 200px; font-family: monospace; }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      width: 100%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-box h2 { margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.4rem; color: var(--text-secondary); font-size: 0.9rem; }
+    input, textarea {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    textarea { height: 200px; resize: vertical; font-family: 'Fira Code', monospace; }
+    input:focus, textarea:focus { outline: none; border-color: var(--primary); }
+    .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+    /* Status dot */
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+    .dot.error { background: var(--danger); }
+    .dot.loading { background: var(--warning); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+
+    .empty-state { text-align: center; padding: 3rem; color: var(--text-secondary); }
   </style>
 </head>
 <body>
-  <h1>📜 Scripts</h1>
-  <button onclick="openCreateModal()">+ Novo Script</button>
-  <div id="scriptsContainer">Carregando scripts...</div>
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+      </svg>
+      Astro
+    </div>
+    <nav class="sidebar-nav">
+      <button class="active" data-tab="dashboard">📊 Dashboard</button>
+      <button data-tab="scripts">📜 Scripts</button>
+    </nav>
+    <div class="status-pill">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">conectando</span>
+    </div>
+    <button class="logout-btn" onclick="window.location.href='/api/auth/logout'">🚪 Sair</button>
+  </aside>
 
-  <div id="createModal" class="modal">
+  <main class="main">
+    <!-- Dashboard -->
+    <div id="tab-dashboard" class="tab active">
+      <div class="header">
+        <h1>Dashboard</h1>
+      </div>
+      <div class="stats-grid" id="statsCards">
+        <div class="stat-card"><div class="stat-label">Total Scripts</div><div class="stat-value">—</div></div>
+        <div class="stat-card"><div class="stat-label">Online</div><div class="stat-value">—</div></div>
+        <div class="stat-card"><div class="stat-label">Offline</div><div class="stat-value">—</div></div>
+        <div class="stat-card"><div class="stat-label">Execuções</div><div class="stat-value">—</div></div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <div id="tab-scripts" class="tab">
+      <div class="header">
+        <h1>Scripts</h1>
+        <div>
+          <button class="btn" onclick="exportData()">📤 Exportar</button>
+          <button class="btn" onclick="document.getElementById('importFile').click()">📥 Importar</button>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+          <button class="btn btn-primary" onclick="openCreateModal()">+ Novo Script</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Nome</th><th>Execuções</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="scriptsTable"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyScripts" style="display:none;">Nenhum script criado ainda.</div>
+    </div>
+  </main>
+
+  <!-- Modal Criar/Editar -->
+  <div id="scriptModal" class="modal">
     <div class="modal-box">
-      <h2>Novo Script</h2>
+      <h2 id="modalTitle">Novo Script</h2>
+      <input type="hidden" id="scriptId">
+      <label>Nome</label>
       <input type="text" id="scriptName" placeholder="Nome do script">
-      <textarea id="scriptContent" placeholder="Código Lua"></textarea>
-      <button onclick="createScript()">Salvar</button>
-      <button onclick="closeCreateModal()" style="background:#444;">Cancelar</button>
+      <label>Código Lua</label>
+      <textarea id="scriptContent" placeholder="print('Hello World')"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveScript()">Salvar</button>
+      </div>
     </div>
   </div>
 
   <script>
     const ADMIN_PATH = '/painel';
 
+    // Funções auxiliares
     function escapeHtml(s) {
-      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    function loadScripts() {
-      fetch('/api/scripts', { credentials: 'include' })
-        .then(res => res.json())
-        .then(scripts => {
-          const container = document.getElementById('scriptsContainer');
-          if (!scripts.length) {
-            container.innerHTML = '<div class="empty">Nenhum script criado ainda.</div>';
-            return;
-          }
-          let html = '<table><thead><tr><th>Nome</th><th>Execuções</th><th>Ações</th></tr></thead><tbody>';
-          scripts.forEach(s => {
-            html += `<tr>
-              <td><strong>${escapeHtml(s.name)}</strong></td>
-              <td>${s.executions || 0}</td>
-              <td>
-                <button onclick="deleteScript('${s.id}')">🗑️</button>
-                <button onclick="copyLoader('${s.short_id}', '${s.token}')">📋 Copiar Loader</button>
-              </td>
-            </tr>`;
-          });
-          html += '</tbody></table>';
-          container.innerHTML = html;
-        })
-        .catch(() => {
-          document.getElementById('scriptsContainer').innerHTML = '<div class="empty">Erro ao carregar scripts.</div>';
+    function setStatus(ok) {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      dot.className = 'dot ' + (ok ? '' : 'error');
+      text.textContent = ok ? 'online' : 'offline';
+    }
+
+    // API via fetch
+    async function api(url, options = {}) {
+      const res = await fetch(url, { credentials: 'include', ...options });
+      if (res.status === 401) { window.location.href = ADMIN_PATH; throw new Error('Unauthorized'); }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Erro desconhecido' }));
+        throw new Error(err.error || 'Erro na requisição');
+      }
+      return res.json();
+    }
+
+    // Carregar dashboard
+    async function loadDashboard() {
+      try {
+        const stats = await api('/api/stats');
+        setStatus(true);
+        document.getElementById('statsCards').innerHTML = `
+          <div class="stat-card"><div class="stat-label">Total Scripts</div><div class="stat-value">${stats.totalScripts||0}</div></div>
+          <div class="stat-card"><div class="stat-label">Online</div><div class="stat-value" style="color:var(--success)">${stats.onlineScripts||0}</div></div>
+          <div class="stat-card"><div class="stat-label">Offline</div><div class="stat-value" style="color:var(--danger)">${stats.offlineScripts||0}</div></div>
+          <div class="stat-card"><div class="stat-label">Execuções</div><div class="stat-value">${stats.totalExecutions||0}</div></div>
+        `;
+      } catch (e) {
+        setStatus(false);
+      }
+    }
+
+    // Carregar scripts
+    async function loadScripts() {
+      try {
+        const scripts = await api('/api/scripts');
+        setStatus(true);
+        const tbody = document.getElementById('scriptsTable');
+        const empty = document.getElementById('emptyScripts');
+        if (!scripts.length) {
+          tbody.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+        empty.style.display = 'none';
+        tbody.innerHTML = scripts.map(s => `
+          <tr>
+            <td><strong>${escapeHtml(s.name)}</strong></td>
+            <td>${s.executions||0}</td>
+            <td><span style="color:${s.status==='online'?'var(--success)':'var(--danger)'}">${s.status||'—'}</span></td>
+            <td>
+              <button class="btn btn-sm" onclick="editScript('${s.id}')">✏️</button>
+              <button class="btn btn-sm" onclick="copyLoader('${s.short_id}','${s.token}')">📋</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteScript('${s.id}')">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        setStatus(false);
+      }
+    }
+
+    // Modal
+    function openCreateModal() {
+      document.getElementById('modalTitle').textContent = 'Novo Script';
+      document.getElementById('scriptId').value = '';
+      document.getElementById('scriptName').value = '';
+      document.getElementById('scriptContent').value = '';
+      document.getElementById('scriptModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('scriptModal').classList.remove('active');
+    }
+
+    async function editScript(id) {
+      try {
+        const script = await api('/api/scripts/' + id);
+        document.getElementById('modalTitle').textContent = 'Editar Script';
+        document.getElementById('scriptId').value = script.id;
+        document.getElementById('scriptName').value = script.name;
+        document.getElementById('scriptContent').value = script.content;
+        document.getElementById('scriptModal').classList.add('active');
+      } catch (e) {
+        alert('Erro ao carregar script');
+      }
+    }
+
+    async function saveScript() {
+      const id = document.getElementById('scriptId').value;
+      const name = document.getElementById('scriptName').value.trim();
+      const content = document.getElementById('scriptContent').value;
+      if (!name || !content) return alert('Preencha todos os campos');
+
+      const method = id ? 'PUT' : 'POST';
+      const url = id ? '/api/scripts/' + id : '/api/scripts';
+
+      try {
+        await api(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, content })
         });
+        closeModal();
+        loadScripts();
+        loadDashboard();
+      } catch (e) {
+        alert('Erro ao salvar: ' + e.message);
+      }
+    }
+
+    async function deleteScript(id) {
+      if (!confirm('Tem certeza que deseja excluir este script?')) return;
+      try {
+        await api('/api/scripts/' + id, { method: 'DELETE' });
+        loadScripts();
+        loadDashboard();
+      } catch (e) {
+        alert('Erro ao excluir script');
+      }
     }
 
     function copyLoader(shortId, token) {
@@ -72,33 +422,61 @@
       navigator.clipboard.writeText(loader).then(() => alert('Loader copiado!'));
     }
 
-    function deleteScript(id) {
-      if (!confirm('Excluir este script?')) return;
-      fetch('/api/scripts/' + id, { method: 'DELETE', credentials: 'include' })
-        .then(() => loadScripts());
+    async function exportData() {
+      try {
+        const data = await api('/api/export');
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `astro_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+      } catch (e) {
+        alert('Erro ao exportar');
+      }
     }
 
-    function openCreateModal() { document.getElementById('createModal').classList.add('active'); }
-    function closeCreateModal() { document.getElementById('createModal').classList.remove('active'); }
-
-    function createScript() {
-      const name = document.getElementById('scriptName').value.trim();
-      const content = document.getElementById('scriptContent').value;
-      if (!name || !content) return alert('Preencha todos os campos');
-      fetch('/api/scripts', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, content })
-      })
-      .then(res => res.json())
-      .then(() => {
-        closeCreateModal();
+    async function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        await api('/api/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...data, confirmation: 'IMPORTAR' })
+        });
         loadScripts();
-      });
+        loadDashboard();
+        alert('Importação concluída!');
+      } catch (e) {
+        alert('Erro ao importar: ' + e.message);
+      }
+      event.target.value = '';
     }
 
-    loadScripts();
+    // Navegação
+    document.querySelectorAll('.sidebar-nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        if (btn.dataset.tab === 'dashboard') loadDashboard();
+        else if (btn.dataset.tab === 'scripts') loadScripts();
+      });
+    });
+
+    // Inicial
+    (async () => {
+      try {
+        await api('/api/auth/me');
+        loadDashboard();
+        loadScripts(); // já carrega scripts ao iniciar
+      } catch {
+        window.location.href = ADMIN_PATH;
+      }
+    })();
   </script>
 </body>
 </html>
