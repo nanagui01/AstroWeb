@@ -23,13 +23,9 @@
       --transition: 0.25s ease;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
-    
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(99,102,241,0.08), transparent 40%),
-        radial-gradient(circle at bottom right, rgba(16,185,129,0.06), transparent 40%),
-        #0a0a0a;
+      background: radial-gradient(circle at top left, rgba(99,102,241,0.08), transparent 40%), radial-gradient(circle at bottom right, rgba(16,185,129,0.06), transparent 40%), #0a0a0a;
       color: var(--text);
       display: flex;
       height: 100vh;
@@ -37,297 +33,93 @@
     }
 
     /* Sidebar */
-    .sidebar {
-      width: 260px;
-      background: rgba(17, 17, 17, 0.6);
-      backdrop-filter: blur(12px);
-      border-right: 1px solid var(--border);
-      padding: 2rem 1.2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      transition: transform var(--transition);
-      z-index: 10;
-    }
-    .sidebar-logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #fff;
-    }
+    .sidebar { width: 260px; background: rgba(17,17,17,0.6); backdrop-filter: blur(12px); border-right: 1px solid var(--border); padding: 2rem 1.2rem; display: flex; flex-direction: column; gap: 2rem; transition: transform var(--transition); z-index: 10; }
+    .sidebar-logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.5rem; color: #fff; }
     .sidebar-logo svg { width: 32px; height: 32px; color: var(--primary); }
     .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
-    .sidebar-nav button {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      padding: 0.75rem 1rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transition);
-      text-align: left;
-      width: 100%;
-    }
+    .sidebar-nav button { display: flex; align-items: center; gap: 0.7rem; background: transparent; border: none; color: var(--text-secondary); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all var(--transition); text-align: left; width: 100%; }
     .sidebar-nav button:hover { background: rgba(255,255,255,0.05); color: #fff; }
     .sidebar-nav button.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
-    
-    .logout-btn {
-      background: none;
-      border: 1px solid var(--danger);
-      color: var(--danger);
-      padding: 0.7rem;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      transition: all var(--transition);
-    }
+    .logout-btn { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 0.7rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; text-align: center; transition: all var(--transition); }
     .logout-btn:hover { background: rgba(239,68,68,0.1); transform: translateY(-2px); }
+    .hamburger { display: none; position: fixed; top: 1rem; left: 1rem; z-index: 20; background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 0.5rem; border-radius: var(--radius-sm); cursor: pointer; }
 
-    /* Hamburger Menu para Mobile */
-    .hamburger {
-      display: none;
-      position: fixed;
-      top: 1rem;
-      left: 1rem;
-      z-index: 20;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: #fff;
-      padding: 0.5rem;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-    }
-
-    /* Main Container */
     .main { flex: 1; padding: 2rem; overflow-y: auto; }
     .tab { display: none; }
-    
-    /* Animação suave nas Abas */
-    .tab.active { 
-      display: block; 
-      animation: fadeUp 0.25s ease;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .tab.active { display: block; animation: fadeUp 0.25s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      gap: 1rem;
-    }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
     .header h1 { font-size: 1.8rem; font-weight: 700; }
 
-    /* Skeletons */
-    .skeleton {
-      background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: var(--radius-sm);
-    }
+    .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-    /* Stats Grid & Cards com Glow */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.2rem;
-      margin-bottom: 2rem;
-    }
-    .stat-card {
-      background: rgba(17, 17, 17, 0.7);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
-    }
-    .stat-card:hover { 
-      transform: translateY(-4px);
-      border-color: rgba(99,102,241,0.5);
-      box-shadow:
-        0 0 20px rgba(99,102,241,0.15),
-        0 10px 30px rgba(0,0,0,0.4);
-    }
-    .stat-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
+    .stat-card { background: rgba(17,17,17,0.7); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition); }
+    .stat-card:hover { transform: translateY(-4px); border-color: rgba(99,102,241,0.5); box-shadow: 0 0 20px rgba(99,102,241,0.15), 0 10px 30px rgba(0,0,0,0.4); }
+    .stat-card-header { display: flex; justify-content: space-between; align-items: center; }
     .stat-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-    .stat-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .stat-value { font-size: 2rem; font-weight: 700; font-family: 'Inter', sans-serif; }
+    .stat-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
+    .stat-value { font-size: 2rem; font-weight: 700; }
 
-    /* Gráficos em Vidro (Glassmorphism) */
-    .chart-container {
-      background: rgba(17, 17, 17, 0.8);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
+    .chart-container { background: rgba(17,17,17,0.8); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; }
     .chart-container h3 { margin-bottom: 1rem; font-size: 1.1rem; color: #fff; }
 
-    /* Tabelas mais Bonitas */
-    .table-wrapper {
-      background: rgba(17, 17, 17, 0.6);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
+    .table-wrapper { background: rgba(17,17,17,0.6); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
     table { width: 100%; border-collapse: collapse; }
-    th {
-      background: rgba(24, 24, 27, 0.8);
-      padding: 1rem;
-      text-align: left;
-      font-weight: 600;
-      color: var(--text-secondary);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid var(--border);
-    }
+    th { background: rgba(24,24,27,0.8); padding: 1rem; text-align: left; font-weight: 600; color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
+    th:hover { color: #fff; }
     td { padding: 1rem; border-bottom: 1px solid var(--border); color: #e4e4e7; }
-    tbody tr {
-      transition: background 0.2s;
-    }
-    tbody tr:hover {
-      background: rgba(255, 255, 255, 0.03);
-    }
+    tbody tr { transition: background 0.2s; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
     tr:last-child td { border-bottom: none; }
 
-    /* Badges */
-    .badge {
-      padding: 0.25rem 0.6rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      display: inline-block;
-    }
+    .badge { padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; display: inline-block; }
     .badge-online { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
     .badge-offline { background: rgba(239,68,68,0.12); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
     .badge-maintenance { background: rgba(245,158,11,0.12); color: var(--warning); border: 1px solid rgba(245,158,11,0.2); }
     .badge-development { background: rgba(59,130,246,0.12); color: var(--info); border: 1px solid rgba(59,130,246,0.2); }
+    .tag { display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; background: rgba(255,255,255,0.05); color: var(--text-secondary); margin-right: 0.3rem; margin-bottom: 0.2rem; }
 
-    /* Inputs & Search Box */
-    .search-box {
-      background: rgba(20, 20, 20, 0.8);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.6rem 1rem;
-      color: #fff;
-      width: 250px;
-      font-size: 0.9rem;
-      transition: all var(--transition);
-    }
+    .search-box { background: rgba(20,20,20,0.8); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.6rem 1rem; color: #fff; width: 250px; font-size: 0.9rem; transition: all var(--transition); }
     .search-box::placeholder { color: var(--text-secondary); }
     .search-box:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(99,102,241,0.2); }
 
-    /* Botões Modernos */
-    .btn {
-      padding: 0.6rem 1.2rem;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: #fff;
-      color: #000;
-    }
-    .btn:hover { 
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      opacity: 0.95;
-    }
+    .btn { padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem; background: #fff; color: #000; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); opacity: 0.95; }
     .btn:active { transform: translateY(0); }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
     .btn-danger:hover { background: rgba(239,68,68,0.1); color: var(--danger); }
     .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; }
+    .btn-xs { padding: 0.2rem 0.5rem; font-size: 0.7rem; }
 
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(6px);
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-    }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 100; }
     .modal.active { display: flex; }
-    .modal-box {
-      background: #121212;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      width: 100%;
-      max-width: 600px;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-    }
+    .modal-box { background: #121212; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; width: 100%; max-width: 650px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
     .modal-box h2 { margin-bottom: 1.5rem; font-weight: 700; }
     label { display: block; margin-bottom: 0.4rem; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; }
-    input, textarea, select {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1.2rem;
-      background: #161616;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      color: #fff;
-      font-family: inherit;
-      font-size: 0.9rem;
-      transition: border var(--transition);
-    }
+    input, textarea, select { width: 100%; padding: 0.75rem; margin-bottom: 1.2rem; background: #161616; border: 1px solid var(--border); border-radius: var(--radius-sm); color: #fff; font-family: inherit; font-size: 0.9rem; transition: border var(--transition); }
     textarea { height: 180px; resize: vertical; font-family: 'Fira Code', monospace; }
     input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
     .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
+    .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.2rem; }
+    .checkbox-group input { width: auto; margin-bottom: 0; }
+    .checkbox-group label { margin-bottom: 0; }
 
-    /* Toasts */
     .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 200; }
-    .toast {
-      background: var(--surface); border: 1px solid var(--border); color: #fff;
-      padding: 0.8rem 1.2rem; border-radius: var(--radius-sm); font-weight: 500;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5); animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex; align-items: center; gap: 0.5rem;
-    }
+    .toast { background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 0.8rem 1.2rem; border-radius: var(--radius-sm); font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.5); animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1); display: flex; align-items: center; gap: 0.5rem; }
     .toast.success { border-left: 4px solid var(--success); }
     .toast.error { border-left: 4px solid var(--danger); }
     @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    .pagination { display: flex; gap: 0.5rem; align-items: center; margin-top: 1rem; }
+    .pagination button { padding: 0.4rem 0.8rem; }
+
+    .alert-item { padding: 0.75rem; border-radius: var(--radius-sm); background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .alert-item.warning { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); }
+    .alert-item svg { flex-shrink: 0; }
 
     @media (max-width: 768px) {
       .sidebar { position: fixed; left: -280px; height: 100vh; background: #0a0a0a; }
@@ -365,26 +157,34 @@
   </aside>
 
   <main class="main">
+    <!-- Dashboard -->
     <div id="tab-dashboard" class="tab active">
-      <div class="header"><h1>Dashboard</h1></div>
-      
-      <div class="stats-grid" id="statsCards">
-        <div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div>
-        <div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div>
-        <div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div>
-        <div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div>
+      <div class="header"><h1>Dashboard</h1><button class="btn btn-sm" onclick="exportStats()">📊 Exportar Estatísticas</button></div>
+      <div id="alertsContainer" style="margin-bottom:1.5rem;"></div>
+      <div class="stats-grid" id="statsCards"><div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+        <div class="chart-container"><h3>🌍 Execuções por País</h3><canvas id="countriesChart" height="200"></canvas></div>
+        <div class="chart-container"><h3>🖥️ Saúde do Servidor</h3><div id="healthWidget">Carregando...</div></div>
       </div>
-      
       <div class="chart-container"><canvas id="dailyChart" height="100"></canvas></div>
       <div class="chart-container"><h3>Execuções por Hora</h3><canvas id="hourlyChart" height="80"></canvas></div>
-      <div class="chart-container" id="popularScripts"><h3>Scripts Mais Populares</h3><div class="skeleton" style="height:2rem;margin-bottom:0.5rem;"></div></div>
+      <div class="chart-container" id="popularScripts"><h3>Scripts Mais Populares</h3><div class="skeleton" style="height:2rem;"></div></div>
     </div>
 
+    <!-- Scripts -->
     <div id="tab-scripts" class="tab">
       <div class="header">
         <h1>Scripts</h1>
         <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
           <input type="text" class="search-box" id="searchInput" placeholder="Buscar scripts..." oninput="filterScripts()">
+          <select id="statusFilter" style="width:150px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadScripts(1)">
+            <option value="">Todos status</option>
+            <option value="online">Online</option>
+            <option value="offline">Offline</option>
+            <option value="maintenance">Manutenção</option>
+            <option value="development">Desenvolvimento</option>
+          </select>
+          <select id="tagFilter" style="width:150px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadScripts(1)"><option value="">Todas tags</option></select>
           <button class="btn" onclick="exportData()">Exportar</button>
           <button class="btn" onclick="document.getElementById('importFile').click()">Importar</button>
           <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
@@ -395,20 +195,17 @@
       </div>
       <div class="table-wrapper">
         <table>
-          <thead><tr><th>Nome</th><th>Execuções</th><th>Status</th><th>Ações</th></tr></thead>
+          <thead><tr><th data-sort="name">Nome ↕</th><th data-sort="executions">Execuções ↕</th><th data-sort="status">Status ↕</th><th>Tags</th><th>Ações</th></tr></thead>
           <tbody id="scriptsTable"></tbody>
         </table>
       </div>
+      <div class="pagination" id="paginationContainer"></div>
     </div>
 
+    <!-- Segurança -->
     <div id="tab-security" class="tab">
       <div class="header"><h1>Segurança</h1></div>
-      <div class="table-wrapper">
-        <table>
-          <thead><tr><th>IP Bloqueado</th><th>Ações</th></tr></thead>
-          <tbody id="blockedIPsTable"></tbody>
-        </table>
-      </div>
+      <div class="table-wrapper"><table><thead><tr><th>IP Bloqueado</th><th>Ações</th></tr></thead><tbody id="blockedIPsTable"></tbody></table></div>
       <div style="margin-top:1.5rem; display:flex; gap:0.5rem; align-items:center;">
         <input type="text" id="newIP" placeholder="192.168.1.1" style="width:240px; margin-bottom:0;">
         <button class="btn btn-primary" onclick="blockIP()">Bloquear IP</button>
@@ -416,19 +213,22 @@
     </div>
   </main>
 
+  <!-- Modal Script -->
   <div id="scriptModal" class="modal">
     <div class="modal-box">
       <h2 id="modalTitle">Novo Script</h2>
       <input type="hidden" id="scriptId">
       <label>Nome</label><input type="text" id="scriptName" placeholder="Nome do script">
       <label>Status</label>
-      <select id="scriptStatus">
-        <option value="online">Online</option>
-        <option value="offline">Offline</option>
-        <option value="maintenance">Manutenção</option>
-        <option value="development">Desenvolvimento</option>
-      </select>
+      <select id="scriptStatus"><option value="online">Online</option><option value="offline">Offline</option><option value="maintenance">Manutenção</option><option value="development">Desenvolvimento</option></select>
+      <label>Tags (separadas por vírgula)</label><input type="text" id="scriptTags" placeholder="farm, auto, combate">
       <label>Código Lua</label><textarea id="scriptContent" placeholder="print('Hello World')"></textarea>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+        <div><label>Limite diário (0=sem limite)</label><input type="number" id="scriptDailyLimit" value="0" min="0"></div>
+        <div><label>Data de expiração</label><input type="datetime-local" id="scriptExpiresAt"></div>
+      </div>
+      <div class="checkbox-group"><input type="checkbox" id="scriptSandbox"><label>Modo Sandbox (apenas admin executa)</label></div>
+      <div class="checkbox-group"><input type="checkbox" id="scriptSilent"><label>Modo Silencioso (não conta execuções)</label></div>
       <div id="changelogFields" style="display:none;">
         <label>Título do Changelog</label><input type="text" id="changelogTitle" placeholder="Nova atualização">
         <label>Descrição</label><textarea id="changelogDesc" rows="3" placeholder="O que mudou..."></textarea>
@@ -440,14 +240,22 @@
     </div>
   </div>
 
+  <!-- Modal Histórico de Versões -->
+  <div id="versionsModal" class="modal">
+    <div class="modal-box">
+      <h2>Histórico de Versões</h2>
+      <div id="versionsList" style="max-height:400px; overflow-y:auto;"></div>
+      <button class="btn btn-danger" onclick="document.getElementById('versionsModal').classList.remove('active')" style="margin-top:1rem;">Fechar</button>
+    </div>
+  </div>
+
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
     const ADMIN_PATH = '/painel';
-    let allScripts = [];
-    let dailyChart, hourlyChart;
+    let currentPage = 1, totalPages = 1, currentSort = 'updated_at', currentOrder = 'DESC';
+    let dailyChart, hourlyChart, countriesChart;
 
-    // Toast
     function showToast(msg, type='success') {
       const c = document.getElementById('toastContainer');
       const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg;
@@ -456,7 +264,6 @@
 
     function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    // API
     async function api(url, options={}) {
       const res = await fetch(url, { credentials:'include', ...options });
       if (res.status === 401) { window.location.href = ADMIN_PATH; throw new Error('Unauthorized'); }
@@ -464,181 +271,150 @@
       return res.json();
     }
 
-    // Dashboard
+    // ========== DASHBOARD ==========
     async function loadDashboard() {
       try {
-        const stats = await api('/api/stats');
-        
-        // Renderização dos cards com SVGs e layout em cabeçalho interno
-        document.getElementById('statsCards').innerHTML = `
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-label">Total Scripts</div>
-              <div class="stat-icon" style="color:var(--primary)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-              </div>
-            </div>
-            <div class="stat-value">${stats.totalScripts}</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-label">Online</div>
-              <div class="stat-icon" style="color:var(--success)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 11 15 16 9"></polyline></svg>
-              </div>
-            </div>
-            <div class="stat-value" style="color:var(--success)">${stats.onlineScripts}</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-label">Offline</div>
-              <div class="stat-icon" style="color:var(--danger)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-              </div>
-            </div>
-            <div class="stat-value" style="color:var(--danger)">${stats.offlineScripts}</div>
-          </div>
-          
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <div class="stat-label">Execuções</div>
-              <div class="stat-icon" style="color:var(--warning)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              </div>
-            </div>
-            <div class="stat-value">${stats.totalExecutions}</div>
-          </div>
-        `;
-
-        const ctx1 = document.getElementById('dailyChart').getContext('2d');
-        if (dailyChart) dailyChart.destroy();
-        const gradient1 = ctx1.createLinearGradient(0, 0, 0, 200);
-        gradient1.addColorStop(0, 'rgba(99,102,241,0.4)');
-        gradient1.addColorStop(1, 'rgba(99,102,241,0.01)');
-        dailyChart = new Chart(ctx1, {
-          type: 'bar',
-          data: {
-            labels: stats.daily.map(d => d.date.slice(5)),
-            datasets: [{
-              label: 'Execuções',
-              data: stats.daily.map(d => d.count),
-              backgroundColor: gradient1,
-              borderColor: '#6366f1',
-              borderWidth: 1.5,
-              borderRadius: 6,
-              borderSkipped: false,
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              y: { beginAtZero: true, ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-              x: { ticks: { color: '#a0a0a0' }, grid: { display: false } }
-            }
-          }
-        });
-
-        const ctx2 = document.getElementById('hourlyChart').getContext('2d');
-        if (hourlyChart) hourlyChart.destroy();
-        const gradient2 = ctx2.createLinearGradient(0, 0, 0, 150);
-        gradient2.addColorStop(0, 'rgba(16,185,129,0.3)');
-        gradient2.addColorStop(1, 'rgba(16,185,129,0.01)');
-        hourlyChart = new Chart(ctx2, {
-          type: 'line',
-          data: {
-            labels: stats.hourly.map(h => h.hour + 'h'),
-            datasets: [{
-              label: 'Execuções',
-              data: stats.hourly.map(h => h.count),
-              borderColor: '#10b981',
-              backgroundColor: gradient2,
-              fill: true,
-              tension: 0.4,
-              pointRadius: 3,
-              pointBackgroundColor: '#10b981',
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-              y: { beginAtZero: true, ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-              x: { ticks: { color: '#a0a0a0', maxTicksLimit: 12 }, grid: { display: false } }
-            }
-          }
-        });
-
-        const popDiv = document.getElementById('popularScripts');
-        popDiv.innerHTML = '<h3>Scripts Mais Populares</h3>' + stats.popular.map(s => `
-          <div style="display:flex; justify-content:space-between; padding:0.75rem 0; border-bottom:1px solid var(--border);">
-            <span style="font-weight:500;">${escapeHtml(s.name)}</span>
-            <span style="color:var(--success); font-weight:600;">${s.executions||0} execuções</span>
-          </div>
-        `).join('') || '<p style="color:var(--text-secondary); padding:0.5rem 0;">Nenhum script ainda.</p>';
+        const [stats, alerts, health] = await Promise.all([
+          api('/api/stats'), api('/api/alerts'), api('/api/health')
+        ]);
+        renderStatsCards(stats);
+        renderAlerts(alerts);
+        renderHealth(health);
+        renderDailyChart(stats.daily);
+        renderHourlyChart(stats.hourly);
+        renderCountriesChart(stats.countries);
+        renderPopular(stats.popular);
       } catch(e) { showToast('Erro ao carregar dashboard', 'error'); }
     }
 
-    // Scripts
-    async function loadScripts() {
+    function renderStatsCards(s) {
+      document.getElementById('statsCards').innerHTML = `
+        <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Total Scripts</div><div class="stat-icon" style="color:var(--primary)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div></div><div class="stat-value">${s.totalScripts}</div></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Online</div><div class="stat-icon" style="color:var(--success)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg></div></div><div class="stat-value" style="color:var(--success)">${s.onlineScripts}</div></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Offline</div><div class="stat-icon" style="color:var(--danger)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div></div><div class="stat-value" style="color:var(--danger)">${s.offlineScripts}</div></div>
+        <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Execuções</div><div class="stat-icon" style="color:var(--warning)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div><div class="stat-value">${s.totalExecutions}</div></div>
+      `;
+    }
+
+    function renderAlerts(alerts) {
+      const container = document.getElementById('alertsContainer');
+      let html = '';
+      if (alerts.offline.length) alerts.offline.forEach(s => html += `<div class="alert-item">⚠️ Script offline: <strong>${escapeHtml(s.name)}</strong></div>`);
+      if (alerts.expiring.length) alerts.expiring.forEach(s => html += `<div class="alert-item warning">⏰ Expirando em breve: <strong>${escapeHtml(s.name)}</strong> (${new Date(s.expires_at).toLocaleDateString()})</div>`);
+      container.innerHTML = html;
+    }
+
+    function renderHealth(h) {
+      document.getElementById('healthWidget').innerHTML = `
+        <p>⏱️ Uptime: ${(h.uptime/3600).toFixed(1)}h</p>
+        <p>🧠 Memória: ${h.memory.heapUsed} / ${h.memory.heapTotal}</p>
+        <p>⚙️ Node: ${h.nodeVersion}</p>
+        <p>🔄 PID: ${h.pid}</p>
+      `;
+    }
+
+    function renderDailyChart(data) {
+      const ctx = document.getElementById('dailyChart').getContext('2d');
+      if (dailyChart) dailyChart.destroy();
+      const grad = ctx.createLinearGradient(0,0,0,200);
+      grad.addColorStop(0,'rgba(99,102,241,0.4)'); grad.addColorStop(1,'rgba(99,102,241,0.01)');
+      dailyChart = new Chart(ctx, { type:'bar', data:{ labels: data.map(d=>d.date.slice(5)), datasets:[{ label:'Execuções', data: data.map(d=>d.count), backgroundColor:grad, borderColor:'#6366f1', borderWidth:1.5, borderRadius:6 }] }, options:{ responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{color:'#a0a0a0'}, grid:{color:'rgba(255,255,255,0.05)'} }, x:{ ticks:{color:'#a0a0a0'}, grid:{display:false} } } } });
+    }
+
+    function renderHourlyChart(data) {
+      const ctx = document.getElementById('hourlyChart').getContext('2d');
+      if (hourlyChart) hourlyChart.destroy();
+      const grad = ctx.createLinearGradient(0,0,0,150);
+      grad.addColorStop(0,'rgba(16,185,129,0.3)'); grad.addColorStop(1,'rgba(16,185,129,0.01)');
+      hourlyChart = new Chart(ctx, { type:'line', data:{ labels: data.map(h=>h.hour+'h'), datasets:[{ label:'Execuções', data: data.map(h=>h.count), borderColor:'#10b981', backgroundColor:grad, fill:true, tension:0.4, pointRadius:3 }] }, options:{ responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{color:'#a0a0a0'}, grid:{color:'rgba(255,255,255,0.05)'} }, x:{ ticks:{color:'#a0a0a0', maxTicksLimit:12}, grid:{display:false} } } } });
+    }
+
+    function renderCountriesChart(data) {
+      const ctx = document.getElementById('countriesChart').getContext('2d');
+      if (countriesChart) countriesChart.destroy();
+      countriesChart = new Chart(ctx, { type:'bar', data:{ labels: data.map(d=>d.country), datasets:[{ label:'Execuções', data: data.map(d=>d.count), backgroundColor: data.map((_,i)=> `hsl(${i*40}, 70%, 50%)`) }] }, options:{ indexAxis:'y', responsive:true, plugins:{legend:{display:false}} } });
+    }
+
+    function renderPopular(data) {
+      const div = document.getElementById('popularScripts');
+      div.innerHTML = '<h3>Scripts Mais Populares</h3>' + data.map(s => `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);"><span>${escapeHtml(s.name)}</span><span style="color:var(--success);">${s.executions||0} execuções</span></div>`).join('') || '<p>Nenhum script.</p>';
+    }
+
+    async function exportStats() {
+      const format = confirm('Clique OK para JSON, Cancelar para CSV') ? 'json' : 'csv';
+      const res = await fetch(`/api/stats/export?format=${format}`, { credentials:'include' });
+      const blob = await res.blob();
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `astro_stats.${format}`; a.click();
+    }
+
+    // ========== SCRIPTS ==========
+    async function loadScripts(page = currentPage) {
+      const status = document.getElementById('statusFilter').value;
+      const tag = document.getElementById('tagFilter').value;
+      let url = `/api/scripts?page=${page}&limit=25&sort=${currentSort}&order=${currentOrder}`;
+      if (status) url += `&status=${status}`;
+      if (tag) url += `&tag=${tag}`;
       try {
-        allScripts = await api('/api/scripts');
-        renderScripts(allScripts);
+        const result = await api(url);
+        currentPage = result.page;
+        totalPages = result.totalPages;
+        renderScripts(result.data);
+        renderPagination();
       } catch(e) { showToast('Erro ao carregar scripts', 'error'); }
     }
 
     function renderScripts(scripts) {
       const tbody = document.getElementById('scriptsTable');
-      if (!scripts.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-secondary);">Nenhum script encontrado.</td></tr>'; return; }
-      tbody.innerHTML = scripts.map(s => `
-        <tr>
+      if (!scripts.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum script.</td></tr>'; return; }
+      tbody.innerHTML = scripts.map(s => {
+        const tagsHtml = (s.tags||[]).map(t => `<span class="tag">${escapeHtml(t.name)}</span>`).join('');
+        return `<tr>
           <td><strong>${escapeHtml(s.name)}</strong></td>
-          <td><span style="font-weight: 500;">${s.executions||0}</span></td>
+          <td>${s.executions||0}</td>
           <td><span class="badge badge-${s.status||'online'}">${s.status}</span></td>
+          <td>${tagsHtml || '—'}</td>
           <td>
-            <button class="btn btn-sm edit-btn" data-id="${s.id}" title="Editar">✏️</button>
-            <button class="btn btn-sm duplicate-btn" data-id="${s.id}" title="Duplicar">📄</button>
-            <button class="btn btn-sm copy-btn" data-short="${s.short_id}" data-token="${s.token}" title="Copiar Loader">📋</button>
-            <button class="btn btn-sm btn-danger delete-btn" data-id="${s.id}" title="Excluir">🗑️</button>
+            <button class="btn btn-xs edit-btn" data-id="${s.id}">✏️</button>
+            <button class="btn btn-xs duplicate-btn" data-id="${s.id}">📄</button>
+            <button class="btn btn-xs copy-btn" data-short="${s.short_id}" data-token="${s.token}">📋</button>
+            <button class="btn btn-xs" onclick="openVersions('${s.id}')">🕒</button>
+            <button class="btn btn-xs btn-danger delete-btn" data-id="${s.id}">🗑️</button>
           </td>
-        </tr>
-      `).join('');
+        </tr>`;
+      }).join('');
 
-      tbody.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const id = this.getAttribute('data-id');
-          if (id) editScript(id);
-        });
-      });
-
-      tbody.querySelectorAll('.duplicate-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const id = this.getAttribute('data-id');
-          if (id) duplicateScript(id);
-        });
-      });
-
-      tbody.querySelectorAll('.copy-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const short = this.getAttribute('data-short');
-          const token = this.getAttribute('data-token');
-          if (short && token) copyLoader(short, token);
-        });
-      });
-
-      tbody.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const id = this.getAttribute('data-id');
-          if (id) deleteScript(id);
-        });
-      });
+      tbody.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', function(){ editScript(this.dataset.id); }));
+      tbody.querySelectorAll('.duplicate-btn').forEach(b => b.addEventListener('click', function(){ duplicateScript(this.dataset.id); }));
+      tbody.querySelectorAll('.copy-btn').forEach(b => b.addEventListener('click', function(){ copyLoader(this.dataset.short, this.dataset.token); }));
+      tbody.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', function(){ deleteScript(this.dataset.id); }));
     }
 
-    function filterScripts() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      renderScripts(allScripts.filter(s => s.name.toLowerCase().includes(q)));
+    function renderPagination() {
+      const container = document.getElementById('paginationContainer');
+      container.innerHTML = `
+        <button class="btn btn-sm" ${currentPage<=1?'disabled':''} onclick="loadScripts(${currentPage-1})">← Anterior</button>
+        <span style="color:var(--text-secondary);">Página ${currentPage} de ${totalPages}</span>
+        <button class="btn btn-sm" ${currentPage>=totalPages?'disabled':''} onclick="loadScripts(${currentPage+1})">Próxima →</button>
+      `;
+    }
+
+    function filterScripts() { loadScripts(1); }
+
+    document.querySelectorAll('#tab-scripts th[data-sort]').forEach(th => {
+      th.addEventListener('click', function() {
+        currentSort = this.dataset.sort;
+        currentOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
+        loadScripts(1);
+      });
+    });
+
+    // Carregar tags para o filtro
+    async function loadTagsForFilter() {
+      try {
+        const tags = await api('/api/tags');
+        const sel = document.getElementById('tagFilter');
+        sel.innerHTML = '<option value="">Todas tags</option>' + tags.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+      } catch(e) {}
     }
 
     // Modal
@@ -647,7 +423,12 @@
       document.getElementById('scriptId').value = '';
       document.getElementById('scriptName').value = '';
       document.getElementById('scriptStatus').value = 'online';
+      document.getElementById('scriptTags').value = '';
       document.getElementById('scriptContent').value = '';
+      document.getElementById('scriptDailyLimit').value = 0;
+      document.getElementById('scriptExpiresAt').value = '';
+      document.getElementById('scriptSandbox').checked = false;
+      document.getElementById('scriptSilent').checked = false;
       document.getElementById('changelogFields').style.display = 'none';
       document.getElementById('scriptModal').classList.add('active');
     }
@@ -661,7 +442,12 @@
         document.getElementById('scriptId').value = script.id;
         document.getElementById('scriptName').value = script.name;
         document.getElementById('scriptStatus').value = script.status || 'online';
+        document.getElementById('scriptTags').value = (script.tags||[]).map(t=>t.name).join(', ');
         document.getElementById('scriptContent').value = script.content;
+        document.getElementById('scriptDailyLimit').value = script.daily_limit || 0;
+        document.getElementById('scriptExpiresAt').value = script.expires_at ? script.expires_at.slice(0,16) : '';
+        document.getElementById('scriptSandbox').checked = script.sandbox || false;
+        document.getElementById('scriptSilent').checked = script.silent || false;
         document.getElementById('changelogFields').style.display = 'block';
         document.getElementById('scriptModal').classList.add('active');
       }).catch(e => showToast('Erro ao carregar script', 'error'));
@@ -671,26 +457,26 @@
       const id = document.getElementById('scriptId').value;
       const name = document.getElementById('scriptName').value.trim();
       const status = document.getElementById('scriptStatus').value;
+      const tags = document.getElementById('scriptTags').value.split(',').map(t=>t.trim()).filter(Boolean);
       const content = document.getElementById('scriptContent').value;
+      const daily_limit = parseInt(document.getElementById('scriptDailyLimit').value) || 0;
+      const expires_at = document.getElementById('scriptExpiresAt').value || null;
+      const sandbox = document.getElementById('scriptSandbox').checked;
+      const silent = document.getElementById('scriptSilent').checked;
+
       if (!name || !content) return showToast('Preencha todos os campos', 'error');
       const method = id ? 'PUT' : 'POST';
       const url = id ? '/api/scripts/' + id : '/api/scripts';
-      api(url, { method, headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, content, status }) })
+      api(url, { method, headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, content, status, tags, daily_limit, expires_at, sandbox, silent }) })
         .then(async () => {
           if (id) {
-            const changelog = {
-              title: document.getElementById('changelogTitle').value.trim(),
-              description: document.getElementById('changelogDesc').value.trim()
-            };
+            const changelog = { title: document.getElementById('changelogTitle').value.trim(), description: document.getElementById('changelogDesc').value.trim() };
             if (changelog.title || changelog.description) {
-              await api(`/api/scripts/${id}/changelog`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(changelog) }).catch(() => {});
+              await api(`/api/scripts/${id}/changelog`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(changelog) }).catch(()=>{});
             }
           }
-          closeModal();
-          loadScripts();
-          showToast(id ? 'Script atualizado!' : 'Script criado!', 'success');
-        })
-        .catch(e => showToast('Erro ao salvar', 'error'));
+          closeModal(); loadScripts(); showToast(id ? 'Script atualizado!' : 'Script criado!', 'success');
+        }).catch(e => showToast('Erro ao salvar', 'error'));
     }
 
     function deleteScript(id) {
@@ -706,30 +492,42 @@
       navigator.clipboard.writeText(`loadstring(game:HttpGet("${location.origin}/api/load/${shortId}/${token}"))()`).then(() => showToast('Loader copiado!', 'success'));
     }
 
-    // Importar .txt
+    async function openVersions(scriptId) {
+      try {
+        const versions = await api(`/api/scripts/${scriptId}/versions`);
+        const list = document.getElementById('versionsList');
+        list.innerHTML = versions.length === 0 ? '<p>Nenhuma versão anterior.</p>' : versions.map(v => `
+          <div style="border:1px solid var(--border); border-radius:8px; padding:0.8rem; margin-bottom:0.5rem;">
+            <strong>${escapeHtml(v.name)}</strong> (${new Date(v.created_at).toLocaleString()})<br>
+            <button class="btn btn-xs btn-primary" onclick="restoreVersion('${scriptId}','${v.id}')">Restaurar esta versão</button>
+          </div>`).join('');
+        document.getElementById('versionsModal').classList.add('active');
+      } catch(e) { showToast('Erro ao carregar versões', 'error'); }
+    }
+
+    async function restoreVersion(scriptId, versionId) {
+      if (!confirm('Restaurar esta versão? O estado atual será salvo como versão anterior.')) return;
+      try {
+        await api(`/api/scripts/${scriptId}/restore`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ versionId }) });
+        document.getElementById('versionsModal').classList.remove('active');
+        loadScripts();
+        showToast('Versão restaurada!', 'success');
+      } catch(e) { showToast('Erro ao restaurar', 'error'); }
+    }
+
     async function importTxtFiles(event) {
-      const files = event.target.files;
-      if (!files.length) return;
+      const files = event.target.files; if (!files.length) return;
       const scriptsToCreate = [];
       for (const file of files) {
         if (!file.name.endsWith('.txt')) continue;
-        const content = await file.text();
-        if (!content.trim()) continue;
-        const name = file.name.replace(/\.txt$/i, '');
-        scriptsToCreate.push({ name, content });
+        const content = await file.text(); if (!content.trim()) continue;
+        scriptsToCreate.push({ name: file.name.replace(/\.txt$/i,''), content });
       }
       if (!scriptsToCreate.length) return showToast('Nenhum arquivo .txt válido.', 'error');
       try {
-        await api('/api/scripts/bulk', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ scripts: scriptsToCreate })
-        });
-        loadScripts();
-        showToast(`${scriptsToCreate.length} script(s) importado(s)!`, 'success');
-      } catch (e) {
-        showToast('Erro ao importar arquivos.', 'error');
-      }
+        await api('/api/scripts/bulk', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ scripts: scriptsToCreate }) });
+        loadScripts(); showToast(`${scriptsToCreate.length} script(s) importado(s)!`, 'success');
+      } catch(e) { showToast('Erro ao importar arquivos.', 'error'); }
       event.target.value = '';
     }
 
@@ -737,17 +535,14 @@
       try {
         const data = await api('/api/export');
         const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-        a.download = `astro_backup_${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `astro_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
       } catch(e) { showToast('Erro ao exportar', 'error'); }
     }
 
     async function importData(event) {
       const file = event.target.files[0]; if (!file) return;
       try {
-        const text = await file.text();
-        const data = JSON.parse(text);
+        const text = await file.text(); const data = JSON.parse(text);
         await api('/api/import', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...data, confirmation:'IMPORTAR'}) });
         loadScripts(); showToast('Importado!', 'success');
       } catch(e) { showToast('Erro ao importar', 'error'); }
@@ -758,25 +553,20 @@
     async function loadBlockedIPs() {
       try {
         const ips = await api('/api/admin/blocked-ips');
-        document.getElementById('blockedIPsTable').innerHTML = ips.map(ip => `
-          <tr><td>${ip}</td><td><button class="btn btn-sm btn-danger" onclick="unblockIP('${ip}')">Remover</button></td></tr>
-        `).join('');
+        document.getElementById('blockedIPsTable').innerHTML = ips.map(ip => `<tr><td>${ip}</td><td><button class="btn btn-sm btn-danger" onclick="unblockIP('${ip}')">Remover</button></td></tr>`).join('');
       } catch(e) {}
     }
 
     async function blockIP() {
-      const ip = document.getElementById('newIP').value.trim();
-      if (!ip) return showToast('Digite um IP', 'error');
-      try { await api('/api/admin/block-ip', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ip }) }); loadBlockedIPs(); showToast('IP bloqueado!', 'success'); }
-      catch(e) { showToast('Erro ao bloquear IP', 'error'); }
+      const ip = document.getElementById('newIP').value.trim(); if (!ip) return showToast('Digite um IP', 'error');
+      try { await api('/api/admin/block-ip', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ip }) }); loadBlockedIPs(); showToast('IP bloqueado!', 'success'); } catch(e) { showToast('Erro ao bloquear IP', 'error'); }
     }
 
     async function unblockIP(ip) {
-      try { await api(`/api/admin/block-ip/${ip}`, { method:'DELETE' }); loadBlockedIPs(); showToast('IP removido!', 'success'); }
-      catch(e) { showToast('Erro ao remover IP', 'error'); }
+      try { await api(`/api/admin/block-ip/${ip}`, { method:'DELETE' }); loadBlockedIPs(); showToast('IP removido!', 'success'); } catch(e) { showToast('Erro ao remover IP', 'error'); }
     }
 
-    // Navegação entre abas
+    // Navegação
     document.querySelectorAll('.sidebar-nav button').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
@@ -784,13 +574,14 @@
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
         if (btn.dataset.tab === 'dashboard') loadDashboard();
-        else if (btn.dataset.tab === 'scripts') loadScripts();
+        else if (btn.dataset.tab === 'scripts') { loadScripts(); loadTagsForFilter(); }
         else if (btn.dataset.tab === 'security') loadBlockedIPs();
         document.querySelector('.sidebar').classList.remove('open');
       });
     });
 
     document.getElementById('scriptModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    document.getElementById('versionsModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
 
     (async () => {
       try { await api('/api/auth/me'); loadDashboard(); }
