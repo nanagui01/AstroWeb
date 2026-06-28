@@ -1,7 +1,7 @@
 {
   "name": "astro-storage",
   "version": "7.0.0",
-  "description": "Astro Storage – Painel de scripts para Roblox com PostgreSQL, segurança avançada e bot Discord integrado",
+  "description": "Astro Storage – Painel de scripts para Roblox com PostgreSQL, segurança e bot Discord integrado",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
