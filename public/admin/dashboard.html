@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
+    /* ... (CSS idêntico ao fornecido anteriormente, sem alterações) ... */
     :root {
       --bg: #0a0a0a;
       --surface: #111111;
@@ -32,7 +33,6 @@
       overflow: hidden;
     }
 
-    /* Sidebar */
     .sidebar { width: 260px; background: rgba(17,17,17,0.6); backdrop-filter: blur(12px); border-right: 1px solid var(--border); padding: 2rem 1.2rem; display: flex; flex-direction: column; gap: 2rem; transition: transform var(--transition); z-index: 10; }
     .sidebar-logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.5rem; color: #fff; }
     .sidebar-logo svg { width: 32px; height: 32px; color: var(--primary); }
@@ -135,6 +135,7 @@
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </button>
 
+  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
@@ -161,6 +162,7 @@
     <button class="logout-btn" onclick="window.location.href='/api/auth/logout'">Sair</button>
   </aside>
 
+  <!-- Main content -->
   <main class="main">
     <!-- Dashboard -->
     <div id="tab-dashboard" class="tab active">
@@ -245,7 +247,7 @@
     </div>
   </main>
 
-  <!-- Modals (idênticos ao que você já tinha, mas com o campo de serviço) -->
+  <!-- Modals -->
   <!-- Modal Script -->
   <div id="scriptModal" class="modal">
     <div class="modal-box">
@@ -275,7 +277,7 @@
     </div>
   </div>
 
-  <!-- Modal Key (agora pede serviço) -->
+  <!-- Modal Key -->
   <div id="keyModal" class="modal">
     <div class="modal-box">
       <h2>Criar Nova Key</h2>
@@ -341,7 +343,6 @@
     let keysPage = 1, keysTotalPages = 1;
     let dailyChart;
 
-    // Ícones SVG personalizados (substituem emojis)
     const icons = {
       edit: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
       copy: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
@@ -376,9 +377,7 @@
     // ========== DASHBOARD ==========
     async function loadDashboard() {
       try {
-        const [stats, alerts] = await Promise.all([
-          api('/api/stats'), api('/api/alerts')
-        ]);
+        const [stats, alerts] = await Promise.all([api('/api/stats'), api('/api/alerts')]);
         renderStatsCards(stats);
         renderAlerts(alerts);
         renderDailyChart(stats.daily || []);
@@ -571,7 +570,7 @@
     }
 
     function copyLoader(shortId, token, hasService) {
-      const base = `${location.origin}/api/load/${shortId}/${token}`;
+      const base = `${location.origin}/api/loader/${shortId}/${token}`;
       let loader;
       if (hasService) {
         loader = `local KEY = ""\nloadstring(game:HttpGet("${base}?key="..KEY))()`;
@@ -581,11 +580,62 @@
       navigator.clipboard.writeText(loader).then(() => showToast('Loader copiado!', 'success'));
     }
 
-    async function openVersions(scriptId) { /* ... mantido igual ao original ... */ }
-    async function restoreVersion(scriptId, versionId) { /* ... */ }
-    async function importTxtFiles(event) { /* ... */ }
-    async function exportData() { /* ... */ }
-    async function importData(event) { /* ... */ }
+    async function openVersions(scriptId) {
+      try {
+        const versions = await api(`/api/scripts/${scriptId}/versions`);
+        const list = document.getElementById('versionsList');
+        list.innerHTML = versions.length === 0 ? '<p>Nenhuma versão anterior.</p>' : versions.map(v => `
+          <div style="border:1px solid var(--border); border-radius:8px; padding:0.8rem; margin-bottom:0.5rem;">
+            <strong>${escapeHtml(v.name)}</strong> (${new Date(v.created_at).toLocaleString()})<br>
+            <button class="btn btn-xs btn-primary" onclick="restoreVersion('${scriptId}','${v.id}')">Restaurar esta versão</button>
+          </div>`).join('');
+        document.getElementById('versionsModal').classList.add('active');
+      } catch(e) { showToast('Erro ao carregar versões', 'error'); }
+    }
+
+    async function restoreVersion(scriptId, versionId) {
+      if (!confirm('Restaurar esta versão? O estado atual será salvo como versão anterior.')) return;
+      try {
+        await api(`/api/scripts/${scriptId}/restore`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ versionId }) });
+        document.getElementById('versionsModal').classList.remove('active');
+        loadScripts();
+        showToast('Versão restaurada!', 'success');
+      } catch(e) { showToast('Erro ao restaurar', 'error'); }
+    }
+
+    async function importTxtFiles(event) {
+      const files = event.target.files; if (!files.length) return;
+      const scriptsToCreate = [];
+      for (const file of files) {
+        if (!file.name.endsWith('.txt')) continue;
+        const content = await file.text(); if (!content.trim()) continue;
+        scriptsToCreate.push({ name: file.name.replace(/\.txt$/i,''), content });
+      }
+      if (!scriptsToCreate.length) return showToast('Nenhum arquivo .txt válido.', 'error');
+      try {
+        await api('/api/scripts/bulk', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ scripts: scriptsToCreate }) });
+        loadScripts(); showToast(`${scriptsToCreate.length} script(s) importado(s)!`, 'success');
+      } catch(e) { showToast('Erro ao importar arquivos.', 'error'); }
+      event.target.value = '';
+    }
+
+    async function exportData() {
+      try {
+        const data = await api('/api/export');
+        const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `storm_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+      } catch(e) { showToast('Erro ao exportar', 'error'); }
+    }
+
+    async function importData(event) {
+      const file = event.target.files[0]; if (!file) return;
+      try {
+        const text = await file.text(); const data = JSON.parse(text);
+        await api('/api/import', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...data, confirmation:'IMPORTAR'}) });
+        loadScripts(); showToast('Importado!', 'success');
+      } catch(e) { showToast('Erro ao importar', 'error'); }
+      event.target.value = '';
+    }
 
     // ========== SERVIÇOS ==========
     async function loadServices() {
@@ -665,7 +715,6 @@
     }
 
     async function loadServiceFilters(services) {
-      // Atualiza dropdowns de filtro nos modais e tabelas
       const keyServiceFilter = document.getElementById('keyServiceFilter');
       if (keyServiceFilter) keyServiceFilter.innerHTML = '<option value="">Todos serviços</option>' + services.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
       const keyServiceSelect = document.getElementById('keyServiceSelect');
@@ -718,24 +767,99 @@
       }));
     }
 
-    function renderKeysPagination() { /* ... */ }
-    function openCreateKeyModal() {
-      if (!document.getElementById('keyServiceSelect').options.length || document.getElementById('keyServiceSelect').options[0].value === '') {
-        loadServices(); // garante que os serviços estejam carregados
-      }
-      document.getElementById('keyModal').classList.add('active');
+    function renderKeysPagination() {
+      const container = document.getElementById('keysPagination');
+      container.innerHTML = `
+        <button class="btn btn-sm" ${keysPage<=1?'disabled':''} onclick="loadKeys(${keysPage-1})">← Anterior</button>
+        <span style="color:var(--text-secondary);">Página ${keysPage} de ${keysTotalPages}</span>
+        <button class="btn btn-sm" ${keysPage>=keysTotalPages?'disabled':''} onclick="loadKeys(${keysPage+1})">Próxima →</button>
+      `;
     }
-    async function createKey() { /* ... */ }
-    function openRenewModal(keyId) { /* ... */ }
-    async function renewKey() { /* ... */ }
-    async function revokeKey(keyId) { /* ... */ }
-    async function deleteKey(keyId) { /* ... */ }
-    async function loadKeyStats() { /* ... */ }
+
+    function openCreateKeyModal() {
+      // Garante que os serviços estão carregados antes de abrir o modal
+      loadServices().then(() => {
+        document.getElementById('keyModal').classList.add('active');
+      });
+    }
+
+    async function createKey() {
+      const service_id = document.getElementById('keyServiceSelect').value;
+      const duration = parseInt(document.getElementById('keyDuration').value);
+      if (!service_id) return showToast('Selecione um serviço', 'error');
+      try {
+        const res = await api('/api/keys', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ duration, service_id }) });
+        document.getElementById('keyModal').classList.remove('active');
+        showToast(`Key criada: ${res.key}`, 'success');
+        loadKeys();
+      } catch(e) { showToast('Erro ao criar key', 'error'); }
+    }
+
+    function openRenewModal(keyId) {
+      document.getElementById('renewKeyId').value = keyId;
+      document.getElementById('renewModal').classList.add('active');
+    }
+
+    async function renewKey() {
+      const keyId = document.getElementById('renewKeyId').value;
+      const days = parseInt(document.getElementById('renewDays').value) || 7;
+      try {
+        await api(`/api/keys/${keyId}/renew`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ days }) });
+        document.getElementById('renewModal').classList.remove('active');
+        showToast('Key renovada!', 'success');
+        loadKeys();
+      } catch(e) { showToast('Erro ao renovar', 'error'); }
+    }
+
+    async function revokeKey(keyId) {
+      if (!confirm('Revogar esta key? Ela ficará inativa.')) return;
+      try {
+        await api(`/api/keys/${keyId}/revoke`, { method:'POST' });
+        showToast('Key revogada.', 'success');
+        loadKeys();
+      } catch(e) { showToast('Erro ao revogar', 'error'); }
+    }
+
+    async function deleteKey(keyId) {
+      if (!confirm('Excluir permanentemente esta key?')) return;
+      try {
+        await api(`/api/keys/${keyId}`, { method:'DELETE' });
+        showToast('Key excluída.', 'success');
+        loadKeys();
+      } catch(e) { showToast('Erro ao excluir', 'error'); }
+    }
+
+    async function loadKeyStats() {
+      try {
+        const stats = await api('/api/stats');
+        if (stats.keyStats) {
+          document.getElementById('keyStatsCards').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Total Keys</div><div class="stat-value">${stats.keyStats.total}</div></div>
+            <div class="stat-card"><div class="stat-label">Ativas</div><div class="stat-value" style="color:var(--success)">${stats.keyStats.active}</div></div>
+            <div class="stat-card"><div class="stat-label">Expiradas</div><div class="stat-value" style="color:var(--warning)">${stats.keyStats.expired}</div></div>
+            <div class="stat-card"><div class="stat-label">Revogadas</div><div class="stat-value" style="color:var(--danger)">${stats.keyStats.revoked}</div></div>
+            <div class="stat-card"><div class="stat-label">Ativações Hoje</div><div class="stat-value">${stats.keyStats.activationsToday}</div></div>
+          `;
+        }
+      } catch(e) {}
+    }
 
     // ========== SEGURANÇA ==========
-    async function loadBlockedIPs() { /* ... */ }
-    async function blockIP() { /* ... */ }
-    async function unblockIP(ip) { /* ... */ }
+    async function loadBlockedIPs() {
+      try {
+        const ips = await api('/api/admin/blocked-ips');
+        document.getElementById('blockedIPsTable').innerHTML = ips.length ? ips.map(ip => `<tr><td>${ip}</td><td><button class="btn btn-sm btn-danger" onclick="unblockIP('${ip}')">Remover</button></td></tr>`).join('') : '<tr><td colspan="2">Nenhum IP bloqueado.</td></tr>';
+      } catch(e) {}
+    }
+
+    async function blockIP() {
+      const ip = document.getElementById('newIP').value.trim(); if (!ip) return showToast('Digite um IP', 'error');
+      try { await api('/api/admin/block-ip', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ip }) }); loadBlockedIPs(); showToast('IP bloqueado!', 'success'); } catch(e) { showToast('Erro ao bloquear IP', 'error'); }
+    }
+
+    async function unblockIP(ip) {
+      try { await api(`/api/admin/block-ip/${ip}`, { method:'DELETE' }); loadBlockedIPs(); showToast('IP removido!', 'success'); } catch(e) { showToast('Erro ao remover IP', 'error'); }
+    }
 
     // Navegação
     document.querySelectorAll('.sidebar-nav button').forEach(btn => {
@@ -753,7 +877,7 @@
       });
     });
 
-    // Fechar modais
+    // Fechar modals
     document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); }));
 
     // Inicialização
