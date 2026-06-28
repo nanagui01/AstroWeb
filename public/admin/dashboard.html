@@ -1,771 +1,1475 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Storm — Painel de Controle</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <style>
-    :root {
-      --bg: #0a0a0a;
-      --surface: #111111;
-      --border: #1f1f1f;
-      --text: #ffffff;
-      --text-secondary: #a0a0a0;
-      --primary: #6366f1;
-      --danger: #ef4444;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --info: #3b82f6;
-      --radius: 14px;
-      --radius-sm: 8px;
-      --transition: 0.25s ease;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: radial-gradient(circle at top left, rgba(99,102,241,0.08), transparent 40%), radial-gradient(circle at bottom right, rgba(16,185,129,0.06), transparent 40%), #0a0a0a;
-      color: var(--text);
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storm — Painel de Controle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #111111;
+            --border: #1f1f1f;
+            --text: #ffffff;
+            --text-secondary: #a0a0a0;
+            --primary: #6366f1;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --transition: 0.25s ease;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.08), transparent 40%),
+                radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.06), transparent 40%), #0a0a0a;
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-    /* Sidebar */
-    .sidebar { width: 260px; background: rgba(17,17,17,0.6); backdrop-filter: blur(12px); border-right: 1px solid var(--border); padding: 2rem 1.2rem; display: flex; flex-direction: column; gap: 2rem; transition: transform var(--transition); z-index: 10; }
-    .sidebar-logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.5rem; color: #fff; }
-    .sidebar-logo svg { width: 32px; height: 32px; color: var(--primary); }
-    .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
-    .sidebar-nav button { display: flex; align-items: center; gap: 0.7rem; background: transparent; border: none; color: var(--text-secondary); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all var(--transition); text-align: left; width: 100%; }
-    .sidebar-nav button:hover { background: rgba(255,255,255,0.05); color: #fff; }
-    .sidebar-nav button.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
-    .logout-btn { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 0.7rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; text-align: center; transition: all var(--transition); }
-    .logout-btn:hover { background: rgba(239,68,68,0.1); transform: translateY(-2px); }
-    .hamburger { display: none; position: fixed; top: 1rem; left: 1rem; z-index: 20; background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 0.5rem; border-radius: var(--radius-sm); cursor: pointer; }
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            transition: transform var(--transition);
+            z-index: 10;
+        }
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fff;
+        }
+        .sidebar-logo svg {
+            width: 32px;
+            height: 32px;
+            color: var(--primary);
+        }
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        .sidebar-nav button {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-align: left;
+            width: 100%;
+        }
+        .sidebar-nav button:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        .sidebar-nav button.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 0.7rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all var(--transition);
+        }
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            transform: translateY(-2px);
+        }
+        .hamburger {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 20;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
 
-    .main { flex: 1; padding: 2rem; overflow-y: auto; }
-    .tab { display: none; }
-    .tab.active { display: block; animation: fadeUp 0.25s ease; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .main {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .tab {
+            display: none;
+        }
+        .tab.active {
+            display: block;
+            animation: fadeUp 0.25s ease;
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; }
-    .header h1 { font-size: 1.8rem; font-weight: 700; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
 
-    .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .skeleton {
+            background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
-    .stat-card { background: rgba(17,17,17,0.7); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition); }
-    .stat-card:hover { transform: translateY(-4px); border-color: rgba(99,102,241,0.5); box-shadow: 0 0 20px rgba(99,102,241,0.15), 0 10px 30px rgba(0,0,0,0.4); }
-    .stat-card-header { display: flex; justify-content: space-between; align-items: center; }
-    .stat-label { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-    .stat-icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
-    .stat-value { font-size: 2rem; font-weight: 700; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: rgba(17, 17, 17, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15), 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+        .stat-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
 
-    .chart-container { background: rgba(17,17,17,0.8); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; }
-    .chart-container h3 { margin-bottom: 1rem; font-size: 1.1rem; color: #fff; }
+        .chart-container {
+            background: rgba(17, 17, 17, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .chart-container h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-    .table-wrapper { background: rgba(17,17,17,0.6); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: rgba(24,24,27,0.8); padding: 1rem; text-align: left; font-weight: 600; color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
-    th:hover { color: #fff; }
-    td { padding: 1rem; border-bottom: 1px solid var(--border); color: #e4e4e7; }
-    tbody tr { transition: background 0.2s; }
-    tbody tr:hover { background: rgba(255,255,255,0.03); }
-    tr:last-child td { border-bottom: none; }
+        .table-wrapper {
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            background: rgba(24, 24, 27, 0.8);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+        th:hover {
+            color: #fff;
+        }
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            color: #e4e4e7;
+        }
+        tbody tr {
+            transition: background 0.2s;
+        }
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
 
-    .badge { padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; display: inline-block; }
-    .badge-online { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.2); }
-    .badge-offline { background: rgba(239,68,68,0.12); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
-    .badge-maintenance { background: rgba(245,158,11,0.12); color: var(--warning); border: 1px solid rgba(245,158,11,0.2); }
-    .badge-development { background: rgba(59,130,246,0.12); color: var(--info); border: 1px solid rgba(59,130,246,0.2); }
-    .tag { display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; background: rgba(255,255,255,0.05); color: var(--text-secondary); margin-right: 0.3rem; margin-bottom: 0.2rem; }
+        .badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .badge-online {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .badge-offline {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .badge-maintenance {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        .badge-development {
+            background: rgba(59, 130, 246, 0.12);
+            color: var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            margin-right: 0.3rem;
+            margin-bottom: 0.2rem;
+        }
+        .service-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            background: rgba(99, 102, 241, 0.12);
+            color: var(--primary);
+            margin-left: 0.3rem;
+        }
 
-    .search-box { background: rgba(20,20,20,0.8); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.6rem 1rem; color: #fff; width: 250px; font-size: 0.9rem; transition: all var(--transition); }
-    .search-box::placeholder { color: var(--text-secondary); }
-    .search-box:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(99,102,241,0.2); }
+        .search-box {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 1rem;
+            color: #fff;
+            width: 250px;
+            font-size: 0.9rem;
+            transition: all var(--transition);
+        }
+        .search-box::placeholder {
+            color: var(--text-secondary);
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+        }
 
-    .btn { padding: 0.6rem 1.2rem; border: none; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem; background: #fff; color: #000; }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); opacity: 0.95; }
-    .btn:active { transform: translateY(0); }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
-    .btn-danger:hover { background: rgba(239,68,68,0.1); color: var(--danger); }
-    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: 6px; }
-    .btn-xs { padding: 0.2rem 0.5rem; font-size: 0.7rem; }
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #fff;
+            color: #000;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0.95;
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-danger {
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+        .btn-xs {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+        }
 
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 100; }
-    .modal.active { display: flex; }
-    .modal-box { background: #121212; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; width: 100%; max-width: 650px; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-    .modal-box h2 { margin-bottom: 1.5rem; font-weight: 700; }
-    label { display: block; margin-bottom: 0.4rem; color: var(--text-secondary); font-size: 0.9rem; font-weight: 500; }
-    input, textarea, select { width: 100%; padding: 0.75rem; margin-bottom: 1.2rem; background: #161616; border: 1px solid var(--border); border-radius: var(--radius-sm); color: #fff; font-family: inherit; font-size: 0.9rem; transition: border var(--transition); }
-    textarea { height: 180px; resize: vertical; font-family: 'Fira Code', monospace; }
-    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
-    .modal-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
-    .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.2rem; }
-    .checkbox-group input { width: auto; margin-bottom: 0; }
-    .checkbox-group label { margin-bottom: 0; }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #121212;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            width: 100%;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+        .modal-box h2 {
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1.2rem;
+            background: #161616;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: border var(--transition);
+        }
+        textarea {
+            height: 180px;
+            resize: vertical;
+            font-family: 'Fira Code', monospace;
+        }
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .checkbox-group input {
+            width: auto;
+            margin-bottom: 0;
+        }
+        .checkbox-group label {
+            margin-bottom: 0;
+        }
 
-    .toast-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 200; }
-    .toast { background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 0.8rem 1.2rem; border-radius: var(--radius-sm); font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.5); animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1); display: flex; align-items: center; gap: 0.5rem; }
-    .toast.success { border-left: 4px solid var(--success); }
-    .toast.error { border-left: 4px solid var(--danger); }
-    @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 200;
+        }
+        .toast {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(110%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
 
-    .pagination { display: flex; gap: 0.5rem; align-items: center; margin-top: 1rem; }
-    .pagination button { padding: 0.4rem 0.8rem; }
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        .pagination button {
+            padding: 0.4rem 0.8rem;
+        }
 
-    .alert-item { padding: 0.75rem; border-radius: var(--radius-sm); background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
-    .alert-item.warning { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); }
-    .alert-item svg { flex-shrink: 0; }
+        .alert-item {
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .alert-item.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        .alert-item svg {
+            flex-shrink: 0;
+        }
 
-    @media (max-width: 768px) {
-      .sidebar { position: fixed; left: -280px; height: 100vh; background: #0a0a0a; }
-      .sidebar.open { left: 0; transform: none; }
-      .hamburger { display: block; }
-      .main { padding: 5rem 1.5rem 1.5rem 1.5rem; }
-    }
-  </style>
+        .section-divider {
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100vh;
+                background: #0a0a0a;
+            }
+            .sidebar.open {
+                left: 0;
+                transform: none;
+            }
+            .hamburger {
+                display: block;
+            }
+            .main {
+                padding: 5rem 1.5rem 1.5rem 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-  </button>
+    <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
 
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-      Storm
-    </div>
-    <nav class="sidebar-nav">
-      <button class="active" data-tab="dashboard">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        Dashboard
-      </button>
-      <button data-tab="scripts">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        Scripts
-      </button>
-      <button data-tab="keys">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-        Keys
-      </button>
-      <button data-tab="security">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Segurança
-      </button>
-    </nav>
-    <button class="logout-btn" onclick="window.location.href='/api/auth/logout'">Sair</button>
-  </aside>
-
-  <main class="main">
-    <!-- Dashboard -->
-    <div id="tab-dashboard" class="tab active">
-      <div class="header"><h1>Dashboard</h1><button class="btn btn-sm" onclick="exportStats()">📊 Exportar Estatísticas</button></div>
-      <div id="alertsContainer" style="margin-bottom:1.5rem;"></div>
-      <div class="stats-grid" id="statsCards"><div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div></div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
-        <div class="chart-container"><h3>🌍 Execuções por País</h3><canvas id="countriesChart" height="200"></canvas></div>
-        <div class="chart-container"><h3>🖥️ Saúde do Servidor</h3><div id="healthWidget">Carregando...</div></div>
-      </div>
-      <div class="chart-container"><canvas id="dailyChart" height="100"></canvas></div>
-      <div class="chart-container"><h3>Execuções por Hora</h3><canvas id="hourlyChart" height="80"></canvas></div>
-      <div class="chart-container" id="popularScripts"><h3>Scripts Mais Populares</h3><div class="skeleton" style="height:2rem;"></div></div>
-    </div>
-
-    <!-- Scripts -->
-    <div id="tab-scripts" class="tab">
-      <div class="header">
-        <h1>Scripts</h1>
-        <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-          <input type="text" class="search-box" id="searchInput" placeholder="Buscar scripts..." oninput="filterScripts()">
-          <select id="statusFilter" style="width:150px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadScripts(1)">
-            <option value="">Todos status</option>
-            <option value="online">Online</option>
-            <option value="offline">Offline</option>
-            <option value="maintenance">Manutenção</option>
-            <option value="development">Desenvolvimento</option>
-          </select>
-          <select id="tagFilter" style="width:150px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadScripts(1)"><option value="">Todas tags</option></select>
-          <button class="btn" onclick="exportData()">Exportar</button>
-          <button class="btn" onclick="document.getElementById('importFile').click()">Importar</button>
-          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-          <button class="btn" onclick="document.getElementById('txtFileInput').click()">📄 Importar .txt</button>
-          <input type="file" id="txtFileInput" accept=".txt" multiple style="display:none" onchange="importTxtFiles(event)">
-          <button class="btn btn-primary" onclick="openCreateModal()">+ Novo Script</button>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            Storm
         </div>
-      </div>
-      <div class="table-wrapper">
-        <table>
-          <thead><tr><th data-sort="name">Nome ↕</th><th data-sort="executions">Execuções ↕</th><th data-sort="status">Status ↕</th><th>Tags</th><th>Ações</th></tr></thead>
-          <tbody id="scriptsTable"></tbody>
-        </table>
-      </div>
-      <div class="pagination" id="paginationContainer"></div>
-    </div>
+        <nav class="sidebar-nav">
+            <button class="active" data-tab="dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+            </button>
+            <button data-tab="scripts">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Scripts
+            </button>
+            <button data-tab="keys">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                Keys & Serviços
+            </button>
+            <button data-tab="security">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Segurança
+            </button>
+        </nav>
+        <button class="logout-btn" onclick="window.location.href='/api/auth/logout'">Sair</button>
+    </aside>
 
-    <!-- Keys -->
-    <div id="tab-keys" class="tab">
-      <div class="header">
-        <h1>Licenças (Keys)</h1>
-        <div style="display:flex; gap:0.5rem; align-items:center;">
-          <select id="keyStatusFilter" style="width:150px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadKeys(1)">
-            <option value="">Todos</option>
-            <option value="active">Ativas</option>
-            <option value="expired">Expiradas</option>
-            <option value="revoked">Revogadas</option>
-          </select>
-          <button class="btn btn-primary" onclick="openCreateKeyModal()">+ Criar Key</button>
+    <main class="main">
+        <!-- Dashboard -->
+        <div id="tab-dashboard" class="tab active">
+            <div class="header"><h1>Dashboard</h1><button class="btn btn-sm" onclick="exportStats()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar Estatísticas</button></div>
+            <div id="alertsContainer" style="margin-bottom:1.5rem;"></div>
+            <div class="stats-grid" id="statsCards"><div class="stat-card"><div class="stat-label">Carregando...</div><div class="skeleton" style="height:2.5rem;width:60%;"></div></div></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+                <div class="chart-container"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg> Execuções por País</h3><canvas id="countriesChart" height="200"></canvas></div>
+                <div class="chart-container"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Saúde do Servidor</h3><div id="healthWidget">Carregando...</div></div>
+            </div>
+            <div class="chart-container"><canvas id="dailyChart" height="100"></canvas></div>
+            <div class="chart-container"><h3>Execuções por Hora</h3><canvas id="hourlyChart" height="80"></canvas></div>
+            <div class="chart-container" id="popularScripts"><h3>Scripts Mais Populares</h3><div class="skeleton" style="height:2rem;"></div></div>
         </div>
-      </div>
-      <div class="stats-grid" id="keyStatsCards"></div>
-      <div class="table-wrapper">
-        <table>
-          <thead><tr><th>Key</th><th>Criada em</th><th>Expira</th><th>Status</th><th>Device</th><th>Ações</th></tr></thead>
-          <tbody id="keysTable"></tbody>
-        </table>
-      </div>
-      <div class="pagination" id="keysPagination"></div>
+
+        <!-- Scripts -->
+        <div id="tab-scripts" class="tab">
+            <div class="header">
+                <h1>Scripts</h1>
+                <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                    <input type="text" class="search-box" id="searchInput" placeholder="Buscar scripts..." oninput="filterScripts()">
+                    <select id="statusFilter" style="width:150px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadScripts(1)">
+                        <option value="">Todos status</option>
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                        <option value="maintenance">Manutenção</option>
+                        <option value="development">Desenvolvimento</option>
+                    </select>
+                    <select id="tagFilter" style="width:150px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadScripts(1)"><option value="">Todas tags</option></select>
+                    <button class="btn" onclick="exportData()">Exportar</button>
+                    <button class="btn" onclick="document.getElementById('importFile').click()">Importar</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+                    <button class="btn" onclick="document.getElementById('txtFileInput').click()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Importar .txt</button>
+                    <input type="file" id="txtFileInput" accept=".txt" multiple style="display:none" onchange="importTxtFiles(event)">
+                    <button class="btn btn-primary" onclick="openCreateModal()">+ Novo Script</button>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th data-sort="name">Nome ↕</th><th data-sort="executions">Execuções ↕</th><th data-sort="status">Status ↕</th><th>Tags</th><th>Serviço</th><th>Ações</th></tr></thead>
+                    <tbody id="scriptsTable"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="paginationContainer"></div>
+        </div>
+
+        <!-- Keys & Serviços -->
+        <div id="tab-keys" class="tab">
+            <div class="header"><h1>Serviços</h1><button class="btn btn-primary" onclick="openCreateServiceModal()">+ Novo Serviço</button></div>
+            <div class="table-wrapper" style="margin-bottom:2rem;">
+                <table>
+                    <thead><tr><th>Nome</th><th>Descrição</th><th>Keys ativas</th><th>Criado em</th><th>Ações</th></tr></thead>
+                    <tbody id="servicesTable"></tbody>
+                </table>
+            </div>
+
+            <div class="header" style="margin-top:1rem;"><h1>Licenças (Keys)</h1>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <select id="keyServiceFilter" style="width:180px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadKeys(1)"><option value="">Todos serviços</option></select>
+                    <select id="keyStatusFilter" style="width:150px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadKeys(1)">
+                        <option value="">Todos</option>
+                        <option value="active">Ativas</option>
+                        <option value="expired">Expiradas</option>
+                        <option value="revoked">Revogadas</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="openCreateKeyModal()">+ Criar Key</button>
+                </div>
+            </div>
+            <div class="stats-grid" id="keyStatsCards"></div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Key</th><th>Serviço</th><th>Criada em</th><th>Expira</th><th>Status</th><th>Device</th><th>Ações</th></tr></thead>
+                    <tbody id="keysTable"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="keysPagination"></div>
+        </div>
+
+        <!-- Segurança -->
+        <div id="tab-security" class="tab">
+            <div class="header"><h1>Segurança</h1></div>
+            <div class="table-wrapper"><table><thead><tr><th>IP Bloqueado</th><th>Ações</th></tr></thead><tbody id="blockedIPsTable"></tbody></table></div>
+            <div style="margin-top:1.5rem; display:flex; gap:0.5rem; align-items:center;">
+                <input type="text" id="newIP" placeholder="192.168.1.1" style="width:240px; margin-bottom:0;">
+                <button class="btn btn-primary" onclick="blockIP()">Bloquear IP</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Script -->
+    <div id="scriptModal" class="modal">
+        <div class="modal-box">
+            <h2 id="modalTitle">Novo Script</h2>
+            <input type="hidden" id="scriptId">
+            <label>Nome</label><input type="text" id="scriptName" placeholder="Nome do script">
+            <label>Status</label>
+            <select id="scriptStatus"><option value="online">Online</option><option value="offline">Offline</option><option value="maintenance">Manutenção</option><option value="development">Desenvolvimento</option></select>
+            <label>Serviço vinculado (opcional)</label>
+            <select id="scriptServiceId"><option value="">Nenhum (script livre)</option></select>
+            <label>Tags (separadas por vírgula)</label><input type="text" id="scriptTags" placeholder="farm, auto, combate">
+            <label>Código Lua</label><textarea id="scriptContent" placeholder="print('Hello World')"></textarea>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div><label>Limite diário (0=sem limite)</label><input type="number" id="scriptDailyLimit" value="0" min="0"></div>
+                <div><label>Data de expiração</label><input type="datetime-local" id="scriptExpiresAt"></div>
+            </div>
+            <div class="checkbox-group"><input type="checkbox" id="scriptSandbox"><label>Modo Sandbox (apenas admin executa)</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="scriptSilent"><label>Modo Silencioso (não conta execuções)</label></div>
+            <div id="changelogFields" style="display:none;">
+                <label>Título do Changelog</label><input type="text" id="changelogTitle" placeholder="Nova atualização">
+                <label>Descrição</label><textarea id="changelogDesc" rows="3" placeholder="O que mudou..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveScript()">Salvar</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Segurança -->
-    <div id="tab-security" class="tab">
-      <div class="header"><h1>Segurança</h1></div>
-      <div class="table-wrapper"><table><thead><tr><th>IP Bloqueado</th><th>Ações</th></tr></thead><tbody id="blockedIPsTable"></tbody></table></div>
-      <div style="margin-top:1.5rem; display:flex; gap:0.5rem; align-items:center;">
-        <input type="text" id="newIP" placeholder="192.168.1.1" style="width:240px; margin-bottom:0;">
-        <button class="btn btn-primary" onclick="blockIP()">Bloquear IP</button>
-      </div>
+    <!-- Modal Key -->
+    <div id="keyModal" class="modal">
+        <div class="modal-box">
+            <h2>Criar Nova Key</h2>
+            <label>Serviço</label>
+            <select id="keyServiceSelect"><option value="">Carregando...</option></select>
+            <label>Duração</label>
+            <select id="keyDuration">
+                <option value="1">1 dia</option>
+                <option value="7">7 dias</option>
+                <option value="30">30 dias</option>
+                <option value="90">90 dias</option>
+                <option value="0">Permanente</option>
+            </select>
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="document.getElementById('keyModal').classList.remove('active')">Cancelar</button>
+                <button class="btn btn-primary" onclick="createKey()">Criar</button>
+            </div>
+        </div>
     </div>
-  </main>
 
-  <!-- Modal Script -->
-  <div id="scriptModal" class="modal">
-    <div class="modal-box">
-      <h2 id="modalTitle">Novo Script</h2>
-      <input type="hidden" id="scriptId">
-      <label>Nome</label><input type="text" id="scriptName" placeholder="Nome do script">
-      <label>Status</label>
-      <select id="scriptStatus"><option value="online">Online</option><option value="offline">Offline</option><option value="maintenance">Manutenção</option><option value="development">Desenvolvimento</option></select>
-      <label>Tags (separadas por vírgula)</label><input type="text" id="scriptTags" placeholder="farm, auto, combate">
-      <label>Código Lua</label><textarea id="scriptContent" placeholder="print('Hello World')"></textarea>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-        <div><label>Limite diário (0=sem limite)</label><input type="number" id="scriptDailyLimit" value="0" min="0"></div>
-        <div><label>Data de expiração</label><input type="datetime-local" id="scriptExpiresAt"></div>
-      </div>
-      <div class="checkbox-group"><input type="checkbox" id="scriptSandbox"><label>Modo Sandbox (apenas admin executa)</label></div>
-      <div class="checkbox-group"><input type="checkbox" id="scriptSilent"><label>Modo Silencioso (não conta execuções)</label></div>
-      <div id="changelogFields" style="display:none;">
-        <label>Título do Changelog</label><input type="text" id="changelogTitle" placeholder="Nova atualização">
-        <label>Descrição</label><textarea id="changelogDesc" rows="3" placeholder="O que mudou..."></textarea>
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-danger" onclick="closeModal()">Cancelar</button>
-        <button class="btn btn-primary" onclick="saveScript()">Salvar</button>
-      </div>
+    <!-- Modal Serviço -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-box">
+            <h2 id="serviceModalTitle">Novo Serviço</h2>
+            <input type="hidden" id="serviceId">
+            <label>Nome</label><input type="text" id="serviceName" placeholder="Ex: Script Farm Premium">
+            <label>Descrição</label><input type="text" id="serviceDescription" placeholder="Descrição opcional">
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="document.getElementById('serviceModal').classList.remove('active')">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveService()">Salvar</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Modal Key -->
-  <div id="keyModal" class="modal">
-    <div class="modal-box">
-      <h2>Criar Nova Key</h2>
-      <label>Duração</label>
-      <select id="keyDuration">
-        <option value="1">1 dia</option>
-        <option value="7">7 dias</option>
-        <option value="30">30 dias</option>
-        <option value="90">90 dias</option>
-        <option value="0">Permanente</option>
-      </select>
-      <div class="modal-actions">
-        <button class="btn btn-danger" onclick="document.getElementById('keyModal').classList.remove('active')">Cancelar</button>
-        <button class="btn btn-primary" onclick="createKey()">Criar</button>
-      </div>
+    <!-- Modal Renovar Key -->
+    <div id="renewModal" class="modal">
+        <div class="modal-box">
+            <h2>Renovar Key</h2>
+            <input type="hidden" id="renewKeyId">
+            <label>Dias adicionais</label>
+            <input type="number" id="renewDays" value="7" min="1">
+            <div class="modal-actions">
+                <button class="btn btn-danger" onclick="document.getElementById('renewModal').classList.remove('active')">Cancelar</button>
+                <button class="btn btn-primary" onclick="renewKey()">Renovar</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Modal Renovar Key -->
-  <div id="renewModal" class="modal">
-    <div class="modal-box">
-      <h2>Renovar Key</h2>
-      <input type="hidden" id="renewKeyId">
-      <label>Dias adicionais</label>
-      <input type="number" id="renewDays" value="7" min="1">
-      <div class="modal-actions">
-        <button class="btn btn-danger" onclick="document.getElementById('renewModal').classList.remove('active')">Cancelar</button>
-        <button class="btn btn-primary" onclick="renewKey()">Renovar</button>
-      </div>
+    <!-- Modal Histórico de Versões -->
+    <div id="versionsModal" class="modal">
+        <div class="modal-box">
+            <h2>Histórico de Versões</h2>
+            <div id="versionsList" style="max-height:400px; overflow-y:auto;"></div>
+            <button class="btn btn-danger" onclick="document.getElementById('versionsModal').classList.remove('active')" style="margin-top:1rem;">Fechar</button>
+        </div>
     </div>
-  </div>
 
-  <!-- Modal Histórico de Versões -->
-  <div id="versionsModal" class="modal">
-    <div class="modal-box">
-      <h2>Histórico de Versões</h2>
-      <div id="versionsList" style="max-height:400px; overflow-y:auto;"></div>
-      <button class="btn btn-danger" onclick="document.getElementById('versionsModal').classList.remove('active')" style="margin-top:1rem;">Fechar</button>
-    </div>
-  </div>
+    <div class="toast-container" id="toastContainer"></div>
 
-  <div class="toast-container" id="toastContainer"></div>
+    <script>
+        const ADMIN_PATH = '/painel';
+        let currentPage = 1,
+            totalPages = 1,
+            currentSort = 'updated_at',
+            currentOrder = 'DESC';
+        let keysPage = 1,
+            keysTotalPages = 1;
+        let dailyChart, hourlyChart, countriesChart;
 
-  <script>
-    const ADMIN_PATH = '/painel';
-    let currentPage = 1, totalPages = 1, currentSort = 'updated_at', currentOrder = 'DESC';
-    let keysPage = 1, keysTotalPages = 1;
-    let dailyChart, hourlyChart, countriesChart;
+        /* ---------- SVGs personalizados (substituem emojis Unicode) ---------- */
+        const icons = {
+            globe: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+            monitor: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+            alert: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+            clock: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            chart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+            document: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+            edit: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+            copy: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+            history: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            trash: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+            refresh: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
+            ban: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',
+            key: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>',
+            download: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+            plus: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+        };
 
-    function showToast(msg, type='success') {
-      const c = document.getElementById('toastContainer');
-      const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg;
-      c.appendChild(t); setTimeout(() => t.remove(), 3000);
-    }
+        function showToast(msg, type = 'success') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.textContent = msg;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
 
-    function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;'); }
 
-    async function api(url, options={}) {
-      const res = await fetch(url, { credentials:'include', ...options });
-      if (res.status === 401) { window.location.href = ADMIN_PATH; throw new Error('Unauthorized'); }
-      if (!res.ok) { const err = await res.json().catch(()=>({error:'Erro desconhecido'})); throw new Error(err.error); }
-      return res.json();
-    }
+        async function api(url, options = {}) {
+            const res = await fetch(url, { credentials: 'include', ...options });
+            if (res.status === 401) { window.location.href = ADMIN_PATH;
+                throw new Error('Unauthorized'); }
+            if (!res.ok) { const err = await res.json().catch(() => ({ error: 'Erro desconhecido' }));
+                throw new Error(err.error); }
+            return res.json();
+        }
 
-    // ========== DASHBOARD ==========
-    async function loadDashboard() {
-      try {
-        const [stats, alerts, health] = await Promise.all([
-          api('/api/stats'), api('/api/alerts'), api('/api/health')
-        ]);
-        renderStatsCards(stats);
-        renderAlerts(alerts);
-        renderHealth(health);
-        renderDailyChart(stats.daily);
-        renderHourlyChart(stats.hourly);
-        renderCountriesChart(stats.countries);
-        renderPopular(stats.popular);
-      } catch(e) { showToast('Erro ao carregar dashboard', 'error'); }
-    }
+        /* ========== DASHBOARD ========== */
+        async function loadDashboard() {
+            try {
+                const [stats, alerts, health] = await Promise.all([
+                    api('/api/stats'), api('/api/alerts'), api('/api/health')
+                ]);
+                renderStatsCards(stats);
+                renderAlerts(alerts);
+                renderHealth(health);
+                renderDailyChart(stats.daily || []);
+                renderHourlyChart(stats.hourly || []);
+                renderCountriesChart(stats.countries || []);
+                renderPopular(stats.popular || []);
+            } catch (e) { showToast('Erro ao carregar dashboard', 'error'); }
+        }
 
-    function renderStatsCards(s) {
-      document.getElementById('statsCards').innerHTML = `
-        <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Total Scripts</div><div class="stat-icon" style="color:var(--primary)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div></div><div class="stat-value">${s.totalScripts}</div></div>
-        <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Online</div><div class="stat-icon" style="color:var(--success)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg></div></div><div class="stat-value" style="color:var(--success)">${s.onlineScripts}</div></div>
-        <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Offline</div><div class="stat-icon" style="color:var(--danger)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div></div><div class="stat-value" style="color:var(--danger)">${s.offlineScripts}</div></div>
-        <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Execuções</div><div class="stat-icon" style="color:var(--warning)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div><div class="stat-value">${s.totalExecutions}</div></div>
-      `;
-    }
-
-    function renderAlerts(alerts) {
-      const container = document.getElementById('alertsContainer');
-      let html = '';
-      if (alerts.offline.length) alerts.offline.forEach(s => html += `<div class="alert-item">⚠️ Script offline: <strong>${escapeHtml(s.name)}</strong></div>`);
-      if (alerts.expiring.length) alerts.expiring.forEach(s => html += `<div class="alert-item warning">⏰ Expirando em breve: <strong>${escapeHtml(s.name)}</strong> (${new Date(s.expires_at).toLocaleDateString()})</div>`);
-      container.innerHTML = html;
-    }
-
-    function renderHealth(h) {
-      document.getElementById('healthWidget').innerHTML = `
-        <p>⏱️ Uptime: ${(h.uptime/3600).toFixed(1)}h</p>
-        <p>🧠 Memória: ${h.memory.heapUsed} / ${h.memory.heapTotal}</p>
-        <p>⚙️ Node: ${h.nodeVersion}</p>
-        <p>🔄 PID: ${h.pid}</p>
-      `;
-    }
-
-    function renderDailyChart(data) {
-      const ctx = document.getElementById('dailyChart').getContext('2d');
-      if (dailyChart) dailyChart.destroy();
-      const grad = ctx.createLinearGradient(0,0,0,200);
-      grad.addColorStop(0,'rgba(99,102,241,0.4)'); grad.addColorStop(1,'rgba(99,102,241,0.01)');
-      dailyChart = new Chart(ctx, { type:'bar', data:{ labels: data.map(d=>d.date.slice(5)), datasets:[{ label:'Execuções', data: data.map(d=>d.count), backgroundColor:grad, borderColor:'#6366f1', borderWidth:1.5, borderRadius:6 }] }, options:{ responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{color:'#a0a0a0'}, grid:{color:'rgba(255,255,255,0.05)'} }, x:{ ticks:{color:'#a0a0a0'}, grid:{display:false} } } } });
-    }
-
-    function renderHourlyChart(data) {
-      const ctx = document.getElementById('hourlyChart').getContext('2d');
-      if (hourlyChart) hourlyChart.destroy();
-      const grad = ctx.createLinearGradient(0,0,0,150);
-      grad.addColorStop(0,'rgba(16,185,129,0.3)'); grad.addColorStop(1,'rgba(16,185,129,0.01)');
-      hourlyChart = new Chart(ctx, { type:'line', data:{ labels: data.map(h=>h.hour+'h'), datasets:[{ label:'Execuções', data: data.map(h=>h.count), borderColor:'#10b981', backgroundColor:grad, fill:true, tension:0.4, pointRadius:3 }] }, options:{ responsive:true, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true, ticks:{color:'#a0a0a0'}, grid:{color:'rgba(255,255,255,0.05)'} }, x:{ ticks:{color:'#a0a0a0', maxTicksLimit:12}, grid:{display:false} } } } });
-    }
-
-    function renderCountriesChart(data) {
-      const ctx = document.getElementById('countriesChart').getContext('2d');
-      if (countriesChart) countriesChart.destroy();
-      countriesChart = new Chart(ctx, { type:'bar', data:{ labels: data.map(d=>d.country), datasets:[{ label:'Execuções', data: data.map(d=>d.count), backgroundColor: data.map((_,i)=> `hsl(${i*40}, 70%, 50%)`) }] }, options:{ indexAxis:'y', responsive:true, plugins:{legend:{display:false}} } });
-    }
-
-    function renderPopular(data) {
-      const div = document.getElementById('popularScripts');
-      div.innerHTML = '<h3>Scripts Mais Populares</h3>' + data.map(s => `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);"><span>${escapeHtml(s.name)}</span><span style="color:var(--success);">${s.executions||0} execuções</span></div>`).join('') || '<p>Nenhum script.</p>';
-    }
-
-    async function exportStats() {
-      const format = confirm('Clique OK para JSON, Cancelar para CSV') ? 'json' : 'csv';
-      const res = await fetch(`/api/stats/export?format=${format}`, { credentials:'include' });
-      const blob = await res.blob();
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `storm_stats.${format}`; a.click();
-    }
-
-    // ========== SCRIPTS ==========
-    async function loadScripts(page = currentPage) {
-      const status = document.getElementById('statusFilter').value;
-      const tag = document.getElementById('tagFilter').value;
-      let url = `/api/scripts?page=${page}&limit=25&sort=${currentSort}&order=${currentOrder}`;
-      if (status) url += `&status=${status}`;
-      if (tag) url += `&tag=${tag}`;
-      try {
-        const result = await api(url);
-        currentPage = result.page;
-        totalPages = result.totalPages;
-        renderScripts(result.data);
-        renderPagination();
-      } catch(e) { showToast('Erro ao carregar scripts', 'error'); }
-    }
-
-    function renderScripts(scripts) {
-      const tbody = document.getElementById('scriptsTable');
-      if (!scripts.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum script.</td></tr>'; return; }
-      tbody.innerHTML = scripts.map(s => {
-        const tagsHtml = (s.tags||[]).map(t => `<span class="tag">${escapeHtml(t.name)}</span>`).join('');
-        return `<tr>
-          <td><strong>${escapeHtml(s.name)}</strong></td>
-          <td>${s.executions||0}</td>
-          <td><span class="badge badge-${s.status||'online'}">${s.status}</span></td>
-          <td>${tagsHtml || '—'}</td>
-          <td>
-            <button class="btn btn-xs edit-btn" data-id="${s.id}">✏️</button>
-            <button class="btn btn-xs duplicate-btn" data-id="${s.id}">📄</button>
-            <button class="btn btn-xs copy-btn" data-short="${s.short_id}" data-token="${s.token}">📋</button>
-            <button class="btn btn-xs" onclick="openVersions('${s.id}')">🕒</button>
-            <button class="btn btn-xs btn-danger delete-btn" data-id="${s.id}">🗑️</button>
-          </td>
-        </tr>`;
-      }).join('');
-
-      tbody.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', function(){ editScript(this.dataset.id); }));
-      tbody.querySelectorAll('.duplicate-btn').forEach(b => b.addEventListener('click', function(){ duplicateScript(this.dataset.id); }));
-      tbody.querySelectorAll('.copy-btn').forEach(b => b.addEventListener('click', function(){ copyLoader(this.dataset.short, this.dataset.token); }));
-      tbody.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', function(){ deleteScript(this.dataset.id); }));
-    }
-
-    function renderPagination() {
-      const container = document.getElementById('paginationContainer');
-      container.innerHTML = `
-        <button class="btn btn-sm" ${currentPage<=1?'disabled':''} onclick="loadScripts(${currentPage-1})">← Anterior</button>
-        <span style="color:var(--text-secondary);">Página ${currentPage} de ${totalPages}</span>
-        <button class="btn btn-sm" ${currentPage>=totalPages?'disabled':''} onclick="loadScripts(${currentPage+1})">Próxima →</button>
-      `;
-    }
-
-    function filterScripts() { loadScripts(1); }
-
-    document.querySelectorAll('#tab-scripts th[data-sort]').forEach(th => {
-      th.addEventListener('click', function() {
-        currentSort = this.dataset.sort;
-        currentOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
-        loadScripts(1);
-      });
-    });
-
-    async function loadTagsForFilter() {
-      try {
-        const tags = await api('/api/tags');
-        const sel = document.getElementById('tagFilter');
-        sel.innerHTML = '<option value="">Todas tags</option>' + tags.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-      } catch(e) {}
-    }
-
-    // Modal Scripts
-    function openCreateModal() {
-      document.getElementById('modalTitle').textContent = 'Novo Script';
-      document.getElementById('scriptId').value = '';
-      document.getElementById('scriptName').value = '';
-      document.getElementById('scriptStatus').value = 'online';
-      document.getElementById('scriptTags').value = '';
-      document.getElementById('scriptContent').value = '';
-      document.getElementById('scriptDailyLimit').value = 0;
-      document.getElementById('scriptExpiresAt').value = '';
-      document.getElementById('scriptSandbox').checked = false;
-      document.getElementById('scriptSilent').checked = false;
-      document.getElementById('changelogFields').style.display = 'none';
-      document.getElementById('scriptModal').classList.add('active');
-    }
-
-    function closeModal() { document.getElementById('scriptModal').classList.remove('active'); }
-
-    function editScript(id) {
-      if (!id) return;
-      api('/api/scripts/' + id).then(script => {
-        document.getElementById('modalTitle').textContent = 'Editar Script';
-        document.getElementById('scriptId').value = script.id;
-        document.getElementById('scriptName').value = script.name;
-        document.getElementById('scriptStatus').value = script.status || 'online';
-        document.getElementById('scriptTags').value = (script.tags||[]).map(t=>t.name).join(', ');
-        document.getElementById('scriptContent').value = script.content;
-        document.getElementById('scriptDailyLimit').value = script.daily_limit || 0;
-        document.getElementById('scriptExpiresAt').value = script.expires_at ? script.expires_at.slice(0,16) : '';
-        document.getElementById('scriptSandbox').checked = script.sandbox || false;
-        document.getElementById('scriptSilent').checked = script.silent || false;
-        document.getElementById('changelogFields').style.display = 'block';
-        document.getElementById('scriptModal').classList.add('active');
-      }).catch(e => showToast('Erro ao carregar script', 'error'));
-    }
-
-    function saveScript() {
-      const id = document.getElementById('scriptId').value;
-      const name = document.getElementById('scriptName').value.trim();
-      const status = document.getElementById('scriptStatus').value;
-      const tags = document.getElementById('scriptTags').value.split(',').map(t=>t.trim()).filter(Boolean);
-      const content = document.getElementById('scriptContent').value;
-      const daily_limit = parseInt(document.getElementById('scriptDailyLimit').value) || 0;
-      const expires_at = document.getElementById('scriptExpiresAt').value || null;
-      const sandbox = document.getElementById('scriptSandbox').checked;
-      const silent = document.getElementById('scriptSilent').checked;
-
-      if (!name || !content) return showToast('Preencha todos os campos', 'error');
-      const method = id ? 'PUT' : 'POST';
-      const url = id ? '/api/scripts/' + id : '/api/scripts';
-      api(url, { method, headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, content, status, tags, daily_limit, expires_at, sandbox, silent }) })
-        .then(async () => {
-          if (id) {
-            const changelog = { title: document.getElementById('changelogTitle').value.trim(), description: document.getElementById('changelogDesc').value.trim() };
-            if (changelog.title || changelog.description) {
-              await api(`/api/scripts/${id}/changelog`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(changelog) }).catch(()=>{});
-            }
-          }
-          closeModal(); loadScripts(); showToast(id ? 'Script atualizado!' : 'Script criado!', 'success');
-        }).catch(e => showToast('Erro ao salvar', 'error'));
-    }
-
-    function deleteScript(id) {
-      if (!confirm('Excluir este script?')) return;
-      api('/api/scripts/' + id, { method:'DELETE' }).then(() => { loadScripts(); showToast('Excluído.', 'success'); }).catch(e => showToast('Erro ao excluir', 'error'));
-    }
-
-    function duplicateScript(id) {
-      api(`/api/scripts/${id}/duplicate`, { method:'POST' }).then(() => { loadScripts(); showToast('Duplicado!', 'success'); }).catch(e => showToast('Erro ao duplicar', 'error'));
-    }
-
-    function copyLoader(shortId, token) {
-      navigator.clipboard.writeText(`loadstring(game:HttpGet("${location.origin}/api/load/${shortId}/${token}"))()`).then(() => showToast('Loader copiado!', 'success'));
-    }
-
-    async function openVersions(scriptId) {
-      try {
-        const versions = await api(`/api/scripts/${scriptId}/versions`);
-        const list = document.getElementById('versionsList');
-        list.innerHTML = versions.length === 0 ? '<p>Nenhuma versão anterior.</p>' : versions.map(v => `
-          <div style="border:1px solid var(--border); border-radius:8px; padding:0.8rem; margin-bottom:0.5rem;">
-            <strong>${escapeHtml(v.name)}</strong> (${new Date(v.created_at).toLocaleString()})<br>
-            <button class="btn btn-xs btn-primary" onclick="restoreVersion('${scriptId}','${v.id}')">Restaurar esta versão</button>
-          </div>`).join('');
-        document.getElementById('versionsModal').classList.add('active');
-      } catch(e) { showToast('Erro ao carregar versões', 'error'); }
-    }
-
-    async function restoreVersion(scriptId, versionId) {
-      if (!confirm('Restaurar esta versão? O estado atual será salvo como versão anterior.')) return;
-      try {
-        await api(`/api/scripts/${scriptId}/restore`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ versionId }) });
-        document.getElementById('versionsModal').classList.remove('active');
-        loadScripts();
-        showToast('Versão restaurada!', 'success');
-      } catch(e) { showToast('Erro ao restaurar', 'error'); }
-    }
-
-    async function importTxtFiles(event) {
-      const files = event.target.files; if (!files.length) return;
-      const scriptsToCreate = [];
-      for (const file of files) {
-        if (!file.name.endsWith('.txt')) continue;
-        const content = await file.text(); if (!content.trim()) continue;
-        scriptsToCreate.push({ name: file.name.replace(/\.txt$/i,''), content });
-      }
-      if (!scriptsToCreate.length) return showToast('Nenhum arquivo .txt válido.', 'error');
-      try {
-        await api('/api/scripts/bulk', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ scripts: scriptsToCreate }) });
-        loadScripts(); showToast(`${scriptsToCreate.length} script(s) importado(s)!`, 'success');
-      } catch(e) { showToast('Erro ao importar arquivos.', 'error'); }
-      event.target.value = '';
-    }
-
-    async function exportData() {
-      try {
-        const data = await api('/api/export');
-        const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `storm_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
-      } catch(e) { showToast('Erro ao exportar', 'error'); }
-    }
-
-    async function importData(event) {
-      const file = event.target.files[0]; if (!file) return;
-      try {
-        const text = await file.text(); const data = JSON.parse(text);
-        await api('/api/import', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({...data, confirmation:'IMPORTAR'}) });
-        loadScripts(); showToast('Importado!', 'success');
-      } catch(e) { showToast('Erro ao importar', 'error'); }
-      event.target.value = '';
-    }
-
-    // ========== KEYS ==========
-    async function loadKeys(page = keysPage) {
-      const status = document.getElementById('keyStatusFilter').value;
-      let url = `/api/keys?page=${page}&limit=25`;
-      if (status) url += `&status=${status}`;
-      try {
-        const result = await api(url);
-        keysPage = result.page;
-        keysTotalPages = result.totalPages;
-        renderKeys(result.data);
-        renderKeysPagination();
-      } catch(e) { showToast('Erro ao carregar keys', 'error'); }
-    }
-
-    function renderKeys(keys) {
-      const tbody = document.getElementById('keysTable');
-      if (!keys.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Nenhuma key.</td></tr>'; return; }
-      tbody.innerHTML = keys.map(k => {
-        const expires = k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Nunca';
-        const isExpired = k.active && k.expires_at && new Date(k.expires_at) < new Date();
-        const statusClass = k.active && !isExpired ? 'badge-online' : (k.active && isExpired ? 'badge-offline' : 'badge-offline');
-        const statusText = k.active ? (isExpired ? 'Expirada' : 'Ativa') : 'Revogada';
-        return `<tr>
-          <td><code style="background:#161616; padding:0.2rem 0.5rem; border-radius:4px;">${escapeHtml(k.key)}</code></td>
-          <td>${new Date(k.created_at).toLocaleDateString()}</td>
-          <td>${expires}</td>
-          <td><span class="badge ${statusClass}">${statusText}</span></td>
-          <td>${k.device_id || '—'}</td>
-          <td>
-            <button class="btn btn-xs copy-key-btn" data-key="${escapeHtml(k.key)}">📋</button>
-            <button class="btn btn-xs" onclick="openRenewModal('${k.id}')">🔄</button>
-            <button class="btn btn-xs btn-danger" onclick="revokeKey('${k.id}')">🚫</button>
-            <button class="btn btn-xs btn-danger" onclick="deleteKey('${k.id}')">🗑️</button>
-          </td>
-        </tr>`;
-      }).join('');
-
-      tbody.querySelectorAll('.copy-key-btn').forEach(b => b.addEventListener('click', function(){
-        navigator.clipboard.writeText(this.dataset.key).then(() => showToast('Key copiada!', 'success'));
-      }));
-    }
-
-    function renderKeysPagination() {
-      const container = document.getElementById('keysPagination');
-      container.innerHTML = `
-        <button class="btn btn-sm" ${keysPage<=1?'disabled':''} onclick="loadKeys(${keysPage-1})">← Anterior</button>
-        <span style="color:var(--text-secondary);">Página ${keysPage} de ${keysTotalPages}</span>
-        <button class="btn btn-sm" ${keysPage>=keysTotalPages?'disabled':''} onclick="loadKeys(${keysPage+1})">Próxima →</button>
-      `;
-    }
-
-    function openCreateKeyModal() {
-      document.getElementById('keyModal').classList.add('active');
-    }
-
-    async function createKey() {
-      const duration = parseInt(document.getElementById('keyDuration').value);
-      try {
-        const res = await api('/api/keys', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ duration }) });
-        document.getElementById('keyModal').classList.remove('active');
-        showToast(`Key criada: ${res.key}`, 'success');
-        loadKeys();
-      } catch(e) { showToast('Erro ao criar key', 'error'); }
-    }
-
-    function openRenewModal(keyId) {
-      document.getElementById('renewKeyId').value = keyId;
-      document.getElementById('renewModal').classList.add('active');
-    }
-
-    async function renewKey() {
-      const keyId = document.getElementById('renewKeyId').value;
-      const days = parseInt(document.getElementById('renewDays').value) || 7;
-      try {
-        await api(`/api/keys/${keyId}/renew`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ days }) });
-        document.getElementById('renewModal').classList.remove('active');
-        showToast('Key renovada!', 'success');
-        loadKeys();
-      } catch(e) { showToast('Erro ao renovar', 'error'); }
-    }
-
-    async function revokeKey(keyId) {
-      if (!confirm('Revogar esta key? Ela ficará inativa.')) return;
-      try {
-        await api(`/api/keys/${keyId}/revoke`, { method:'POST' });
-        showToast('Key revogada.', 'success');
-        loadKeys();
-      } catch(e) { showToast('Erro ao revogar', 'error'); }
-    }
-
-    async function deleteKey(keyId) {
-      if (!confirm('Excluir permanentemente esta key?')) return;
-      try {
-        await api(`/api/keys/${keyId}`, { method:'DELETE' });
-        showToast('Key excluída.', 'success');
-        loadKeys();
-      } catch(e) { showToast('Erro ao excluir', 'error'); }
-    }
-
-    // Key stats cards
-    async function loadKeyStats() {
-      try {
-        const stats = await api('/api/stats');
-        if (stats.keyStats) {
-          document.getElementById('keyStatsCards').innerHTML = `
-            <div class="stat-card"><div class="stat-label">Total Keys</div><div class="stat-value">${stats.keyStats.total}</div></div>
-            <div class="stat-card"><div class="stat-label">Ativas</div><div class="stat-value" style="color:var(--success)">${stats.keyStats.active}</div></div>
-            <div class="stat-card"><div class="stat-label">Expiradas</div><div class="stat-value" style="color:var(--warning)">${stats.keyStats.expired}</div></div>
-            <div class="stat-card"><div class="stat-label">Revogadas</div><div class="stat-value" style="color:var(--danger)">${stats.keyStats.revoked}</div></div>
-            <div class="stat-card"><div class="stat-label">Ativações Hoje</div><div class="stat-value">${stats.keyStats.activationsToday}</div></div>
+        function renderStatsCards(s) {
+            document.getElementById('statsCards').innerHTML = `
+            <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Total Scripts</div><div class="stat-icon" style="color:var(--primary)">${icons.edit}</div></div><div class="stat-value">${s.totalScripts||0}</div></div>
+            <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Online</div><div class="stat-icon" style="color:var(--success)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg></div></div><div class="stat-value" style="color:var(--success)">${s.onlineScripts||0}</div></div>
+            <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Offline</div><div class="stat-icon" style="color:var(--danger)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div></div><div class="stat-value" style="color:var(--danger)">${s.offlineScripts||0}</div></div>
+            <div class="stat-card"><div class="stat-card-header"><div class="stat-label">Execuções</div><div class="stat-icon" style="color:var(--warning)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div><div class="stat-value">${s.totalExecutions||0}</div></div>
           `;
         }
-      } catch(e) {}
-    }
 
-    // Segurança (IPs)
-    async function loadBlockedIPs() {
-      try {
-        const ips = await api('/api/admin/blocked-ips');
-        document.getElementById('blockedIPsTable').innerHTML = ips.map(ip => `<tr><td>${ip}</td><td><button class="btn btn-sm btn-danger" onclick="unblockIP('${ip}')">Remover</button></td></tr>`).join('');
-      } catch(e) {}
-    }
+        function renderAlerts(alerts) {
+            const container = document.getElementById('alertsContainer');
+            let html = '';
+            if (alerts.offline && alerts.offline.length) alerts.offline.forEach(s => html +=
+                `<div class="alert-item">${icons.alert} Script offline: <strong>${escapeHtml(s.name)}</strong></div>`);
+            if (alerts.expiring && alerts.expiring.length) alerts.expiring.forEach(s => html +=
+                `<div class="alert-item warning">${icons.clock} Expirando em breve: <strong>${escapeHtml(s.name)}</strong> (${new Date(s.expires_at).toLocaleDateString()})</div>`
+                );
+            container.innerHTML = html;
+        }
 
-    async function blockIP() {
-      const ip = document.getElementById('newIP').value.trim(); if (!ip) return showToast('Digite um IP', 'error');
-      try { await api('/api/admin/block-ip', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ip }) }); loadBlockedIPs(); showToast('IP bloqueado!', 'success'); } catch(e) { showToast('Erro ao bloquear IP', 'error'); }
-    }
+        function renderHealth(h) {
+            document.getElementById('healthWidget').innerHTML = `
+            <p>${icons.clock} Uptime: ${(h.uptime/3600).toFixed(1)}h</p>
+            <p>🧠 Memória: ${h.memory.heapUsed} / ${h.memory.heapTotal}</p>
+            <p>⚙️ Node: ${h.nodeVersion}</p>
+            <p>🔄 PID: ${h.pid}</p>
+          `;
+        }
 
-    async function unblockIP(ip) {
-      try { await api(`/api/admin/block-ip/${ip}`, { method:'DELETE' }); loadBlockedIPs(); showToast('IP removido!', 'success'); } catch(e) { showToast('Erro ao remover IP', 'error'); }
-    }
+        function renderDailyChart(data) {
+            const ctx = document.getElementById('dailyChart').getContext('2d');
+            if (dailyChart) dailyChart.destroy();
+            const grad = ctx.createLinearGradient(0, 0, 0, 200);
+            grad.addColorStop(0, 'rgba(99,102,241,0.4)');
+            grad.addColorStop(1, 'rgba(99,102,241,0.01)');
+            dailyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.date ? d.date.slice(5) : ''),
+                    datasets: [{ label: 'Execuções', data: data.map(d => d.count || 0),
+                        backgroundColor: grad, borderColor: '#6366f1', borderWidth: 1.5, borderRadius: 6 }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true,
+                            ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#a0a0a0' },
+                            grid: { display: false } } } }
+            });
+        }
 
-    // Navegação
-    document.querySelectorAll('.sidebar-nav button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-        if (btn.dataset.tab === 'dashboard') loadDashboard();
-        else if (btn.dataset.tab === 'scripts') { loadScripts(); loadTagsForFilter(); }
-        else if (btn.dataset.tab === 'keys') { loadKeys(); loadKeyStats(); }
-        else if (btn.dataset.tab === 'security') loadBlockedIPs();
-        document.querySelector('.sidebar').classList.remove('open');
-      });
-    });
+        function renderHourlyChart(data) {
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
+            if (hourlyChart) hourlyChart.destroy();
+            const grad = ctx.createLinearGradient(0, 0, 0, 150);
+            grad.addColorStop(0, 'rgba(16,185,129,0.3)');
+            grad.addColorStop(1, 'rgba(16,185,129,0.01)');
+            hourlyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(h => (h.hour || '') + 'h'),
+                    datasets: [{ label: 'Execuções', data: data.map(h => h.count || 0), borderColor: '#10b981',
+                        backgroundColor: grad, fill: true, tension: 0.4, pointRadius: 3 }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true,
+                            ticks: { color: '#a0a0a0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#a0a0a0',
+                                maxTicksLimit: 12 }, grid: { display: false } } } }
+            });
+        }
 
-    document.getElementById('scriptModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-    document.getElementById('keyModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
-    document.getElementById('renewModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
-    document.getElementById('versionsModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
+        function renderCountriesChart(data) {
+            const ctx = document.getElementById('countriesChart').getContext('2d');
+            if (countriesChart) countriesChart.destroy();
+            countriesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.country || ''),
+                    datasets: [{ label: 'Execuções', data: data.map(d => d.count || 0), backgroundColor: data.map((_, i) =>
+                            `hsl(${i*40}, 70%, 50%)`) }]
+                },
+                options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
 
-    (async () => {
-      try { await api('/api/auth/me'); loadDashboard(); }
-      catch { window.location.href = ADMIN_PATH; }
-    })();
-  </script>
+        function renderPopular(data) {
+            const div = document.getElementById('popularScripts');
+            div.innerHTML = '<h3>Scripts Mais Populares</h3>' + (data.length ? data.map(s =>
+                `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);"><span>${escapeHtml(s.name)}</span><span style="color:var(--success);">${s.executions||0} execuções</span></div>`
+                ).join('') : '<p>Nenhum script.</p>');
+        }
+
+        async function exportStats() {
+            const format = confirm('Clique OK para JSON, Cancelar para CSV') ? 'json' : 'csv';
+            const res = await fetch(`/api/stats/export?format=${format}`, { credentials: 'include' });
+            const blob = await res.blob();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `storm_stats.${format}`;
+            a.click();
+        }
+
+        /* ========== SCRIPTS ========== */
+        async function loadScripts(page = currentPage) {
+            const status = document.getElementById('statusFilter').value;
+            const tag = document.getElementById('tagFilter').value;
+            let url = `/api/scripts?page=${page}&limit=25&sort=${currentSort}&order=${currentOrder}`;
+            if (status) url += `&status=${status}`;
+            if (tag) url += `&tag=${tag}`;
+            try {
+                const result = await api(url);
+                currentPage = result.page;
+                totalPages = result.totalPages;
+                renderScripts(result.data);
+                renderPagination();
+            } catch (e) { showToast('Erro ao carregar scripts', 'error'); }
+        }
+
+        function renderScripts(scripts) {
+            const tbody = document.getElementById('scriptsTable');
+            if (!scripts.length) { tbody.innerHTML =
+                    '<tr><td colspan="6" style="text-align:center;">Nenhum script.</td></tr>'; return; }
+            tbody.innerHTML = scripts.map(s => {
+                const tagsHtml = (s.tags || []).map(t => `<span class="tag">${escapeHtml(t.name)}</span>`).join('');
+                const serviceHtml = s.service ? `<span class="service-badge">${escapeHtml(s.service.name)}</span>` :
+                    '—';
+                return `<tr>
+              <td><strong>${escapeHtml(s.name)}</strong></td>
+              <td>${s.executions||0}</td>
+              <td><span class="badge badge-${s.status||'online'}">${s.status}</span></td>
+              <td>${tagsHtml || '—'}</td>
+              <td>${serviceHtml}</td>
+              <td>
+                <button class="btn btn-xs edit-btn" data-id="${s.id}">${icons.edit}</button>
+                <button class="btn btn-xs duplicate-btn" data-id="${s.id}">${icons.document}</button>
+                <button class="btn btn-xs copy-btn" data-short="${s.short_id}" data-token="${s.token}" data-service="${!!s.service}">${icons.copy}</button>
+                <button class="btn btn-xs" onclick="openVersions('${s.id}')">${icons.history}</button>
+                <button class="btn btn-xs btn-danger delete-btn" data-id="${s.id}">${icons.trash}</button>
+              </td>
+            </tr>`;
+            }).join('');
+
+            tbody.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', function() { editScript(this
+                    .dataset.id); }));
+            tbody.querySelectorAll('.duplicate-btn').forEach(b => b.addEventListener('click', function() { duplicateScript(
+                    this.dataset.id); }));
+            tbody.querySelectorAll('.copy-btn').forEach(b => b.addEventListener('click', function() { copyLoader(this
+                    .dataset.short, this.dataset.token, this.dataset.service === 'true'); }));
+            tbody.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', function() { deleteScript(this
+                    .dataset.id); }));
+        }
+
+        function renderPagination() {
+            const container = document.getElementById('paginationContainer');
+            container.innerHTML = `
+            <button class="btn btn-sm" ${currentPage<=1?'disabled':''} onclick="loadScripts(${currentPage-1})">← Anterior</button>
+            <span style="color:var(--text-secondary);">Página ${currentPage} de ${totalPages}</span>
+            <button class="btn btn-sm" ${currentPage>=totalPages?'disabled':''} onclick="loadScripts(${currentPage+1})">Próxima →</button>
+          `;
+        }
+
+        function filterScripts() { loadScripts(1); }
+
+        document.querySelectorAll('#tab-scripts th[data-sort]').forEach(th => {
+            th.addEventListener('click', function() {
+                currentSort = this.dataset.sort;
+                currentOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
+                loadScripts(1);
+            });
+        });
+
+        async function loadTagsForFilter() {
+            try {
+                const tags = await api('/api/tags');
+                const sel = document.getElementById('tagFilter');
+                sel.innerHTML = '<option value="">Todas tags</option>' + tags.map(t =>
+                    `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+            } catch (e) {}
+        }
+
+        /* Modal Scripts */
+        async function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Novo Script';
+            document.getElementById('scriptId').value = '';
+            document.getElementById('scriptName').value = '';
+            document.getElementById('scriptStatus').value = 'online';
+            document.getElementById('scriptTags').value = '';
+            document.getElementById('scriptContent').value = '';
+            document.getElementById('scriptDailyLimit').value = 0;
+            document.getElementById('scriptExpiresAt').value = '';
+            document.getElementById('scriptSandbox').checked = false;
+            document.getElementById('scriptSilent').checked = false;
+            document.getElementById('changelogFields').style.display = 'none';
+            await loadServicesIntoSelect('scriptServiceId');
+            document.getElementById('scriptModal').classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('scriptModal').classList.remove('active'); }
+
+        async function editScript(id) {
+            if (!id) return;
+            try {
+                const script = await api('/api/scripts/' + id);
+                document.getElementById('modalTitle').textContent = 'Editar Script';
+                document.getElementById('scriptId').value = script.id;
+                document.getElementById('scriptName').value = script.name;
+                document.getElementById('scriptStatus').value = script.status || 'online';
+                document.getElementById('scriptTags').value = (script.tags || []).map(t => t.name).join(', ');
+                document.getElementById('scriptContent').value = script.content;
+                document.getElementById('scriptDailyLimit').value = script.daily_limit || 0;
+                document.getElementById('scriptExpiresAt').value = script.expires_at ? script.expires_at.slice(0,
+                    16) : '';
+                document.getElementById('scriptSandbox').checked = script.sandbox || false;
+                document.getElementById('scriptSilent').checked = script.silent || false;
+                document.getElementById('changelogFields').style.display = 'block';
+                await loadServicesIntoSelect('scriptServiceId', script.service_id);
+                document.getElementById('scriptModal').classList.add('active');
+            } catch (e) { showToast('Erro ao carregar script', 'error'); }
+        }
+
+        async function saveScript() {
+            const id = document.getElementById('scriptId').value;
+            const name = document.getElementById('scriptName').value.trim();
+            const status = document.getElementById('scriptStatus').value;
+            const tags = document.getElementById('scriptTags').value.split(',').map(t => t.trim()).filter(Boolean);
+            const content = document.getElementById('scriptContent').value;
+            const daily_limit = parseInt(document.getElementById('scriptDailyLimit').value) || 0;
+            const expires_at = document.getElementById('scriptExpiresAt').value || null;
+            const sandbox = document.getElementById('scriptSandbox').checked;
+            const silent = document.getElementById('scriptSilent').checked;
+            const service_id = document.getElementById('scriptServiceId').value || null;
+
+            if (!name || !content) return showToast('Preencha todos os campos', 'error');
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? '/api/scripts/' + id : '/api/scripts';
+            try {
+                await api(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, content, status, tags, daily_limit, expires_at, sandbox, silent,
+                        service_id })
+                });
+                if (id) {
+                    const changelog = { title: document.getElementById('changelogTitle').value.trim(),
+                        description: document.getElementById('changelogDesc').value.trim() };
+                    if (changelog.title || changelog.description) {
+                        await api(`/api/scripts/${id}/changelog`, { method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(changelog) })
+                            .catch(() => {});
+                    }
+                }
+                closeModal();
+                loadScripts();
+                showToast(id ? 'Script atualizado!' : 'Script criado!', 'success');
+            } catch (e) { showToast('Erro ao salvar', 'error'); }
+        }
+
+        function deleteScript(id) {
+            if (!confirm('Excluir este script?')) return;
+            api('/api/scripts/' + id, { method: 'DELETE' }).then(() => { loadScripts();
+                showToast('Excluído.', 'success'); }).catch(e => showToast('Erro ao excluir', 'error'));
+        }
+
+        function duplicateScript(id) {
+            api(`/api/scripts/${id}/duplicate`, { method: 'POST' }).then(() => { loadScripts();
+                showToast('Duplicado!', 'success'); }).catch(e => showToast('Erro ao duplicar', 'error'));
+        }
+
+        function copyLoader(shortId, token, hasService) {
+            const base = `${location.origin}/api/load/${shortId}/${token}`;
+            let loader;
+            if (hasService) {
+                loader =
+                    `local KEY = ""\nloadstring(game:HttpGet("${base}?key="..KEY))()`;
+            } else {
+                loader = `loadstring(game:HttpGet("${base}"))()`;
+            }
+            navigator.clipboard.writeText(loader).then(() => showToast('Loader copiado!', 'success'));
+        }
+
+        async function openVersions(scriptId) {
+            try {
+                const versions = await api(`/api/scripts/${scriptId}/versions`);
+                const list = document.getElementById('versionsList');
+                list.innerHTML = versions.length === 0 ? '<p>Nenhuma versão anterior.</p>' : versions.map(v => `
+              <div style="border:1px solid var(--border); border-radius:8px; padding:0.8rem; margin-bottom:0.5rem;">
+                <strong>${escapeHtml(v.name)}</strong> (${new Date(v.created_at).toLocaleString()})<br>
+                <button class="btn btn-xs btn-primary" onclick="restoreVersion('${scriptId}','${v.id}')">Restaurar esta versão</button>
+              </div>`).join('');
+                document.getElementById('versionsModal').classList.add('active');
+            } catch (e) { showToast('Erro ao carregar versões', 'error'); }
+        }
+
+        async function restoreVersion(scriptId, versionId) {
+            if (!confirm('Restaurar esta versão? O estado atual será salvo como versão anterior.')) return;
+            try {
+                await api(`/api/scripts/${scriptId}/restore`, { method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ versionId }) });
+                document.getElementById('versionsModal').classList.remove('active');
+                loadScripts();
+                showToast('Versão restaurada!', 'success');
+            } catch (e) { showToast('Erro ao restaurar', 'error'); }
+        }
+
+        async function importTxtFiles(event) {
+            const files = event.target.files;
+            if (!files.length) return;
+            const scriptsToCreate = [];
+            for (const file of files) {
+                if (!file.name.endsWith('.txt')) continue;
+                const content = await file.text();
+                if (!content.trim()) continue;
+                scriptsToCreate.push({ name: file.name.replace(/\.txt$/i, ''), content });
+            }
+            if (!scriptsToCreate.length) return showToast('Nenhum arquivo .txt válido.', 'error');
+            try {
+                await api('/api/scripts/bulk', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ scripts: scriptsToCreate }) });
+                loadScripts();
+                showToast(`${scriptsToCreate.length} script(s) importado(s)!`, 'success');
+            } catch (e) { showToast('Erro ao importar arquivos.', 'error'); }
+            event.target.value = '';
+        }
+
+        async function exportData() {
+            try {
+                const data = await api('/api/export');
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `storm_backup_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+            } catch (e) { showToast('Erro ao exportar', 'error'); }
+        }
+
+        async function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                await api('/api/import', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...data, confirmation: 'IMPORTAR' }) });
+                loadScripts();
+                showToast('Importado!', 'success');
+            } catch (e) { showToast('Erro ao importar', 'error'); }
+            event.target.value = '';
+        }
+
+        /* ========== SERVIÇOS ========== */
+        async function loadServices() {
+            try {
+                const services = await api('/api/services');
+                renderServices(services);
+                await loadServiceFilters(services);
+            } catch (e) { showToast('Erro ao carregar serviços', 'error'); }
+        }
+
+        function renderServices(services) {
+            const tbody = document.getElementById('servicesTable');
+            if (!services.length) { tbody.innerHTML =
+                    '<tr><td colspan="5" style="text-align:center;">Nenhum serviço.</td></tr>'; return; }
+            tbody.innerHTML = services.map(s => `
+            <tr>
+              <td><strong>${escapeHtml(s.name)}</strong></td>
+              <td>${escapeHtml(s.description||'—')}</td>
+              <td>${s.active_keys||0}</td>
+              <td>${new Date(s.created_at).toLocaleDateString()}</td>
+              <td>
+                <button class="btn btn-xs" onclick="editService('${s.id}')">${icons.edit}</button>
+                <button class="btn btn-xs btn-danger" onclick="deleteService('${s.id}')">${icons.trash}</button>
+              </td>
+            </tr>`).join('');
+        }
+
+        function openCreateServiceModal() {
+            document.getElementById('serviceModalTitle').textContent = 'Novo Serviço';
+            document.getElementById('serviceId').value = '';
+            document.getElementById('serviceName').value = '';
+            document.getElementById('serviceDescription').value = '';
+            document.getElementById('serviceModal').classList.add('active');
+        }
+
+        async function editService(id) {
+            try {
+                const service = await api('/api/services/' + id);
+                document.getElementById('serviceModalTitle').textContent = 'Editar Serviço';
+                document.getElementById('serviceId').value = service.id;
+                document.getElementById('serviceName').value = service.name;
+                document.getElementById('serviceDescription').value = service.description || '';
+                document.getElementById('serviceModal').classList.add('active');
+            } catch (e) { showToast('Erro ao carregar serviço', 'error'); }
+        }
+
+        async function saveService() {
+            const id = document.getElementById('serviceId').value;
+            const name = document.getElementById('serviceName').value.trim();
+            const description = document.getElementById('serviceDescription').value.trim();
+            if (!name) return showToast('Nome obrigatório', 'error');
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? '/api/services/' + id : '/api/services';
+            try {
+                await api(url, { method, headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description }) });
+                document.getElementById('serviceModal').classList.remove('active');
+                loadServices();
+                showToast(id ? 'Serviço atualizado!' : 'Serviço criado!', 'success');
+            } catch (e) { showToast('Erro ao salvar serviço', 'error'); }
+        }
+
+        async function deleteService(id) {
+            if (!confirm('Excluir este serviço? As keys associadas não serão excluídas.')) return;
+            try {
+                await api('/api/services/' + id, { method: 'DELETE' });
+                loadServices();
+                showToast('Serviço excluído.', 'success');
+            } catch (e) { showToast('Erro ao excluir', 'error'); }
+        }
+
+        async function loadServicesIntoSelect(selectId, selectedId = null) {
+            try {
+                const services = await api('/api/services');
+                const sel = document.getElementById(selectId);
+                sel.innerHTML = '<option value="">Nenhum (script livre)</option>' + services.map(s =>
+                    `<option value="${s.id}" ${s.id==selectedId?'selected':''}>${escapeHtml(s.name)}</option>`).join(
+                    '');
+            } catch (e) {}
+        }
+
+        async function loadServiceFilters(services) {
+            const keyServiceFilter = document.getElementById('keyServiceFilter');
+            keyServiceFilter.innerHTML = '<option value="">Todos serviços</option>' + services.map(s =>
+                `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+            const keyServiceSelect = document.getElementById('keyServiceSelect');
+            keyServiceSelect.innerHTML = services.map(s =>
+                `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+        }
+
+        /* ========== KEYS ========== */
+        async function loadKeys(page = keysPage) {
+            const status = document.getElementById('keyStatusFilter').value;
+            const serviceId = document.getElementById('keyServiceFilter').value;
+            let url = `/api/keys?page=${page}&limit=25`;
+            if (status) url += `&status=${status}`;
+            if (serviceId) url += `&service_id=${serviceId}`;
+            try {
+                const result = await api(url);
+                keysPage = result.page;
+                keysTotalPages = result.totalPages;
+                renderKeys(result.data);
+                renderKeysPagination();
+            } catch (e) { showToast('Erro ao carregar keys', 'error'); }
+        }
+
+        function renderKeys(keys) {
+            const tbody = document.getElementById('keysTable');
+            if (!keys.length) { tbody.innerHTML =
+                    '<tr><td colspan="7" style="text-align:center;">Nenhuma key.</td></tr>'; return; }
+            tbody.innerHTML = keys.map(k => {
+                const expires = k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Nunca';
+                const isExpired = k.active && k.expires_at && new Date(k.expires_at) < new Date();
+                const statusClass = k.active && !isExpired ? 'badge-online' : (k.active && isExpired ?
+                    'badge-offline' : 'badge-offline');
+                const statusText = k.active ? (isExpired ? 'Expirada' : 'Ativa') : 'Revogada';
+                const serviceName = k.service ? escapeHtml(k.service.name) : '—';
+                return `<tr>
+              <td><code style="background:#161616; padding:0.2rem 0.5rem; border-radius:4px;">${escapeHtml(k.key)}</code></td>
+              <td>${serviceName}</td>
+              <td>${new Date(k.created_at).toLocaleDateString()}</td>
+              <td>${expires}</td>
+              <td><span class="badge ${statusClass}">${statusText}</span></td>
+              <td>${k.device_id || '—'}</td>
+              <td>
+                <button class="btn btn-xs copy-key-btn" data-key="${escapeHtml(k.key)}">${icons.copy}</button>
+                <button class="btn btn-xs" onclick="openRenewModal('${k.id}')">${icons.refresh}</button>
+                <button class="btn btn-xs btn-danger" onclick="revokeKey('${k.id}')">${icons.ban}</button>
+                <button class="btn btn-xs btn-danger" onclick="deleteKey('${k.id}')">${icons.trash}</button>
+              </td>
+            </tr>`;
+            }).join('');
+
+            tbody.querySelectorAll('.copy-key-btn').forEach(b => b.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.dataset.key).then(() => showToast('Key copiada!',
+                    'success'));
+            }));
+        }
+
+        function renderKeysPagination() {
+            const container = document.getElementById('keysPagination');
+            container.innerHTML = `
+            <button class="btn btn-sm" ${keysPage<=1?'disabled':''} onclick="loadKeys(${keysPage-1})">← Anterior</button>
+            <span style="color:var(--text-secondary);">Página ${keysPage} de ${keysTotalPages}</span>
+            <button class="btn btn-sm" ${keysPage>=keysTotalPages?'disabled':''} onclick="loadKeys(${keysPage+1})">Próxima →</button>
+          `;
+        }
+
+        function openCreateKeyModal() {
+            document.getElementById('keyModal').classList.add('active');
+        }
+
+        async function createKey() {
+            const duration = parseInt(document.getElementById('keyDuration').value);
+            const service_id = document.getElementById('keyServiceSelect').value;
+            if (!service_id) return showToast('Selecione um serviço', 'error');
+            try {
+                const res = await api('/api/keys', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ duration, service_id }) });
+                document.getElementById('keyModal').classList.remove('active');
+                showToast(`Key criada: ${res.key}`, 'success');
+                loadKeys();
+            } catch (e) { showToast('Erro ao criar key', 'error'); }
+        }
+
+        function openRenewModal(keyId) {
+            document.getElementById('renewKeyId').value = keyId;
+            document.getElementById('renewModal').classList.add('active');
+        }
+
+        async function renewKey() {
+            const keyId = document.getElementById('renewKeyId').value;
+            const days = parseInt(document.getElementById('renewDays').value) || 7;
+            try {
+                await api(`/api/keys/${keyId}/renew`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ days }) });
+                document.getElementById('renewModal').classList.remove('active');
+                showToast('Key renovada!', 'success');
+                loadKeys();
+            } catch (e) { showToast('Erro ao renovar', 'error'); }
+        }
+
+        async function revokeKey(keyId) {
+            if (!confirm('Revogar esta key? Ela ficará inativa.')) return;
+            try {
+                await api(`/api/keys/${keyId}/revoke`, { method: 'POST' });
+                showToast('Key revogada.', 'success');
+                loadKeys();
+            } catch (e) { showToast('Erro ao revogar', 'error'); }
+        }
+
+        async function deleteKey(keyId) {
+            if (!confirm('Excluir permanentemente esta key?')) return;
+            try {
+                await api(`/api/keys/${keyId}`, { method: 'DELETE' });
+                showToast('Key excluída.', 'success');
+                loadKeys();
+            } catch (e) { showToast('Erro ao excluir', 'error'); }
+        }
+
+        async function loadKeyStats() {
+            try {
+                const stats = await api('/api/stats');
+                if (stats.keyStats) {
+                    document.getElementById('keyStatsCards').innerHTML = `
+                <div class="stat-card"><div class="stat-label">Total Keys</div><div class="stat-value">${stats.keyStats.total}</div></div>
+                <div class="stat-card"><div class="stat-label">Ativas</div><div class="stat-value" style="color:var(--success)">${stats.keyStats.active}</div></div>
+                <div class="stat-card"><div class="stat-label">Expiradas</div><div class="stat-value" style="color:var(--warning)">${stats.keyStats.expired}</div></div>
+                <div class="stat-card"><div class="stat-label">Revogadas</div><div class="stat-value" style="color:var(--danger)">${stats.keyStats.revoked}</div></div>
+                <div class="stat-card"><div class="stat-label">Ativações Hoje</div><div class="stat-value">${stats.keyStats.activationsToday}</div></div>
+              `;
+                }
+            } catch (e) {}
+        }
+
+        /* ========== SEGURANÇA ========== */
+        async function loadBlockedIPs() {
+            try {
+                const ips = await api('/api/admin/blocked-ips');
+                document.getElementById('blockedIPsTable').innerHTML = ips.length ? ips.map(ip =>
+                    `<tr><td>${ip}</td><td><button class="btn btn-sm btn-danger" onclick="unblockIP('${ip}')">Remover</button></td></tr>`
+                    ).join('') : '<tr><td colspan="2">Nenhum IP bloqueado.</td></tr>';
+            } catch (e) {}
+        }
+
+        async function blockIP() {
+            const ip = document.getElementById('newIP').value.trim();
+            if (!ip) return showToast('Digite um IP', 'error');
+            try {
+                await api('/api/admin/block-ip', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ip }) });
+                loadBlockedIPs();
+                showToast('IP bloqueado!', 'success');
+            } catch (e) { showToast('Erro ao bloquear IP', 'error'); }
+        }
+
+        async function unblockIP(ip) {
+            try {
+                await api(`/api/admin/block-ip/${ip}`, { method: 'DELETE' });
+                loadBlockedIPs();
+                showToast('IP removido!', 'success');
+            } catch (e) { showToast('Erro ao remover IP', 'error'); }
+        }
+
+        /* ========== NAVEGAÇÃO ========== */
+        document.querySelectorAll('.sidebar-nav button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove(
+                    'active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+                const tab = btn.dataset.tab;
+                if (tab === 'dashboard') loadDashboard();
+                else if (tab === 'scripts') { loadScripts();
+                    loadTagsForFilter(); }
+                else if (tab === 'keys') { loadServices();
+                    loadKeys();
+                    loadKeyStats(); }
+                else if (tab === 'security') loadBlockedIPs();
+                document.querySelector('.sidebar').classList.remove('open');
+            });
+        });
+
+        document.getElementById('scriptModal').addEventListener('click', function(e) { if (e.target === this)
+            closeModal(); });
+        document.getElementById('keyModal').addEventListener('click', function(e) { if (e.target === this) this
+            .classList.remove('active'); });
+        document.getElementById('serviceModal').addEventListener('click', function(e) { if (e.target === this) this
+            .classList.remove('active'); });
+        document.getElementById('renewModal').addEventListener('click', function(e) { if (e.target === this) this
+            .classList.remove('active'); });
+        document.getElementById('versionsModal').addEventListener('click', function(e) { if (e.target === this) this
+            .classList.remove('active'); });
+
+        /* Inicialização */
+        (async () => {
+            try {
+                await api('/api/auth/me');
+                loadDashboard();
+            } catch {
+                window.location.href = ADMIN_PATH;
+            }
+        })();
+    </script>
 </body>
 </html>
