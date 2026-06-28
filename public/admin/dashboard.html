@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Astro — Painel de Controle</title>
+  <title>Storm — Painel de Controle</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -137,7 +137,7 @@
   <aside class="sidebar">
     <div class="sidebar-logo">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-      Astro
+      Storm
     </div>
     <nav class="sidebar-nav">
       <button class="active" data-tab="dashboard">
@@ -147,6 +147,10 @@
       <button data-tab="scripts">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         Scripts
+      </button>
+      <button data-tab="keys">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        Keys
       </button>
       <button data-tab="security">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -202,6 +206,30 @@
       <div class="pagination" id="paginationContainer"></div>
     </div>
 
+    <!-- Keys -->
+    <div id="tab-keys" class="tab">
+      <div class="header">
+        <h1>Licenças (Keys)</h1>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <select id="keyStatusFilter" style="width:150px; padding:0.5rem; background:#161616; border:1px solid var(--border); color:#fff; border-radius:var(--radius-sm);" onchange="loadKeys(1)">
+            <option value="">Todos</option>
+            <option value="active">Ativas</option>
+            <option value="expired">Expiradas</option>
+            <option value="revoked">Revogadas</option>
+          </select>
+          <button class="btn btn-primary" onclick="openCreateKeyModal()">+ Criar Key</button>
+        </div>
+      </div>
+      <div class="stats-grid" id="keyStatsCards"></div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Key</th><th>Criada em</th><th>Expira</th><th>Status</th><th>Device</th><th>Ações</th></tr></thead>
+          <tbody id="keysTable"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="keysPagination"></div>
+    </div>
+
     <!-- Segurança -->
     <div id="tab-security" class="tab">
       <div class="header"><h1>Segurança</h1></div>
@@ -240,6 +268,39 @@
     </div>
   </div>
 
+  <!-- Modal Key -->
+  <div id="keyModal" class="modal">
+    <div class="modal-box">
+      <h2>Criar Nova Key</h2>
+      <label>Duração</label>
+      <select id="keyDuration">
+        <option value="1">1 dia</option>
+        <option value="7">7 dias</option>
+        <option value="30">30 dias</option>
+        <option value="90">90 dias</option>
+        <option value="0">Permanente</option>
+      </select>
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="document.getElementById('keyModal').classList.remove('active')">Cancelar</button>
+        <button class="btn btn-primary" onclick="createKey()">Criar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Renovar Key -->
+  <div id="renewModal" class="modal">
+    <div class="modal-box">
+      <h2>Renovar Key</h2>
+      <input type="hidden" id="renewKeyId">
+      <label>Dias adicionais</label>
+      <input type="number" id="renewDays" value="7" min="1">
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="document.getElementById('renewModal').classList.remove('active')">Cancelar</button>
+        <button class="btn btn-primary" onclick="renewKey()">Renovar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Histórico de Versões -->
   <div id="versionsModal" class="modal">
     <div class="modal-box">
@@ -254,6 +315,7 @@
   <script>
     const ADMIN_PATH = '/painel';
     let currentPage = 1, totalPages = 1, currentSort = 'updated_at', currentOrder = 'DESC';
+    let keysPage = 1, keysTotalPages = 1;
     let dailyChart, hourlyChart, countriesChart;
 
     function showToast(msg, type='success') {
@@ -344,7 +406,7 @@
       const format = confirm('Clique OK para JSON, Cancelar para CSV') ? 'json' : 'csv';
       const res = await fetch(`/api/stats/export?format=${format}`, { credentials:'include' });
       const blob = await res.blob();
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `astro_stats.${format}`; a.click();
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `storm_stats.${format}`; a.click();
     }
 
     // ========== SCRIPTS ==========
@@ -408,7 +470,6 @@
       });
     });
 
-    // Carregar tags para o filtro
     async function loadTagsForFilter() {
       try {
         const tags = await api('/api/tags');
@@ -417,7 +478,7 @@
       } catch(e) {}
     }
 
-    // Modal
+    // Modal Scripts
     function openCreateModal() {
       document.getElementById('modalTitle').textContent = 'Novo Script';
       document.getElementById('scriptId').value = '';
@@ -535,7 +596,7 @@
       try {
         const data = await api('/api/export');
         const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `astro_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `storm_backup_${new Date().toISOString().slice(0,10)}.json`; a.click();
       } catch(e) { showToast('Erro ao exportar', 'error'); }
     }
 
@@ -547,6 +608,121 @@
         loadScripts(); showToast('Importado!', 'success');
       } catch(e) { showToast('Erro ao importar', 'error'); }
       event.target.value = '';
+    }
+
+    // ========== KEYS ==========
+    async function loadKeys(page = keysPage) {
+      const status = document.getElementById('keyStatusFilter').value;
+      let url = `/api/keys?page=${page}&limit=25`;
+      if (status) url += `&status=${status}`;
+      try {
+        const result = await api(url);
+        keysPage = result.page;
+        keysTotalPages = result.totalPages;
+        renderKeys(result.data);
+        renderKeysPagination();
+      } catch(e) { showToast('Erro ao carregar keys', 'error'); }
+    }
+
+    function renderKeys(keys) {
+      const tbody = document.getElementById('keysTable');
+      if (!keys.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Nenhuma key.</td></tr>'; return; }
+      tbody.innerHTML = keys.map(k => {
+        const expires = k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Nunca';
+        const isExpired = k.active && k.expires_at && new Date(k.expires_at) < new Date();
+        const statusClass = k.active && !isExpired ? 'badge-online' : (k.active && isExpired ? 'badge-offline' : 'badge-offline');
+        const statusText = k.active ? (isExpired ? 'Expirada' : 'Ativa') : 'Revogada';
+        return `<tr>
+          <td><code style="background:#161616; padding:0.2rem 0.5rem; border-radius:4px;">${escapeHtml(k.key)}</code></td>
+          <td>${new Date(k.created_at).toLocaleDateString()}</td>
+          <td>${expires}</td>
+          <td><span class="badge ${statusClass}">${statusText}</span></td>
+          <td>${k.device_id || '—'}</td>
+          <td>
+            <button class="btn btn-xs copy-key-btn" data-key="${escapeHtml(k.key)}">📋</button>
+            <button class="btn btn-xs" onclick="openRenewModal('${k.id}')">🔄</button>
+            <button class="btn btn-xs btn-danger" onclick="revokeKey('${k.id}')">🚫</button>
+            <button class="btn btn-xs btn-danger" onclick="deleteKey('${k.id}')">🗑️</button>
+          </td>
+        </tr>`;
+      }).join('');
+
+      tbody.querySelectorAll('.copy-key-btn').forEach(b => b.addEventListener('click', function(){
+        navigator.clipboard.writeText(this.dataset.key).then(() => showToast('Key copiada!', 'success'));
+      }));
+    }
+
+    function renderKeysPagination() {
+      const container = document.getElementById('keysPagination');
+      container.innerHTML = `
+        <button class="btn btn-sm" ${keysPage<=1?'disabled':''} onclick="loadKeys(${keysPage-1})">← Anterior</button>
+        <span style="color:var(--text-secondary);">Página ${keysPage} de ${keysTotalPages}</span>
+        <button class="btn btn-sm" ${keysPage>=keysTotalPages?'disabled':''} onclick="loadKeys(${keysPage+1})">Próxima →</button>
+      `;
+    }
+
+    function openCreateKeyModal() {
+      document.getElementById('keyModal').classList.add('active');
+    }
+
+    async function createKey() {
+      const duration = parseInt(document.getElementById('keyDuration').value);
+      try {
+        const res = await api('/api/keys', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ duration }) });
+        document.getElementById('keyModal').classList.remove('active');
+        showToast(`Key criada: ${res.key}`, 'success');
+        loadKeys();
+      } catch(e) { showToast('Erro ao criar key', 'error'); }
+    }
+
+    function openRenewModal(keyId) {
+      document.getElementById('renewKeyId').value = keyId;
+      document.getElementById('renewModal').classList.add('active');
+    }
+
+    async function renewKey() {
+      const keyId = document.getElementById('renewKeyId').value;
+      const days = parseInt(document.getElementById('renewDays').value) || 7;
+      try {
+        await api(`/api/keys/${keyId}/renew`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ days }) });
+        document.getElementById('renewModal').classList.remove('active');
+        showToast('Key renovada!', 'success');
+        loadKeys();
+      } catch(e) { showToast('Erro ao renovar', 'error'); }
+    }
+
+    async function revokeKey(keyId) {
+      if (!confirm('Revogar esta key? Ela ficará inativa.')) return;
+      try {
+        await api(`/api/keys/${keyId}/revoke`, { method:'POST' });
+        showToast('Key revogada.', 'success');
+        loadKeys();
+      } catch(e) { showToast('Erro ao revogar', 'error'); }
+    }
+
+    async function deleteKey(keyId) {
+      if (!confirm('Excluir permanentemente esta key?')) return;
+      try {
+        await api(`/api/keys/${keyId}`, { method:'DELETE' });
+        showToast('Key excluída.', 'success');
+        loadKeys();
+      } catch(e) { showToast('Erro ao excluir', 'error'); }
+    }
+
+    // Key stats cards
+    async function loadKeyStats() {
+      try {
+        const stats = await api('/api/stats');
+        if (stats.keyStats) {
+          document.getElementById('keyStatsCards').innerHTML = `
+            <div class="stat-card"><div class="stat-label">Total Keys</div><div class="stat-value">${stats.keyStats.total}</div></div>
+            <div class="stat-card"><div class="stat-label">Ativas</div><div class="stat-value" style="color:var(--success)">${stats.keyStats.active}</div></div>
+            <div class="stat-card"><div class="stat-label">Expiradas</div><div class="stat-value" style="color:var(--warning)">${stats.keyStats.expired}</div></div>
+            <div class="stat-card"><div class="stat-label">Revogadas</div><div class="stat-value" style="color:var(--danger)">${stats.keyStats.revoked}</div></div>
+            <div class="stat-card"><div class="stat-label">Ativações Hoje</div><div class="stat-value">${stats.keyStats.activationsToday}</div></div>
+          `;
+        }
+      } catch(e) {}
     }
 
     // Segurança (IPs)
@@ -575,12 +751,15 @@
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
         if (btn.dataset.tab === 'dashboard') loadDashboard();
         else if (btn.dataset.tab === 'scripts') { loadScripts(); loadTagsForFilter(); }
+        else if (btn.dataset.tab === 'keys') { loadKeys(); loadKeyStats(); }
         else if (btn.dataset.tab === 'security') loadBlockedIPs();
         document.querySelector('.sidebar').classList.remove('open');
       });
     });
 
     document.getElementById('scriptModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    document.getElementById('keyModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
+    document.getElementById('renewModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
     document.getElementById('versionsModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
 
     (async () => {
