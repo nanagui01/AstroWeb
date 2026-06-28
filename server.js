@@ -1,16 +1,8 @@
+// server.js — Backend completo corrigido com suporte a serviços e validação de device mismatch
 require('dotenv').config();
 
-// ============================================================
-// VALIDAÇÃO OBRIGATÓRIA DE AMBIENTE
-// ============================================================
-const requiredEnvVars = [
-  'JWT_SECRET',
-  'COOKIE_SECRET',
-  'ADMIN_USER',
-  'ADMIN_PASS',
-  'DATABASE_URL'
-];
-
+// Validação de variáveis obrigatórias
+const requiredEnvVars = ['JWT_SECRET', 'COOKIE_SECRET', 'ADMIN_USER', 'ADMIN_PASS', 'DATABASE_URL'];
 for (const varName of requiredEnvVars) {
   if (!process.env[varName]) {
     console.error(`❌ ERRO FATAL: ${varName} não definido no .env`);
@@ -33,9 +25,6 @@ const { Pool } = require('pg');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* ============================================================
-   CONFIGURAÇÕES (todas do .env)
-   ============================================================ */
 const JWT_SECRET = process.env.JWT_SECRET;
 const COOKIE_SECRET = process.env.COOKIE_SECRET;
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
@@ -43,11 +32,8 @@ const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
-
-// 🔥 URL DE ADMIN PERSONALIZADA
 const ADMIN_PATH = '/001010GGZEHENXylo9FrostNetaP7zQm2V8xKr6L';
 
-// Conexão com PostgreSQL (Render)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: IS_PRODUCTION ? { rejectUnauthorized: false } : false,
@@ -56,32 +42,21 @@ const pool = new Pool({
   connectionTimeoutMillis: 15000,
 });
 
-/* ============================================================
-   SEGURANÇA BÁSICA
-   ============================================================ */
+// Segurança
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
-app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
-}));
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser(COOKIE_SECRET));
 app.use(express.static(path.join(__dirname, 'public')));
 
-/* ============================================================
-   RATE LIMIT
-   ============================================================ */
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5, message: { error: 'Muitas tentativas.' } });
 const apiLimiter = rateLimit({ windowMs: 1 * 60 * 1000, max: 300 });
 const loaderLimiter = rateLimit({ windowMs: 1 * 60 * 1000, max: 1000 });
-
 app.use('/api/', apiLimiter);
 
-/* ============================================================
-   INICIALIZAÇÃO DAS TABELAS
-   ============================================================ */
+// Inicialização do banco de dados
 async function initDatabase() {
   const client = await pool.connect();
   try {
@@ -96,7 +71,12 @@ async function initDatabase() {
         failed_attempts INT DEFAULT 0,
         locked_until TIMESTAMPTZ
       );
-
+      CREATE TABLE IF NOT EXISTS services (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        name TEXT NOT NULL,
+        description TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
       CREATE TABLE IF NOT EXISTS scripts (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         name TEXT NOT NULL,
@@ -109,10 +89,10 @@ async function initDatabase() {
         executions INT DEFAULT 0,
         short_id TEXT UNIQUE,
         token TEXT UNIQUE,
+        service_id UUID REFERENCES services(id) ON DELETE SET NULL,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );
-
       CREATE TABLE IF NOT EXISTS script_versions (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         script_id UUID REFERENCES scripts(id) ON DELETE CASCADE,
@@ -121,19 +101,16 @@ async function initDatabase() {
         status TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
-
       CREATE TABLE IF NOT EXISTS tags (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         name TEXT UNIQUE NOT NULL,
         color TEXT DEFAULT '#6366f1'
       );
-
       CREATE TABLE IF NOT EXISTS script_tags (
         script_id UUID REFERENCES scripts(id) ON DELETE CASCADE,
         tag_id UUID REFERENCES tags(id) ON DELETE CASCADE,
         PRIMARY KEY (script_id, tag_id)
       );
-
       CREATE TABLE IF NOT EXISTS execution_logs (
         id SERIAL PRIMARY KEY,
         script_id UUID REFERENCES scripts(id) ON DELETE SET NULL,
@@ -142,30 +119,26 @@ async function initDatabase() {
         user_agent TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
-
       CREATE TABLE IF NOT EXISTS blocked_ips (
         ip TEXT PRIMARY KEY,
         blocked_at TIMESTAMPTZ DEFAULT NOW()
       );
-
-      -- 🆕 TABELAS DO SISTEMA DE KEYS
       CREATE TABLE IF NOT EXISTS keys (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         key TEXT UNIQUE NOT NULL,
+        service_id UUID REFERENCES services(id) ON DELETE SET NULL,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         expires_at TIMESTAMPTZ,
         active BOOLEAN DEFAULT true,
         device_id TEXT,
         last_use TIMESTAMPTZ
       );
-
       CREATE TABLE IF NOT EXISTS activations (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         key_id UUID REFERENCES keys(id) ON DELETE CASCADE,
         device_id TEXT NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
-
       CREATE TABLE IF NOT EXISTS key_logs (
         id SERIAL PRIMARY KEY,
         action TEXT NOT NULL,
@@ -180,9 +153,7 @@ async function initDatabase() {
   }
 }
 
-/* ============================================================
-   MIDDLEWARE DE AUTENTICAÇÃO
-   ============================================================ */
+// Middleware de autenticação
 function auth(req, res, next) {
   const token = req.signedCookies?.token || req.cookies?.token;
   if (!token) return res.status(401).json({ error: 'Token ausente' });
@@ -195,445 +166,444 @@ function auth(req, res, next) {
   }
 }
 
-function masterOnly(req, res, next) {
-  if (req.user?.role !== 'master') return res.status(403).json({ error: 'Apenas master' });
-  next();
-}
-
-/* ============================================================
-   FUNÇÕES AUXILIARES
-   ============================================================ */
+// Helpers
 function shortId() { return crypto.randomBytes(8).toString('hex'); }
 function secureToken() { return crypto.randomBytes(16).toString('hex'); }
-
 function generateKey() {
-  const segments = [];
-  for (let i = 0; i < 4; i++) {
-    segments.push(crypto.randomBytes(2).toString('hex').toUpperCase().substring(0, 4));
-  }
-  return `STORM-${segments.join('-')}`;
+  const s = [];
+  for (let i = 0; i < 4; i++) s.push(crypto.randomBytes(2).toString('hex').toUpperCase().substring(0,4));
+  return `STORM-${s.join('-')}`;
 }
-
-async function logKeyAction(action, key, message) {
-  try {
-    await pool.query('INSERT INTO key_logs (action, key, message) VALUES ($1,$2,$3)', [action, key, message]);
-  } catch (err) { console.error('Erro ao logar ação de key:', err.message); }
+async function logKeyAction(action, key, msg) {
+  try { await pool.query('INSERT INTO key_logs (action, key, message) VALUES ($1,$2,$3)', [action, key, msg]); } catch {}
 }
-
-async function sendDiscordEmbed({ title, description, banner, thumbnail, scriptName }) {
-  if (!DISCORD_WEBHOOK_URL) return;
-  const embed = {
-    title: title || `${scriptName} foi atualizado!`,
-    description: description || 'Veja as novidades abaixo.',
-    color: 0x6366f1,
-    timestamp: new Date().toISOString(),
-    footer: { text: 'Storm Hub' }
-  };
-  if (banner) embed.image = { url: banner };
-  if (thumbnail) embed.thumbnail = { url: thumbnail };
-  try {
-    await axios.post(DISCORD_WEBHOOK_URL, { embeds: [embed] }, { timeout: 5000 });
-  } catch (err) { console.error('[DISCORD]', err.message); }
-}
-
 async function getCountry(ip) {
   try {
     const res = await axios.get(`http://ip-api.com/json/${ip}?fields=country`, { timeout: 2000 });
     return res.data?.country || 'Unknown';
   } catch { return 'Unknown'; }
 }
+async function sendDiscordEmbed({ title, description, banner, thumbnail, scriptName }) {
+  if (!DISCORD_WEBHOOK_URL) return;
+  try {
+    await axios.post(DISCORD_WEBHOOK_URL, {
+      embeds: [{ title: title || `${scriptName} foi atualizado!`, description: description || 'Veja as novidades.', color: 0x6366f1, timestamp: new Date().toISOString(), footer: { text: 'Storm Hub' }, image: banner ? { url: banner } : undefined, thumbnail: thumbnail ? { url: thumbnail } : undefined }]
+    }, { timeout: 5000 });
+  } catch (err) { console.error('[DISCORD]', err.message); }
+}
 
-/* ============================================================
-   AUTENTICAÇÃO
-   ============================================================ */
+// ================== AUTENTICAÇÃO ==================
 app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.redirect(`${ADMIN_PATH}?error=1`);
-
   const result = await pool.query('SELECT * FROM admins WHERE LOWER(username) = LOWER($1)', [username]);
   const admin = result.rows[0];
   const FAKE_HASH = '$2a$10$7EqJtq98hPqEX7fNZaFWoOHi5xJYq7u9fN5F5NeLSd851qwL2mM5e';
-
-  if (!admin) {
-    await bcrypt.compare(password, FAKE_HASH);
-    return res.redirect(`${ADMIN_PATH}?error=1`);
-  }
-
+  if (!admin) { await bcrypt.compare(password, FAKE_HASH); return res.redirect(`${ADMIN_PATH}?error=1`); }
   if (!bcrypt.compareSync(password, admin.password_hash)) {
     await pool.query('UPDATE admins SET failed_attempts = failed_attempts + 1 WHERE id = $1', [admin.id]);
     return res.redirect(`${ADMIN_PATH}?error=1`);
   }
-
   await pool.query('UPDATE admins SET failed_attempts = 0, locked_until = NULL, last_login = NOW() WHERE id = $1', [admin.id]);
   const token = jwt.sign({ id: admin.id, username: admin.username, role: admin.role }, JWT_SECRET, { expiresIn: '8h' });
   res.cookie('token', token, { httpOnly: true, secure: IS_PRODUCTION, sameSite: 'lax', path: '/', signed: true });
   return res.redirect(`${ADMIN_PATH}/dashboard`);
 });
 
-app.get('/api/auth/logout', (req, res) => {
-  res.clearCookie('token');
-  res.redirect(ADMIN_PATH);
-});
-
+app.get('/api/auth/logout', (req, res) => { res.clearCookie('token'); res.redirect(ADMIN_PATH); });
 app.get('/api/auth/me', auth, async (req, res) => {
-  const result = await pool.query('SELECT username, role FROM admins WHERE id = $1', [req.user.id]);
-  res.json(result.rows[0] || {});
+  const r = await pool.query('SELECT username, role FROM admins WHERE id = $1', [req.user.id]);
+  res.json(r.rows[0] || {});
 });
 
-/* ============================================================
-   BLOQUEIO DE IP
-   ============================================================ */
-app.get('/api/admin/blocked-ips', auth, async (req, res) => {
-  const result = await pool.query('SELECT ip, blocked_at FROM blocked_ips ORDER BY blocked_at DESC');
-  res.json(result.rows);
-});
-
-app.post('/api/admin/block-ip', auth, async (req, res) => {
-  const { ip } = req.body;
-  if (!ip) return res.status(400).json({ error: 'IP obrigatório' });
-  await pool.query('INSERT INTO blocked_ips (ip) VALUES ($1) ON CONFLICT (ip) DO NOTHING', [ip]);
-  res.json({ success: true });
-});
-
-app.delete('/api/admin/block-ip/:ip', auth, async (req, res) => {
-  await pool.query('DELETE FROM blocked_ips WHERE ip = $1', [req.params.ip]);
-  res.json({ success: true });
-});
-
+// IP Block
+app.get('/api/admin/blocked-ips', auth, async (req, res) => { const r = await pool.query('SELECT ip, blocked_at FROM blocked_ips ORDER BY blocked_at DESC'); res.json(r.rows); });
+app.post('/api/admin/block-ip', auth, async (req, res) => { const { ip } = req.body; if (!ip) return res.status(400).json({ error: 'IP obrigatório' }); await pool.query('INSERT INTO blocked_ips (ip) VALUES ($1) ON CONFLICT DO NOTHING', [ip]); res.json({ success: true }); });
+app.delete('/api/admin/block-ip/:ip', auth, async (req, res) => { await pool.query('DELETE FROM blocked_ips WHERE ip = $1', [req.params.ip]); res.json({ success: true }); });
 app.use(async (req, res, next) => {
   const ip = req.ip || req.connection.remoteAddress;
-  try {
-    const result = await pool.query('SELECT ip FROM blocked_ips WHERE ip = $1', [ip]);
-    if (result.rows.length > 0) return res.status(403).send('Acesso bloqueado.');
-  } catch (err) { /* falha silenciosa */ }
+  try { const r = await pool.query('SELECT ip FROM blocked_ips WHERE ip = $1', [ip]); if (r.rows.length) return res.status(403).send('Acesso bloqueado.'); } catch {}
   next();
 });
 
-/* ============================================================
-   SCRIPTS CRUD
-   ============================================================ */
-app.get('/api/scripts', auth, async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 25;
-  const offset = (page - 1) * limit;
-  const sort = req.query.sort || 'updated_at';
-  const order = req.query.order || 'DESC';
-  const status = req.query.status;
-  const tag = req.query.tag;
-
-  let query = `SELECT s.*, 
-    COALESCE(json_agg(t.*) FILTER (WHERE t.id IS NOT NULL), '[]') AS tags
-    FROM scripts s
-    LEFT JOIN script_tags st ON s.id = st.script_id
-    LEFT JOIN tags t ON st.tag_id = t.id`;
-  let countQuery = 'SELECT COUNT(*) FROM scripts s';
-  const params = [];
-  const conditions = [];
-
-  if (status) {
-    conditions.push(`s.status = $${params.length + 1}`);
-    params.push(status);
-  }
-  if (tag) {
-    conditions.push(`s.id IN (SELECT script_id FROM script_tags WHERE tag_id = $${params.length + 1})`);
-    params.push(tag);
-  }
-
-  if (conditions.length > 0) {
-    const where = ' WHERE ' + conditions.join(' AND ');
-    query += where;
-    countQuery += where;
-  }
-
-  query += ` GROUP BY s.id ORDER BY s.${sort} ${order} LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-  params.push(limit, offset);
-
+// ================== SERVIÇOS ==================
+app.get('/api/services', auth, async (req, res) => {
   try {
-    const scriptsResult = await pool.query(query, params);
-    const countParams = conditions.length > 0 ? params.slice(0, -2) : [];
-    const countResult = await pool.query(countQuery, countParams);
-    const total = parseInt(countResult.rows[0].count);
-    res.json({ data: scriptsResult.rows, page, totalPages: Math.ceil(total / limit), total });
+    const services = await pool.query('SELECT s.*, (SELECT COUNT(*) FROM keys WHERE service_id = s.id AND active = true) AS active_keys FROM services s ORDER BY created_at DESC');
+    res.json(services.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/services/:id', auth, async (req, res) => {
+  try {
+    const r = await pool.query('SELECT * FROM services WHERE id = $1', [req.params.id]);
+    if (!r.rows.length) return res.status(404).json({ error: 'Serviço não encontrado' });
+    res.json(r.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/services', auth, async (req, res) => {
+  const { name, description } = req.body;
+  if (!name) return res.status(400).json({ error: 'Nome obrigatório' });
+  try {
+    const r = await pool.query('INSERT INTO services (name, description) VALUES ($1,$2) RETURNING *', [name.trim(), description?.trim() || '']);
+    res.status(201).json(r.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/services/:id', auth, async (req, res) => {
+  const { name, description } = req.body;
+  if (!name) return res.status(400).json({ error: 'Nome obrigatório' });
+  try {
+    const r = await pool.query('UPDATE services SET name=$1, description=$2 WHERE id=$3 RETURNING *', [name.trim(), description?.trim() || '', req.params.id]);
+    if (!r.rows.length) return res.status(404).json({ error: 'Serviço não encontrado' });
+    res.json(r.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/services/:id', auth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM services WHERE id = $1', [req.params.id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ================== SCRIPTS ==================
+app.get('/api/scripts', auth, async (req, res) => {
+  const page = parseInt(req.query.page) || 1, limit = parseInt(req.query.limit) || 25, offset = (page - 1) * limit;
+  const sort = req.query.sort || 'updated_at', order = req.query.order || 'DESC';
+  const status = req.query.status, tag = req.query.tag;
+  let conds = [], params = [];
+  if (status) { conds.push(`s.status = $${params.length+1}`); params.push(status); }
+  if (tag) { conds.push(`s.id IN (SELECT script_id FROM script_tags WHERE tag_id = $${params.length+1})`); params.push(tag); }
+  const where = conds.length ? ' WHERE ' + conds.join(' AND ') : '';
+  try {
+    const dataQ = `SELECT s.*, COALESCE(json_agg(json_build_object('id', t.id, 'name', t.name, 'color', t.color)) FILTER (WHERE t.id IS NOT NULL), '[]') AS tags,
+      (SELECT row_to_json(svc) FROM services svc WHERE svc.id = s.service_id) AS service
+      FROM scripts s
+      LEFT JOIN script_tags st ON s.id = st.script_id
+      LEFT JOIN tags t ON st.tag_id = t.id
+      ${where}
+      GROUP BY s.id ORDER BY s.${sort} ${order} LIMIT $${params.length+1} OFFSET $${params.length+2}`;
+    const countQ = `SELECT COUNT(*) FROM scripts s ${where}`;
+    const countParams = [...params];
+    params.push(limit, offset);
+    const [dataRes, countRes] = await Promise.all([
+      pool.query(dataQ, params),
+      pool.query(countQ, countParams)
+    ]);
+    const total = parseInt(countRes.rows[0].count);
+    res.json({ data: dataRes.rows, page, totalPages: Math.ceil(total / limit), total });
   } catch (err) {
-    console.error('Erro ao buscar scripts:', err);
+    console.error(err);
     res.status(500).json({ error: 'Erro ao buscar scripts' });
   }
 });
 
 app.get('/api/scripts/:id', auth, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT s.*, COALESCE(json_agg(t.*) FILTER (WHERE t.id IS NOT NULL), '[]') AS tags
+    const r = await pool.query(`
+      SELECT s.*, COALESCE(json_agg(json_build_object('id', t.id, 'name', t.name, 'color', t.color)) FILTER (WHERE t.id IS NOT NULL), '[]') AS tags
       FROM scripts s
       LEFT JOIN script_tags st ON s.id = st.script_id
       LEFT JOIN tags t ON st.tag_id = t.id
-      WHERE s.id = $1
-      GROUP BY s.id`, [req.params.id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Script não encontrado' });
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao buscar script' });
-  }
+      WHERE s.id = $1 GROUP BY s.id`, [req.params.id]);
+    if (!r.rows.length) return res.status(404).json({ error: 'Script não encontrado' });
+    res.json(r.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/scripts', auth, async (req, res) => {
-  const { name, content, status, sandbox, silent, daily_limit, expires_at, tags } = req.body;
+  const { name, content, status, sandbox, silent, daily_limit, expires_at, tags, service_id } = req.body;
   if (!name || !content) return res.status(400).json({ error: 'Nome e conteúdo obrigatórios' });
-  const validStatuses = ['online', 'offline', 'maintenance', 'development'];
-  const id = uuidv4();
-  const short_id = shortId();
-  const token = secureToken();
+  const id = uuidv4(), short_id = shortId(), token = secureToken();
   try {
     await pool.query(
-      `INSERT INTO scripts (id, name, content, status, sandbox, silent, daily_limit, expires_at, short_id, token)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-      [id, name.trim(), content, validStatuses.includes(status) ? status : 'online', sandbox || false, silent || false, daily_limit || 0, expires_at || null, short_id, token]
+      `INSERT INTO scripts (id, name, content, status, sandbox, silent, daily_limit, expires_at, short_id, token, service_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+      [id, name.trim(), content, status || 'online', sandbox || false, silent || false, daily_limit || 0, expires_at || null, short_id, token, service_id || null]
     );
     if (Array.isArray(tags)) {
       for (const tagName of tags) {
-        let tagResult = await pool.query('SELECT id FROM tags WHERE name = $1', [tagName]);
-        if (tagResult.rows.length === 0) {
-          tagResult = await pool.query('INSERT INTO tags (name) VALUES ($1) RETURNING id', [tagName]);
-        }
-        await pool.query('INSERT INTO script_tags (script_id, tag_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, tagResult.rows[0].id]);
+        let r = await pool.query('INSERT INTO tags (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id', [tagName.trim()]);
+        if (!r.rows.length) r = await pool.query('SELECT id FROM tags WHERE name = $1', [tagName.trim()]);
+        const tagId = r.rows[0].id;
+        await pool.query('INSERT INTO script_tags (script_id, tag_id) VALUES ($1,$2) ON CONFLICT DO NOTHING', [id, tagId]);
       }
     }
-    const newScript = await pool.query('SELECT * FROM scripts WHERE id = $1', [id]);
-    res.status(201).json(newScript.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao criar script' });
-  }
+    const script = await pool.query('SELECT * FROM scripts WHERE id = $1', [id]);
+    res.status(201).json(script.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.put('/api/scripts/:id', auth, async (req, res) => {
+  const client = await pool.connect();
   try {
-    const script = (await pool.query('SELECT * FROM scripts WHERE id = $1', [req.params.id])).rows[0];
-    if (!script) return res.status(404).json({ error: 'Script não encontrado' });
-    await pool.query('INSERT INTO script_versions (script_id, name, content, status) VALUES ($1,$2,$3,$4)',
-      [script.id, script.name, script.content, script.status]);
-    const { name, content, status, sandbox, silent, daily_limit, expires_at, tags } = req.body;
-    const validStatuses = ['online', 'offline', 'maintenance', 'development'];
-    if (name !== undefined) script.name = name.trim();
-    if (content !== undefined) script.content = content;
-    if (status !== undefined && validStatuses.includes(status)) script.status = status;
-    if (sandbox !== undefined) script.sandbox = sandbox;
-    if (silent !== undefined) script.silent = silent;
-    if (daily_limit !== undefined) script.daily_limit = daily_limit;
-    if (expires_at !== undefined) script.expires_at = expires_at;
-    await pool.query(
-      `UPDATE scripts SET name=$1, content=$2, status=$3, sandbox=$4, silent=$5, daily_limit=$6, expires_at=$7, updated_at=NOW() WHERE id=$8`,
-      [script.name, script.content, script.status, script.sandbox, script.silent, script.daily_limit, script.expires_at, script.id]
-    );
+    await client.query('BEGIN');
+    const old = (await client.query('SELECT * FROM scripts WHERE id = $1', [req.params.id])).rows[0];
+    if (!old) return res.status(404).json({ error: 'Script não encontrado' });
+    await client.query('INSERT INTO script_versions (script_id, name, content, status) VALUES ($1,$2,$3,$4)', [old.id, old.name, old.content, old.status]);
+    const { name, content, status, sandbox, silent, daily_limit, expires_at, tags, service_id } = req.body;
+    const newData = {
+      name: name !== undefined ? name.trim() : old.name,
+      content: content !== undefined ? content : old.content,
+      status: status !== undefined ? status : old.status,
+      sandbox: sandbox !== undefined ? sandbox : old.sandbox,
+      silent: silent !== undefined ? silent : old.silent,
+      daily_limit: daily_limit !== undefined ? daily_limit : old.daily_limit,
+      expires_at: expires_at !== undefined ? expires_at : old.expires_at,
+      service_id: service_id !== undefined ? service_id : old.service_id,
+    };
+    await client.query(`UPDATE scripts SET name=$1, content=$2, status=$3, sandbox=$4, silent=$5, daily_limit=$6, expires_at=$7, service_id=$8, updated_at=NOW() WHERE id=$9`,
+      [newData.name, newData.content, newData.status, newData.sandbox, newData.silent, newData.daily_limit, newData.expires_at, newData.service_id, old.id]);
     if (Array.isArray(tags)) {
-      await pool.query('DELETE FROM script_tags WHERE script_id = $1', [script.id]);
+      await client.query('DELETE FROM script_tags WHERE script_id = $1', [old.id]);
       for (const tagName of tags) {
-        let tagResult = await pool.query('SELECT id FROM tags WHERE name = $1', [tagName]);
-        if (tagResult.rows.length === 0) {
-          tagResult = await pool.query('INSERT INTO tags (name) VALUES ($1) RETURNING id', [tagName]);
-        }
-        await pool.query('INSERT INTO script_tags (script_id, tag_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [script.id, tagResult.rows[0].id]);
+        let r = await client.query('INSERT INTO tags (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id', [tagName.trim()]);
+        if (!r.rows.length) r = await client.query('SELECT id FROM tags WHERE name = $1', [tagName.trim()]);
+        await client.query('INSERT INTO script_tags (script_id, tag_id) VALUES ($1,$2) ON CONFLICT DO NOTHING', [old.id, r.rows[0].id]);
       }
     }
-    res.json(script);
+    await client.query('COMMIT');
+    res.json({ ...old, ...newData, id: old.id });
   } catch (err) {
-    res.status(500).json({ error: 'Erro ao atualizar script' });
-  }
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: err.message });
+  } finally { client.release(); }
 });
 
 app.delete('/api/scripts/:id', auth, async (req, res) => {
-  try {
-    await pool.query('DELETE FROM scripts WHERE id = $1', [req.params.id]);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao excluir script' });
-  }
+  await pool.query('DELETE FROM scripts WHERE id = $1', [req.params.id]);
+  res.json({ success: true });
 });
 
-/* ... (rotas de duplicação, bulk, versões, restore, changelog mantidas) ... */
-// (As rotas de scripts continuam as mesmas do código original – não vou repeti-las aqui por brevidade)
+app.post('/api/scripts/:id/duplicate', auth, async (req, res) => {
+  try {
+    const s = (await pool.query('SELECT * FROM scripts WHERE id = $1', [req.params.id])).rows[0];
+    if (!s) return res.status(404).json({ error: 'Script não encontrado' });
+    const newId = uuidv4(), newShort = shortId(), newToken = secureToken();
+    await pool.query(`INSERT INTO scripts (id, name, content, status, sandbox, silent, daily_limit, expires_at, short_id, token, service_id)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`, [newId, `${s.name} (cópia)`, s.content, s.status, s.sandbox, s.silent, s.daily_limit, s.expires_at, newShort, newToken, s.service_id]);
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
-/* ============================================================
-   KEYS API (SISTEMA DE LICENÇAS)
-   ============================================================ */
+app.post('/api/scripts/bulk', auth, async (req, res) => {
+  const { scripts } = req.body;
+  if (!Array.isArray(scripts)) return res.status(400).json({ error: 'Formato inválido' });
+  for (const s of scripts) {
+    const id = uuidv4(), short = shortId(), token = secureToken();
+    await pool.query(`INSERT INTO scripts (id, name, content, short_id, token) VALUES ($1,$2,$3,$4,$5)`, [id, s.name, s.content, short, token]);
+  }
+  res.json({ success: true });
+});
 
-// Criar key (admin)
+app.get('/api/scripts/:id/versions', auth, async (req, res) => {
+  const r = await pool.query('SELECT * FROM script_versions WHERE script_id = $1 ORDER BY created_at DESC', [req.params.id]);
+  res.json(r.rows);
+});
+
+app.post('/api/scripts/:id/restore', auth, async (req, res) => {
+  const { versionId } = req.body;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const version = (await client.query('SELECT * FROM script_versions WHERE id = $1', [versionId])).rows[0];
+    if (!version) return res.status(404).json({ error: 'Versão não encontrada' });
+    const current = (await client.query('SELECT * FROM scripts WHERE id = $1', [req.params.id])).rows[0];
+    await client.query('INSERT INTO script_versions (script_id, name, content, status) VALUES ($1,$2,$3,$4)', [current.id, current.name, current.content, current.status]);
+    await client.query('UPDATE scripts SET name=$1, content=$2, status=$3, updated_at=NOW() WHERE id=$4', [version.name, version.content, version.status, current.id]);
+    await client.query('COMMIT');
+    res.json({ success: true });
+  } catch (err) { await client.query('ROLLBACK'); res.status(500).json({ error: err.message }); } finally { client.release(); }
+});
+
+app.post('/api/scripts/:id/changelog', auth, async (req, res) => {
+  const { title, description } = req.body;
+  const s = (await pool.query('SELECT name FROM scripts WHERE id = $1', [req.params.id])).rows[0];
+  if (!s) return res.status(404).json({ error: 'Script não encontrado' });
+  await sendDiscordEmbed({ title, description, scriptName: s.name });
+  res.json({ success: true });
+});
+
+app.get('/api/tags', auth, async (req, res) => {
+  const r = await pool.query('SELECT * FROM tags ORDER BY name');
+  res.json(r.rows);
+});
+
+app.get('/api/export', auth, async (req, res) => {
+  const scripts = (await pool.query('SELECT * FROM scripts')).rows;
+  const tags = (await pool.query('SELECT * FROM tags')).rows;
+  const relations = (await pool.query('SELECT * FROM script_tags')).rows;
+  res.json({ scripts, tags, relations });
+});
+
+app.post('/api/import', auth, async (req, res) => {
+  const { scripts, tags, relations, confirmation } = req.body;
+  if (confirmation !== 'IMPORTAR') return res.status(400).json({ error: 'Confirmação necessária' });
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    if (Array.isArray(scripts)) for (const s of scripts) await client.query('INSERT INTO scripts (id, name, content, status, sandbox, silent, daily_limit, expires_at, short_id, token, service_id, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) ON CONFLICT (id) DO NOTHING', [s.id, s.name, s.content, s.status, s.sandbox, s.silent, s.daily_limit, s.expires_at, s.short_id, s.token, s.service_id, s.created_at, s.updated_at]);
+    if (Array.isArray(tags)) for (const t of tags) await client.query('INSERT INTO tags (id, name, color) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING', [t.id, t.name, t.color]);
+    if (Array.isArray(relations)) for (const r of relations) await client.query('INSERT INTO script_tags (script_id, tag_id) VALUES ($1,$2) ON CONFLICT DO NOTHING', [r.script_id, r.tag_id]);
+    await client.query('COMMIT');
+    res.json({ success: true });
+  } catch (err) { await client.query('ROLLBACK'); res.status(500).json({ error: err.message }); } finally { client.release(); }
+});
+
+app.get('/api/stats/export', auth, async (req, res) => {
+  const stats = await pool.query('SELECT * FROM execution_logs ORDER BY created_at DESC LIMIT 10000');
+  const format = req.query.format || 'json';
+  if (format === 'csv') {
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="storm_stats.csv"');
+    let csv = 'id,script_id,ip,country,user_agent,created_at\n';
+    stats.rows.forEach(r => csv += `${r.id},${r.script_id},${r.ip},${r.country},${r.user_agent},${r.created_at}\n`);
+    return res.send(csv);
+  }
+  res.json(stats.rows);
+});
+
+// ================== KEYS ==================
 app.post('/api/keys', auth, async (req, res) => {
-  const { duration } = req.body; // 0 = permanente
+  const { duration, service_id } = req.body;
+  if (!service_id) return res.status(400).json({ error: 'service_id obrigatório' });
   const key = generateKey();
   const expires_at = duration > 0 ? new Date(Date.now() + duration * 86400000).toISOString() : null;
   try {
-    const result = await pool.query(
-      'INSERT INTO keys (key, expires_at, active) VALUES ($1, $2, true) RETURNING *',
-      [key, expires_at]
-    );
-    await logKeyAction('create', key, `Key criada (${duration || 'permanente'} dias)`);
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao criar key' });
-  }
+    const r = await pool.query('INSERT INTO keys (key, service_id, expires_at, active) VALUES ($1,$2,$3,true) RETURNING *', [key, service_id, expires_at]);
+    await logKeyAction('create', key, `Key criada (serviço ${service_id})`);
+    res.status(201).json(r.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Listar keys (admin)
 app.get('/api/keys', auth, async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 25;
-  const offset = (page - 1) * limit;
-  const sort = req.query.sort || 'created_at';
-  const order = req.query.order || 'DESC';
-  const status = req.query.status;
-
-  let where = '';
-  const params = [];
-  if (status === 'active') {
-    where = 'WHERE active = true AND (expires_at IS NULL OR expires_at > NOW())';
-  } else if (status === 'expired') {
-    where = 'WHERE active = true AND expires_at IS NOT NULL AND expires_at <= NOW()';
-  } else if (status === 'revoked') {
-    where = 'WHERE active = false';
-  }
-
+  const page = parseInt(req.query.page) || 1, limit = parseInt(req.query.limit) || 25, offset = (page - 1) * limit;
+  const status = req.query.status, service_id = req.query.service_id;
+  let conds = [], params = [];
+  if (status === 'active') conds.push('k.active = true AND (k.expires_at IS NULL OR k.expires_at > NOW())');
+  else if (status === 'expired') conds.push('k.active = true AND k.expires_at IS NOT NULL AND k.expires_at <= NOW()');
+  else if (status === 'revoked') conds.push('k.active = false');
+  if (service_id) { conds.push(`k.service_id = $${params.length+1}`); params.push(service_id); }
+  const where = conds.length ? ' WHERE ' + conds.join(' AND ') : '';
   try {
-    const countRes = await pool.query(`SELECT COUNT(*) FROM keys ${where}`, params);
-    const total = parseInt(countRes.rows[0].count);
+    const dataQ = `SELECT k.*, (SELECT row_to_json(s) FROM services s WHERE s.id = k.service_id) AS service
+      FROM keys k ${where} ORDER BY k.created_at DESC LIMIT $${params.length+1} OFFSET $${params.length+2}`;
+    const countQ = `SELECT COUNT(*) FROM keys k ${where}`;
+    const countParams = [...params];
     params.push(limit, offset);
-    const result = await pool.query(`SELECT * FROM keys ${where} ORDER BY ${sort} ${order} LIMIT $${params.length-1} OFFSET $${params.length}`, params);
-    res.json({ data: result.rows, page, totalPages: Math.ceil(total / limit), total });
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao listar keys' });
-  }
+    const [dataRes, countRes] = await Promise.all([pool.query(dataQ, params), pool.query(countQ, countParams)]);
+    const total = parseInt(countRes.rows[0].count);
+    res.json({ data: dataRes.rows, page, totalPages: Math.ceil(total / limit), total });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Verificar key (público)
 app.post('/api/keys/verify', apiLimiter, async (req, res) => {
   const { key, deviceId } = req.body;
   if (!key) return res.status(400).json({ success: false, message: 'Key obrigatória' });
-
   try {
-    const result = await pool.query('SELECT * FROM keys WHERE key = $1', [key]);
-    if (result.rows.length === 0) {
-      await logKeyAction('verify_fail', key, 'Key não encontrada');
-      return res.status(404).json({ success: false, message: 'Key inválida' });
-    }
-    const k = result.rows[0];
-    if (!k.active) {
-      await logKeyAction('verify_fail', key, 'Key revogada');
-      return res.status(403).json({ success: false, message: 'Key revogada' });
-    }
+    const r = await pool.query('SELECT * FROM keys WHERE key = $1', [key]);
+    if (!r.rows.length) { await logKeyAction('verify_fail', key, 'não encontrada'); return res.status(404).json({ success: false, message: 'Key inválida' }); }
+    const k = r.rows[0];
+    if (!k.active) { await logKeyAction('verify_fail', key, 'revogada'); return res.status(403).json({ success: false, message: 'Key revogada' }); }
     if (k.expires_at && new Date(k.expires_at) < new Date()) {
       await pool.query('UPDATE keys SET active = false WHERE id = $1', [k.id]);
-      await logKeyAction('expire', key, 'Key expirada');
+      await logKeyAction('expire', key, 'expirada');
       return res.status(403).json({ success: false, message: 'Key expirada' });
     }
     if (k.device_id) {
       if (!deviceId || k.device_id !== deviceId) {
-        await logKeyAction('verify_fail', key, `Device mismatch: esperado ${k.device_id}, recebido ${deviceId}`);
+        await logKeyAction('verify_fail', key, `device mismatch: esperado ${k.device_id}, recebido ${deviceId}`);
         return res.status(403).json({ success: false, message: 'Device mismatch' });
       }
     } else if (deviceId) {
       await pool.query('UPDATE keys SET device_id = $1, last_use = NOW() WHERE id = $2', [deviceId, k.id]);
-      await pool.query('INSERT INTO activations (key_id, device_id) VALUES ($1, $2)', [k.id, deviceId]);
-      await logKeyAction('activate', key, `Vinculada ao device ${deviceId}`);
+      await pool.query('INSERT INTO activations (key_id, device_id) VALUES ($1,$2)', [k.id, deviceId]);
+      await logKeyAction('activate', key, `vinculada ao device ${deviceId}`);
     }
     await pool.query('UPDATE keys SET last_use = NOW() WHERE id = $1', [k.id]);
-    await logKeyAction('verify', key, 'Verificação bem-sucedida');
-    res.json({ success: true, key: { id: k.id, expires_at: k.expires_at, device_id: k.device_id } });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Erro interno' });
-  }
+    await logKeyAction('verify', key, 'sucesso');
+    res.json({ success: true, key: { id: k.id, expires_at: k.expires_at, device_id: k.device_id, service_id: k.service_id } });
+  } catch (err) { res.status(500).json({ success: false, message: 'Erro interno' }); }
 });
 
-// Revogar key (admin)
+app.get('/api/keys/:id', auth, async (req, res) => {
+  const r = await pool.query('SELECT k.*, (SELECT row_to_json(s) FROM services s WHERE s.id = k.service_id) AS service FROM keys k WHERE id = $1', [req.params.id]);
+  if (!r.rows.length) return res.status(404).json({ error: 'Key não encontrada' });
+  res.json(r.rows[0]);
+});
+
 app.post('/api/keys/:id/revoke', auth, async (req, res) => {
-  try {
-    await pool.query('UPDATE keys SET active = false WHERE id = $1', [req.params.id]);
-    await logKeyAction('revoke', req.params.id, 'Key revogada');
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao revogar key' });
-  }
+  await pool.query('UPDATE keys SET active = false WHERE id = $1', [req.params.id]);
+  await logKeyAction('revoke', req.params.id, 'Key revogada');
+  res.json({ success: true });
 });
 
-// Renovar key (admin)
 app.post('/api/keys/:id/renew', auth, async (req, res) => {
   const { days } = req.body;
-  try {
-    const key = (await pool.query('SELECT * FROM keys WHERE id = $1', [req.params.id])).rows[0];
-    if (!key) return res.status(404).json({ error: 'Key não encontrada' });
-    const newExpiry = days ? new Date(Date.now() + days * 86400000).toISOString() : null;
-    await pool.query('UPDATE keys SET expires_at = $1, active = true WHERE id = $2', [newExpiry, key.id]);
-    await logKeyAction('renew', key.key, `Renovada por ${days} dias`);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao renovar key' });
-  }
+  const key = (await pool.query('SELECT * FROM keys WHERE id = $1', [req.params.id])).rows[0];
+  if (!key) return res.status(404).json({ error: 'Key não encontrada' });
+  const newExpiry = days ? new Date(Date.now() + days * 86400000).toISOString() : null;
+  await pool.query('UPDATE keys SET expires_at = $1, active = true WHERE id = $2', [newExpiry, key.id]);
+  await logKeyAction('renew', key.key, `Renovada por ${days} dias`);
+  res.json({ success: true });
 });
 
-// Excluir key (admin)
 app.delete('/api/keys/:id', auth, async (req, res) => {
-  try {
-    await pool.query('DELETE FROM keys WHERE id = $1', [req.params.id]);
-    await logKeyAction('delete', req.params.id, 'Key excluída');
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao excluir key' });
-  }
+  await pool.query('DELETE FROM keys WHERE id = $1', [req.params.id]);
+  await logKeyAction('delete', req.params.id, 'Key excluída');
+  res.json({ success: true });
 });
 
-// Buscar key por ID
-app.get('/api/keys/:id', auth, async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM keys WHERE id = $1', [req.params.id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Key não encontrada' });
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao buscar key' });
-  }
-});
-
-// Loader com key
-app.get('/api/load-with-key', loaderLimiter, async (req, res) => {
+// ================== LOADER PRINCIPAL (com suporte a serviço) ==================
+app.get('/api/load/:short/:token', loaderLimiter, async (req, res) => {
   if (MAINTENANCE_MODE) return res.status(503).send('Em manutenção.');
-  const { key, script, device } = req.query;
-  if (!key || !script) return res.status(400).send('Parâmetros obrigatórios: key, script');
-
+  const { short, token } = req.params;
+  const { key, device } = req.query;
   try {
-    const keyResult = await pool.query('SELECT * FROM keys WHERE key = $1', [key]);
-    if (keyResult.rows.length === 0) return res.status(403).send('Key inválida.');
-    const k = keyResult.rows[0];
-    if (!k.active) return res.status(403).send('Key revogada.');
-    if (k.expires_at && new Date(k.expires_at) < new Date()) {
-      await pool.query('UPDATE keys SET active = false WHERE id = $1', [k.id]);
-      return res.status(403).send('Key expirada.');
-    }
-    if (k.device_id && device && k.device_id !== device) {
-      return res.status(403).send('Device mismatch.');
-    }
-    if (!k.device_id && device) {
-      await pool.query('UPDATE keys SET device_id = $1, last_use = NOW() WHERE id = $2', [device, k.id]);
-      await pool.query('INSERT INTO activations (key_id, device_id) VALUES ($1, $2)', [k.id, device]);
-    }
-    await pool.query('UPDATE keys SET last_use = NOW() WHERE id = $1', [k.id]);
+    const s = (await pool.query('SELECT * FROM scripts WHERE short_id = $1 AND token = $2', [short, token])).rows[0];
+    if (!s) return res.status(404).send('Script não encontrado.');
+    if (s.status !== 'online') return res.status(403).send('Script indisponível.');
 
-    const scriptResult = await pool.query('SELECT * FROM scripts WHERE short_id = $1 AND status = $2', [script, 'online']);
-    if (scriptResult.rows.length === 0) return res.status(404).send('Script indisponível.');
-    const s = scriptResult.rows[0];
+    // Verificação de serviço vinculado
+    if (s.service_id) {
+      if (!key) return res.status(403).send('Key obrigatória para este script.');
+      const k = (await pool.query('SELECT * FROM keys WHERE key = $1', [key])).rows[0];
+      if (!k) return res.status(403).send('Key inválida.');
+      if (!k.active) return res.status(403).send('Key revogada.');
+      if (k.expires_at && new Date(k.expires_at) < new Date()) {
+        await pool.query('UPDATE keys SET active = false WHERE id = $1', [k.id]);
+        return res.status(403).send('Key expirada.');
+      }
+      if (k.service_id !== s.service_id) return res.status(403).send('Key não pertence a este serviço.');
+      if (k.device_id) {
+        if (!device || k.device_id !== device) return res.status(403).send('Device mismatch.');
+      } else if (device) {
+        await pool.query('UPDATE keys SET device_id = $1, last_use = NOW() WHERE id = $2', [device, k.id]);
+        await pool.query('INSERT INTO activations (key_id, device_id) VALUES ($1,$2)', [k.id, device]);
+        await logKeyAction('activate', k.key, `vinculada ao device ${device}`);
+      }
+      await pool.query('UPDATE keys SET last_use = NOW() WHERE id = $1', [k.id]);
+    }
+
+    // Limite diário e execução
     if (s.daily_limit > 0) {
       const today = new Date().toISOString().split('T')[0];
-      const todayCount = (await pool.query('SELECT COUNT(*) FROM execution_logs WHERE script_id = $1 AND DATE(created_at) = $2', [s.id, today])).rows[0].count;
-      if (todayCount >= s.daily_limit) return res.status(429).send('Limite diário de execuções atingido.');
+      const cnt = (await pool.query('SELECT COUNT(*) FROM execution_logs WHERE script_id = $1 AND DATE(created_at) = $2', [s.id, today])).rows[0].count;
+      if (cnt >= s.daily_limit) return res.status(429).send('Limite diário de execuções atingido.');
     }
-    await pool.query('UPDATE scripts SET executions = executions + 1 WHERE id = $1', [s.id]);
+    if (!s.silent) await pool.query('UPDATE scripts SET executions = executions + 1 WHERE id = $1', [s.id]);
     const ip = req.ip || req.connection.remoteAddress;
     await pool.query('INSERT INTO execution_logs (script_id, ip, country, user_agent) VALUES ($1,$2,$3,$4)', [s.id, ip, req.headers['cf-ipcountry'] || 'Unknown', (req.get('User-Agent') || '').toLowerCase()]);
     res.type('text/plain').send(s.content);
   } catch (err) {
+    console.error(err);
     res.status(500).send('Erro interno');
   }
 });
 
-/* ============================================================
-   ESTATÍSTICAS (com keys)
-   ============================================================ */
+// ================== ESTATÍSTICAS (com keys) ==================
 app.get('/api/stats', auth, async (req, res) => {
   try {
     const total = (await pool.query('SELECT COUNT(*) FROM scripts')).rows[0].count;
@@ -643,26 +613,9 @@ app.get('/api/stats', auth, async (req, res) => {
     const development = (await pool.query('SELECT COUNT(*) FROM scripts WHERE status = $1', ['development'])).rows[0].count;
     const totalExec = (await pool.query('SELECT SUM(executions) FROM scripts')).rows[0].sum || 0;
     const popular = (await pool.query('SELECT name, executions FROM scripts ORDER BY executions DESC LIMIT 5')).rows;
-    const daily = (await pool.query(`
-      SELECT DATE(created_at) as date, COUNT(*) as count 
-      FROM execution_logs 
-      WHERE created_at > NOW() - INTERVAL '7 days' 
-      GROUP BY date ORDER BY date
-    `)).rows;
-    const hourly = (await pool.query(`
-      SELECT EXTRACT(HOUR FROM created_at) as hour, COUNT(*) as count 
-      FROM execution_logs 
-      WHERE created_at > NOW() - INTERVAL '24 hours' 
-      GROUP BY hour ORDER BY hour
-    `)).rows;
-    const countries = (await pool.query(`
-      SELECT country, COUNT(*) as count 
-      FROM execution_logs 
-      WHERE created_at > NOW() - INTERVAL '30 days' 
-      GROUP BY country ORDER BY count DESC LIMIT 10
-    `)).rows;
-
-    // Estatísticas de keys
+    const daily = (await pool.query('SELECT DATE(created_at) as date, COUNT(*) as count FROM execution_logs WHERE created_at > NOW() - INTERVAL \'7 days\' GROUP BY date ORDER BY date')).rows;
+    const hourly = (await pool.query('SELECT EXTRACT(HOUR FROM created_at) as hour, COUNT(*) as count FROM execution_logs WHERE created_at > NOW() - INTERVAL \'24 hours\' GROUP BY hour ORDER BY hour')).rows;
+    const countries = (await pool.query('SELECT country, COUNT(*) as count FROM execution_logs WHERE created_at > NOW() - INTERVAL \'30 days\' GROUP BY country ORDER BY count DESC LIMIT 10')).rows;
     const keyStats = {
       total: parseInt((await pool.query('SELECT COUNT(*) FROM keys')).rows[0].count),
       active: parseInt((await pool.query('SELECT COUNT(*) FROM keys WHERE active = true AND (expires_at IS NULL OR expires_at > NOW())')).rows[0].count),
@@ -670,29 +623,37 @@ app.get('/api/stats', auth, async (req, res) => {
       revoked: parseInt((await pool.query('SELECT COUNT(*) FROM keys WHERE active = false')).rows[0].count),
       activationsToday: parseInt((await pool.query('SELECT COUNT(*) FROM activations WHERE DATE(created_at) = CURRENT_DATE')).rows[0].count),
     };
-
     res.json({
       totalScripts: parseInt(total), onlineScripts: parseInt(online), offlineScripts: parseInt(offline),
       maintenanceScripts: parseInt(maintenance), developmentScripts: parseInt(development),
-      totalExecutions: parseInt(totalExec), popular, daily, hourly, countries,
-      keyStats
+      totalExecutions: parseInt(totalExec), popular, daily, hourly, countries, keyStats
     });
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao buscar estatísticas' });
-  }
+  } catch (err) { res.status(500).json({ error: 'Erro ao buscar estatísticas' }); }
 });
 
-/* ============================================================
-   PÁGINAS
-   ============================================================ */
+// ================== ALERTAS (scripts offline/expirando) ==================
+app.get('/api/alerts', auth, async (req, res) => {
+  const offline = (await pool.query('SELECT name FROM scripts WHERE status = $1', ['offline'])).rows;
+  const expiring = (await pool.query('SELECT name, expires_at FROM scripts WHERE expires_at IS NOT NULL AND expires_at <= NOW() + INTERVAL \'3 days\' AND expires_at > NOW()')).rows;
+  res.json({ offline, expiring });
+});
+
+app.get('/api/health', auth, async (req, res) => {
+  res.json({
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    nodeVersion: process.version,
+    pid: process.pid,
+  });
+});
+
+// Páginas estáticas
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get(ADMIN_PATH, (req, res) => res.sendFile(path.join(__dirname, 'public/admin/login.html')));
 app.get(`${ADMIN_PATH}/dashboard`, auth, (req, res) => res.sendFile(path.join(__dirname, 'public/admin/dashboard.html')));
 app.get(`${ADMIN_PATH}/keys`, auth, (req, res) => res.sendFile(path.join(__dirname, 'public/admin/keys.html')));
 
-/* ============================================================
-   INICIALIZAÇÃO
-   ============================================================ */
+// Inicialização
 (async () => {
   try {
     await initDatabase();
@@ -710,10 +671,6 @@ app.get(`${ADMIN_PATH}/keys`, auth, (req, res) => res.sendFile(path.join(__dirna
         console.log(`🔐 Senha do admin ${ADMIN_USER} atualizada automaticamente.`);
       }
     }
-  } catch (err) {
-    console.error('⚠️ PostgreSQL indisponível:', err.message);
-  }
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`⚡ Storm rodando na porta ${PORT}`);
-  });
+  } catch (err) { console.error('⚠️ PostgreSQL indisponível:', err.message); }
+  app.listen(PORT, '0.0.0.0', () => console.log(`⚡ Storm rodando na porta ${PORT}`));
 })();
