@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    /* ... (CSS idêntico ao fornecido anteriormente, sem alterações) ... */
     :root {
       --bg: #0a0a0a;
       --surface: #111111;
@@ -33,6 +32,7 @@
       overflow: hidden;
     }
 
+    /* Sidebar */
     .sidebar { width: 260px; background: rgba(17,17,17,0.6); backdrop-filter: blur(12px); border-right: 1px solid var(--border); padding: 2rem 1.2rem; display: flex; flex-direction: column; gap: 2rem; transition: transform var(--transition); z-index: 10; }
     .sidebar-logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 0.5rem; color: #fff; }
     .sidebar-logo svg { width: 32px; height: 32px; color: var(--primary); }
@@ -82,6 +82,7 @@
     .badge-development { background: rgba(59,130,246,0.12); color: var(--info); border: 1px solid rgba(59,130,246,0.2); }
     .tag { display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem; background: rgba(255,255,255,0.05); color: var(--text-secondary); margin-right: 0.3rem; margin-bottom: 0.2rem; }
     .service-badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; background: rgba(99,102,241,0.12); color: var(--primary); margin-left: 0.3rem; }
+    .check-icon { color: var(--success); margin-left: 0.25rem; }
 
     .search-box { background: rgba(20,20,20,0.8); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.6rem 1rem; color: #fff; width: 250px; font-size: 0.9rem; transition: all var(--transition); }
     .search-box::placeholder { color: var(--text-secondary); }
@@ -135,7 +136,6 @@
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </button>
 
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4" ry="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
@@ -162,7 +162,6 @@
     <button class="logout-btn" onclick="window.location.href='/api/auth/logout'">Sair</button>
   </aside>
 
-  <!-- Main content -->
   <main class="main">
     <!-- Dashboard -->
     <div id="tab-dashboard" class="tab active">
@@ -224,6 +223,7 @@
             <option value="revoked">Revogadas</option>
           </select>
           <button class="btn btn-primary" onclick="openCreateKeyModal()">+ Criar Key</button>
+          <button class="btn" onclick="openBulkKeysModal()">Criar em massa</button>
         </div>
       </div>
       <div class="stats-grid" id="keyStatsCards"></div>
@@ -247,7 +247,6 @@
     </div>
   </main>
 
-  <!-- Modals -->
   <!-- Modal Script -->
   <div id="scriptModal" class="modal">
     <div class="modal-box">
@@ -294,6 +293,29 @@
       <div class="modal-actions">
         <button class="btn btn-danger" onclick="document.getElementById('keyModal').classList.remove('active')">Cancelar</button>
         <button class="btn btn-primary" onclick="createKey()">Criar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Bulk Keys -->
+  <div id="bulkKeysModal" class="modal">
+    <div class="modal-box">
+      <h2>Criar Keys em Massa</h2>
+      <label>Serviço</label>
+      <select id="bulkServiceSelect"><option value="">Carregando...</option></select>
+      <label>Quantidade</label>
+      <input type="number" id="bulkCount" value="10" min="1">
+      <label>Duração</label>
+      <select id="bulkDuration">
+        <option value="1">1 dia</option>
+        <option value="7">7 dias</option>
+        <option value="30">30 dias</option>
+        <option value="90">90 dias</option>
+        <option value="0">Permanente</option>
+      </select>
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="document.getElementById('bulkKeysModal').classList.remove('active')">Cancelar</button>
+        <button class="btn btn-primary" onclick="createBulkKeys()">Gerar</button>
       </div>
     </div>
   </div>
@@ -357,6 +379,7 @@
       alert: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
       clock: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
       chart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+      check: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
     };
 
     function showToast(msg, type='success') {
@@ -719,6 +742,8 @@
       if (keyServiceFilter) keyServiceFilter.innerHTML = '<option value="">Todos serviços</option>' + services.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
       const keyServiceSelect = document.getElementById('keyServiceSelect');
       if (keyServiceSelect) keyServiceSelect.innerHTML = services.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+      const bulkServiceSelect = document.getElementById('bulkServiceSelect');
+      if (bulkServiceSelect) bulkServiceSelect.innerHTML = services.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
     }
 
     // ========== KEYS ==========
@@ -746,13 +771,15 @@
         const statusClass = k.active && !isExpired ? 'badge-online' : 'badge-offline';
         const statusText = k.active ? (isExpired ? 'Expirada' : 'Ativa') : 'Revogada';
         const serviceName = k.service ? escapeHtml(k.service.name) : '—';
+        // Indicador de Discord resgatado
+        const deviceDisplay = k.redeemed ? `<span class="check-icon">${icons.check}</span>` : (k.device_id ? `<code>${escapeHtml(k.device_id)}</code>` : '—');
         return `<tr>
           <td><code style="background:#161616; padding:0.2rem 0.5rem; border-radius:4px;">${escapeHtml(k.key)}</code></td>
           <td>${serviceName}</td>
           <td>${new Date(k.created_at).toLocaleDateString()}</td>
           <td>${expires}</td>
           <td><span class="badge ${statusClass}">${statusText}</span></td>
-          <td>${k.device_id || '—'}</td>
+          <td>${deviceDisplay}</td>
           <td>
             <button class="btn btn-xs copy-key-btn" data-key="${escapeHtml(k.key)}">${icons.copy}</button>
             <button class="btn btn-xs" onclick="openRenewModal('${k.id}')">${icons.refresh}</button>
@@ -777,9 +804,14 @@
     }
 
     function openCreateKeyModal() {
-      // Garante que os serviços estão carregados antes de abrir o modal
       loadServices().then(() => {
         document.getElementById('keyModal').classList.add('active');
+      });
+    }
+
+    function openBulkKeysModal() {
+      loadServices().then(() => {
+        document.getElementById('bulkKeysModal').classList.add('active');
       });
     }
 
@@ -793,6 +825,19 @@
         showToast(`Key criada: ${res.key}`, 'success');
         loadKeys();
       } catch(e) { showToast('Erro ao criar key', 'error'); }
+    }
+
+    async function createBulkKeys() {
+      const service_id = document.getElementById('bulkServiceSelect').value;
+      const count = parseInt(document.getElementById('bulkCount').value) || 1;
+      const duration = parseInt(document.getElementById('bulkDuration').value);
+      if (!service_id) return showToast('Selecione um serviço', 'error');
+      try {
+        const res = await api('/api/keys/bulk', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ service_id, count, duration }) });
+        document.getElementById('bulkKeysModal').classList.remove('active');
+        showToast(`${count} keys criadas!`, 'success');
+        loadKeys();
+      } catch(e) { showToast('Erro ao criar keys', 'error'); }
     }
 
     function openRenewModal(keyId) {
