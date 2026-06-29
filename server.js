@@ -1,8 +1,8 @@
-// server.js — Storm Hub completo com Discord Bot, keys em massa, loader 2 estágios
+// server.js — Storm Hub completo (login /lgadm, Discord bot, serviços, keys, loader 2 estágios, +1200 linhas)
 require('dotenv').config();
 
 // ============================================================
-// VARIÁVEIS DE AMBIENTE (apenas essenciais para o site)
+// VARIÁVEIS DE AMBIENTE
 // ============================================================
 const requiredEnvVars = [
   'JWT_SECRET',
@@ -31,19 +31,23 @@ const rateLimit = require('express-rate-limit');
 const axios = require('axios');
 const { Pool } = require('pg');
 
-// Discord (opcional)
-let discordClient = null;
-const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
-const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
-const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID; // opcional
+// ============================================================
+// DISCORD.JS – importação global (cliente criado sob condição)
+// ============================================================
+const {
+  Client,
+  GatewayIntentBits,
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  ChannelType,
+  EmbedBuilder,
+  ActionRowBuilder,
+  StringSelectMenuBuilder
+} = require('discord.js');
 
-if (DISCORD_BOT_TOKEN && DISCORD_CLIENT_ID) {
-  const { Client, GatewayIntentBits, SlashCommandBuilder, PermissionFlagsBits, ChannelType, EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
-  discordClient = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
-  });
-}
-
+// ============================================================
+// CONFIGURAÇÕES
+// ============================================================
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -54,10 +58,22 @@ const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const ADMIN_USER = process.env.ADMIN_USER;
 const ADMIN_PASS = process.env.ADMIN_PASS;
-
-// 🔥 ROTA DE LOGIN PERSONALIZADA
 const ADMIN_PATH = '/lgadm';
 
+// Discord opcional
+const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
+const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID;
+
+// Cliente Discord será criado apenas se as credenciais existirem
+let discordClient = null;
+if (DISCORD_BOT_TOKEN && DISCORD_CLIENT_ID) {
+  discordClient = new Client({
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
+  });
+}
+
+// Banco de dados
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: IS_PRODUCTION ? { rejectUnauthorized: false } : false,
@@ -83,7 +99,7 @@ const loaderLimiter = rateLimit({ windowMs: 1 * 60 * 1000, max: 1000 });
 app.use('/api/', apiLimiter);
 
 // ============================================================
-// INICIALIZAÇÃO DO BANCO
+// BANCO DE DADOS
 // ============================================================
 async function initDatabase() {
   const client = await pool.connect();
@@ -99,12 +115,14 @@ async function initDatabase() {
         failed_attempts INT DEFAULT 0,
         locked_until TIMESTAMPTZ
       );
+
       CREATE TABLE IF NOT EXISTS services (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         name TEXT NOT NULL,
         description TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+
       CREATE TABLE IF NOT EXISTS scripts (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         name TEXT NOT NULL,
@@ -120,6 +138,7 @@ async function initDatabase() {
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );
+
       CREATE TABLE IF NOT EXISTS script_versions (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         script_id UUID REFERENCES scripts(id) ON DELETE CASCADE,
@@ -128,16 +147,19 @@ async function initDatabase() {
         status TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+
       CREATE TABLE IF NOT EXISTS tags (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         name TEXT UNIQUE NOT NULL,
         color TEXT DEFAULT '#6366f1'
       );
+
       CREATE TABLE IF NOT EXISTS script_tags (
         script_id UUID REFERENCES scripts(id) ON DELETE CASCADE,
         tag_id UUID REFERENCES tags(id) ON DELETE CASCADE,
         PRIMARY KEY (script_id, tag_id)
       );
+
       CREATE TABLE IF NOT EXISTS execution_logs (
         id SERIAL PRIMARY KEY,
         script_id UUID REFERENCES scripts(id) ON DELETE SET NULL,
@@ -146,10 +168,12 @@ async function initDatabase() {
         user_agent TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+
       CREATE TABLE IF NOT EXISTS blocked_ips (
         ip TEXT PRIMARY KEY,
         blocked_at TIMESTAMPTZ DEFAULT NOW()
       );
+
       CREATE TABLE IF NOT EXISTS keys (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         key TEXT UNIQUE NOT NULL,
@@ -159,12 +183,14 @@ async function initDatabase() {
         device_id TEXT,
         last_use TIMESTAMPTZ
       );
+
       CREATE TABLE IF NOT EXISTS activations (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         key_id UUID REFERENCES keys(id) ON DELETE CASCADE,
         device_id TEXT NOT NULL,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+
       CREATE TABLE IF NOT EXISTS key_logs (
         id SERIAL PRIMARY KEY,
         action TEXT NOT NULL,
@@ -172,18 +198,20 @@ async function initDatabase() {
         message TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+
       CREATE TABLE IF NOT EXISTS discord_whitelist (
         discord_id TEXT NOT NULL,
         key_id UUID REFERENCES keys(id) ON DELETE CASCADE,
         activated_at TIMESTAMPTZ DEFAULT NOW()
       );
+
       CREATE TABLE IF NOT EXISTS discord_config (
         key TEXT PRIMARY KEY,
         value TEXT
       );
     `);
 
-    // Migrações para adicionar colunas que podem faltar em bancos já existentes
+    // Migrações para colunas service_id (caso tabelas já existam)
     await client.query(`
       ALTER TABLE scripts ADD COLUMN IF NOT EXISTS service_id UUID REFERENCES services(id) ON DELETE SET NULL;
       ALTER TABLE keys ADD COLUMN IF NOT EXISTS service_id UUID REFERENCES services(id) ON DELETE SET NULL;
@@ -810,7 +838,7 @@ app.get(ADMIN_PATH, (req, res) => res.sendFile(path.join(__dirname, 'public/admi
 app.get(`${ADMIN_PATH}/dashboard`, auth, (req, res) => res.sendFile(path.join(__dirname, 'public/admin/dashboard.html')));
 
 // ============================================================
-// DISCORD BOT (OPCIONAL)
+// DISCORD BOT (agora sem erro de escopo)
 // ============================================================
 if (discordClient) {
   discordClient.once('ready', async () => {
@@ -895,7 +923,6 @@ if (discordClient) {
       }
       if (!valid) return interaction.reply({ content: 'Sua key expirou ou foi revogada.', ephemeral: true });
 
-      const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
       const row = new ActionRowBuilder()
         .addComponents(
           new StringSelectMenuBuilder()
