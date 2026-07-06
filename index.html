@@ -3,92 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Manager • Dashboard</title>
+  <title>Nexus Manager - Login</title>
   <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-  <!-- Barra lateral -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo-circle"><i class="fa-brands fa-discord"></i></div>
-      <div class="app-name">Nexus Manager</div>
-    </div>
-    <div class="nav-section">
-      <div class="nav-category">Geral</div>
-      <div class="nav-item active"><i class="fa-solid fa-house"></i> Visão Geral</div>
-      <div class="nav-item"><i class="fa-solid fa-user"></i> Perfil</div>
-      <div class="nav-item"><i class="fa-solid fa-chart-line"></i> Analytics</div>
-      <div class="nav-item"><i class="fa-solid fa-message"></i> Mensagens</div>
-      <div class="nav-category">Conta</div>
-      <div class="nav-item"><i class="fa-solid fa-server"></i> Servidores</div>
-      <div class="nav-item"><i class="fa-solid fa-phone"></i> Call</div>
-      <div class="nav-item"><i class="fa-solid fa-database"></i> Dados</div>
-      <div class="nav-item"><i class="fa-solid fa-eye"></i> Monitoramento</div>
-      <div class="nav-category">Sistema</div>
-      <div class="nav-item"><i class="fa-solid fa-list-check"></i> Tasks</div>
-      <div class="nav-item"><i class="fa-solid fa-terminal"></i> Prefix Commands</div>
-      <div class="nav-item"><i class="fa-solid fa-circle-play"></i> Rich Presence</div>
-      <div class="nav-item"><i class="fa-solid fa-gear"></i> Configurações</div>
-    </div>
-    <div class="sidebar-footer">
-      <div class="avatar-small"><div class="status-dot"></div></div>
-      <div class="user-info-mini">
-        <strong>nexus.user</strong>
-        <span>Conectado</span>
+  <div class="login-container">
+    <div class="login-logo"><i class="fa-brands fa-discord"></i></div>
+    <h2>Entrar com Token</h2>
+    <p>Insira seu token do Discord para acessar o painel.</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Token do Discord</label>
+        <input type="password" id="tokenInput" placeholder="Cole seu token aqui" autocomplete="off" required>
       </div>
-    </div>
-  </aside>
-
-  <!-- Conteúdo principal -->
-  <div class="main">
-    <div class="content">
-      <div class="top-bar">
-        <h1>Início</h1>
-        <div class="top-actions">
-          <div class="status-online"><span class="dot"></span> Online</div>
-          <div class="window-btns">
-            <span class="min"></span><span class="max"></span><span class="close"></span>
-          </div>
-        </div>
-      </div>
-      <div class="user-card">
-        <div class="avatar-large"></div>
-        <div class="user-details">
-          <h2>Nexus User <span class="badges"><span class="badge pink"></span><span class="badge purple"></span><span class="badge blue"></span></span></h2>
-          <div class="username-tag">@nexus.user</div>
-          <div class="accounts-badge">5 contas carregadas</div>
-        </div>
-        <div class="connect-status">
-          <button class="connect-btn">Conectado</button>
-          <span class="uptime">🕒 2h 34min</span>
-        </div>
-      </div>
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-trash"></i></div><div class="stat-title">Mensagens deletadas</div><div class="stat-value">1,284</div></div>
-        <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-bolt"></i></div><div class="stat-title">Total de ações</div><div class="stat-value">3,912</div></div>
-        <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-clock"></i></div><div class="stat-title">Tempo total</div><div class="stat-value">48h</div></div>
-        <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-play"></i></div><div class="stat-title">Tasks rodando</div><div class="stat-value">7</div></div>
-      </div>
-      <div class="quick-access">
-        <h3>Acesso Rápido</h3>
-        <div class="quick-grid">
-          <div class="quick-category red"><h4><span class="cat-dot"></span> Mensagens</h4><div class="quick-item">Limpar DM</div><div class="quick-item">DMs Abertas</div><div class="quick-item">Package</div><div class="quick-item">Fechar DMs</div></div>
-          <div class="quick-category orange"><h4><span class="cat-dot"></span> Conta</h4><div class="quick-item">Remover Amigos</div><div class="quick-item">Sair Servidores</div></div>
-          <div class="quick-category blue"><h4><span class="cat-dot"></span> Servidores</h4><div class="quick-item">Clonar Servidor</div><div class="quick-item">Scraper Ícones</div></div>
-          <div class="quick-category green"><h4><span class="cat-dot"></span> Call</h4><div class="quick-item">Desconectar</div><div class="quick-item">Mover</div><div class="quick-item">Farm</div><div class="quick-item">Mutar</div><div class="quick-item">Ensurdecer</div><div class="quick-item">Elevador</div><div class="quick-item">Coleira</div><div class="quick-item">Proteger</div></div>
-          <div class="quick-category purple"><h4><span class="cat-dot"></span> Sistema</h4><div class="quick-item">Rich Presence</div><div class="quick-item">Prefix Creator</div><div class="quick-item">Backup</div><div class="quick-item">Config</div></div>
-        </div>
-      </div>
-      <div class="activity-panel"><i class="fa-solid fa-inbox"></i><p>Nenhuma atividade recente registrada.</p></div>
-    </div>
-    <div class="right-panel">
-      <div class="panel-section"><h4>Indicadores</h4><div class="task-indicators"><div class="task-ind"><span class="num">12</span><span class="label">Total Tasks</span></div><div class="task-ind"><span class="num">8</span><span class="label">Concluídas</span></div><div class="task-ind"><span class="num">2</span><span class="label">Erros</span></div></div></div>
-      <div class="panel-section"><h4>Progresso Nitro</h4><div class="nitro-icons"><i class="fa-solid fa-gem" style="color:#a78bfa;"></i><i class="fa-solid fa-gem" style="color:#60a5fa;"></i><i class="fa-solid fa-gem" style="color:#f59e0b;"></i><i class="fa-solid fa-gem" style="color:#e83e5a;"></i></div><div class="progress-bar"><div class="progress-fill" style="width:68%;"></div></div><small style="color:#a0a0b0;">23 dias restantes • Diamante</small></div>
-      <div class="panel-section"><h4>Progresso Boost</h4><div class="boost-icons"><i class="fa-solid fa-rocket" style="color:#f59e0b;"></i><i class="fa-solid fa-rocket" style="color:#f59e0b;"></i><i class="fa-solid fa-rocket" style="color:#6b6b7a;"></i><i class="fa-solid fa-rocket" style="color:#6b6b7a;"></i></div><div class="progress-bar"><div class="progress-fill green-bar" style="width:45%;"></div></div><small style="color:#a0a0b0;">2 meses • 45%</small></div>
-      <div class="panel-section"><h4>Links Rápidos</h4><ul class="quick-links"><li><span><i class="fa-solid fa-user"></i> Perfil</span> <i class="fa-solid fa-chevron-right"></i></li><li><span><i class="fa-solid fa-chart-line"></i> Analytics</span> <i class="fa-solid fa-chevron-right"></i></li><li><span><i class="fa-solid fa-circle-play"></i> Rich Presence</span> <i class="fa-solid fa-chevron-right"></i></li><li><span><i class="fa-solid fa-gear"></i> Configurações</span> <i class="fa-solid fa-chevron-right"></i></li></ul></div>
-    </div>
+      <div class="error-msg" id="errorMsg">Token inválido ou erro na API.</div>
+      <button type="submit" class="btn"><i class="fa-solid fa-right-to-bracket"></i> Acessar Dashboard</button>
+    </form>
+    <p style="margin-top:1.5rem;font-size:0.75rem;color:var(--text-muted);">
+      <i class="fa-solid fa-shield-halved"></i> Seu token é usado apenas no navegador.
+    </p>
   </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorEl = document.getElementById('errorMsg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = document.getElementById('tokenInput').value.trim();
+      if (!token) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Por favor, insira um token.';
+        return;
+      }
+
+      // Testa o token buscando o próprio usuário
+      try {
+        const res = await fetch('https://discord.com/api/v10/users/@me', {
+          headers: { Authorization: token }
+        });
+        if (!res.ok) throw new Error('Token inválido');
+        const userData = await res.json();
+        // Salva token e dados básicos na sessionStorage
+        sessionStorage.setItem('discord_token', token);
+        sessionStorage.setItem('discord_user', JSON.stringify(userData));
+        window.location.href = '/dashboard';
+      } catch (err) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Token inválido ou sem conexão.';
+      }
+    });
+  </script>
 </body>
 </html>
