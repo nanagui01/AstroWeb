@@ -1,1 +1,39 @@
-
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --color-black: #000000;
+  --color-gray-900: #0a0a0a;
+  --color-gray-800: #1a1a1a;
+  --color-gray-700: #2a2a2a;
+  --color-gray-600: #404040;
+  --color-gray-400: #808080;
+  --color-gray-200: #cccccc;
+  --color-gray-100: #e8e8e8;
+  --color-white: #ffffff;
+  --gradient-hero: linear-gradient(135deg, #000 0%, #1a1a1a 50%, #0a0a0a 100%);
+  --gradient-section: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+  --gradient-card: linear-gradient(145deg, #1a1a1a 0%, #2a2a2a 100%);
+  --gradient-cta: linear-gradient(90deg, #fff 0%, #ccc 100%);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-size-base: 1rem;
+  --line-height-base: 1.6;
+  --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 1rem;
+  --space-lg: 2rem; --space-xl: 4rem; --space-2xl: 8rem;
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 16px; --radius-full: 9999px;
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-card-hover: 0 12px 40px rgba(0,0,0,0.7);
+  --transition-fast: 150ms ease; --transition-base: 250ms ease; --transition-slow: 400ms ease;
+  --navbar-height: 64px;
+}
+html { scroll-behavior: smooth; scroll-padding-top: var(--navbar-height); }
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-white);
+  background: var(--color-black);
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; height: auto; display: block; }
