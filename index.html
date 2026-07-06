@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Tools - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">
+                <i class="fa-brands fa-discord"></i>
+            </div>
+            <h2>Ferramentas Discord</h2>
+            <p>Insira seu ID do Discord e token para acessar</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="userId">ID do Discord</label>
+                <input type="text" id="userId" placeholder="Ex: 123456789012345678" required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="userToken">Token de acesso</label>
+                <input type="password" id="userToken" placeholder="Seu token secreto" required autocomplete="off">
+            </div>
+            <div class="error-message" id="errorMsg">
+                <i class="fa-solid fa-circle-exclamation"></i> Por favor, preencha todos os campos.
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-right-to-bracket"></i> Entrar
+            </button>
+        </form>
+
+        <p style="text-align: center; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-muted);">
+            <i class="fa-solid fa-shield-halved"></i> Seus dados ficam salvos apenas no seu navegador.
+        </p>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const errorEl = document.getElementById('errorMsg');
+        const userIdInput = document.getElementById('userId');
+        const tokenInput = document.getElementById('userToken');
+
+        // Redireciona se já estiver logado
+        if (localStorage.getItem('discord_tools_auth')) {
+            window.location.href = 'tools.html';
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userId = userIdInput.value.trim();
+            const token = tokenInput.value.trim();
+
+            if (!userId || !token) {
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            errorEl.style.display = 'none';
+
+            // Salva em JSON no localStorage
+            const authData = {
+                userId: userId,
+                token: token,
+                timestamp: new Date().toISOString()
+            };
+
+            localStorage.setItem('discord_tools_auth', JSON.stringify(authData));
+
+            // Redireciona para o painel de ferramentas
+            window.location.href = 'tools.html';
+        });
+    </script>
+</body>
+</html>
