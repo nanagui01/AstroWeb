@@ -1,143 +1,140 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mastery Black — Do Caos à Alta Performance em 8 Semanas</title>
-  <meta name="description" content="Curso de produtividade e mentalidade de alta performance. Transforme seu caos em resultados em apenas 8 semanas.">
-  <meta property="og:title" content="Mastery Black — Alta Performance">
-  <meta property="og:image" content="assets/svg/illustration.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/sections.css">
-  <link rel="stylesheet" href="assets/css/animations.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Ferramentas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #0b0b0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff, #b0b0b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 3rem;
+            font-size: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 2.5rem 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .card i {
+            font-size: 2.5rem;
+            color: #fff;
+            opacity: 0.8;
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .status {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        /* Responsivo */
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header class="navbar" role="banner">
-    <nav class="navbar__inner" aria-label="Navegação principal">
-      <a href="#hero" class="navbar__logo">Mastery Black</a>
-      <ul class="navbar__links" role="list">
-        <li><a href="#sobre">Sobre</a></li>
-        <li><a href="#modulos">Módulos</a></li>
-        <li><a href="#depoimentos">Depoimentos</a></li>
-        <li><a href="#preco">Preço</a></li>
-        <li><a href="#faq">FAQ</a></li>
-      </ul>
-      <button class="navbar__hamburger" aria-label="Abrir menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </nav>
-  </header>
+    <div class="container">
+        <h1 class="title">Central de Ferramentas</h1>
+        <p class="subtitle">Escolha a categoria desejada</p>
 
-  <main>
-    <section id="hero" class="hero">
-      <div class="hero__content">
-        <h1 data-animate="fade-up">Mastery Black</h1>
-        <p class="hero__subtitle" data-animate="fade-up" data-delay="200">Do Caos à Alta Performance em 8 Semanas — o método que transforma sua produtividade para sempre.</p>
-        <div class="hero__cta-group" data-animate="fade-up" data-delay="400">
-          <a href="#preco" class="btn btn--primary" data-ripple>Quero transformar minha rotina</a>
-          <a href="#sobre" class="btn btn--secondary">Saiba mais</a>
+        <div class="grid">
+            <!-- Bloco Discord -->
+            <div class="card" onclick="alert('Em breve: Ferramentas para Discord')">
+                <i class="fa-brands fa-discord"></i>
+                <h2>Discord</h2>
+                <p>Gerenciamento de contas, webhooks, embeds e automações.</p>
+            </div>
+
+            <!-- Bloco Divulgação -->
+            <div class="card" onclick="alert('Em breve: Divulgação de cursos/sites')">
+                <i class="fa-solid fa-bullhorn"></i>
+                <h2>Divulgação</h2>
+                <p>Sites de marketing, landing pages e templates de vendas.</p>
+            </div>
+
+            <!-- Bloco Gerador -->
+            <div class="card" onclick="alert('Em breve: Geradores diversos')">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <h2>Gerador</h2>
+                <p>Geradores de código, senhas, tokens e muito mais.</p>
+            </div>
         </div>
-      </div>
-    </section>
 
-    <section id="sobre" class="about">
-      <h2 class="section-title" data-animate="fade-up">Sobre o Curso</h2>
-      <div class="about__grid">
-        <div data-animate="slide-left">
-          <p style="margin-bottom:var(--space-lg); color:var(--color-gray-200);">O Mastery Black é um programa intensivo de 8 semanas que combina neurociência, gestão de energia e sistemas de produtividade para profissionais que querem sair do caos e atingir alta performance sustentável.</p>
-          <ul class="about__benefits">
-            <li class="benefit-item" data-animate="fade-up"><svg><use href="assets/svg/icons.svg#icon-check"/></svg> Método validado por +500 alunos</li>
-            <li class="benefit-item" data-animate="fade-up"><svg><use href="assets/svg/icons.svg#icon-check"/></svg> Aulas gravadas e ao vivo</li>
-            <li class="benefit-item" data-animate="fade-up"><svg><use href="assets/svg/icons.svg#icon-check"/></svg> Comunidade exclusiva</li>
-            <li class="benefit-item" data-animate="fade-up"><svg><use href="assets/svg/icons.svg#icon-check"/></svg> Suporte individualizado</li>
-          </ul>
-        </div>
-        <div data-animate="fade-in">
-          <img src="assets/svg/illustration.svg" alt="Ilustração do curso Mastery Black" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-          <div class="img-fallback" aria-label="Ilustração do curso" style="display:none"><span>Mastery Black</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="modulos" class="modules">
-      <h2 class="section-title" data-animate="fade-up">O que você vai aprender</h2>
-      <div class="modules__grid">
-        <div class="module-card" data-animate="fade-up"><div class="module-card__number">01</div><h3>Diagnóstico do Caos</h3><p>Identifique os padrões que sabotam sua produtividade.</p></div>
-        <div class="module-card" data-animate="fade-up"><div class="module-card__number">02</div><h3>Mente Elite</h3><p>Neurociência aplicada ao foco e tomada de decisão.</p></div>
-        <div class="module-card" data-animate="fade-up"><div class="module-card__number">03</div><h3>Sistema de Prioridades</h3><p>Método P3: o que fazer primeiro quando tudo é urgente.</p></div>
-        <div class="module-card" data-animate="fade-up"><div class="module-card__number">04</div><h3>Energia e Ritmo</h3><p>Alinhe sua agenda ao seu pico biológico de performance.</p></div>
-        <div class="module-card" data-animate="fade-up"><div class="module-card__number">05</div><h3>Comunicação de Impacto</h3><p>Influencie, negocie e lidere com clareza.</p></div>
-        <div class="module-card" data-animate="fade-up"><div class="module-card__number">06</div><h3>Projetos Pessoais</h3><p>Do plano à execução em sprints de 7 dias.</p></div>
-        <div class="module-card" data-animate="fade-up"><div class="module-card__number">07</div><h3>Hábitos Antifrágeis</h3><p>Construa rotinas que se fortalecem sob pressão.</p></div>
-        <div class="module-card" data-animate="fade-up"><div class="module-card__number">08</div><h3>Masterplan 90 Dias</h3><p>Integre tudo em um plano de vida e carreira.</p></div>
-      </div>
-    </section>
-
-    <section id="depoimentos" class="testimonials">
-      <h2 class="section-title" data-animate="fade-up">Depoimentos</h2>
-      <div class="testimonials__grid">
-        <div class="testimonial-card"><p>"Em 3 semanas eliminei 60% das reuniões improdutivas."</p><div style="display:flex;align-items:center;gap:var(--space-sm);margin-top:var(--space-md)"><img src="" alt="Carlos M." onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" style="width:48px;height:48px;border-radius:50%"><div class="avatar-fallback" style="display:none">CM</div><div><strong>Carlos M.</strong><br><small style="color:var(--color-gray-400)">Engenheiro de Software</small></div></div></div>
-        <div class="testimonial-card"><p>"O módulo de hábitos mudou minha manhã completamente."</p><div style="display:flex;align-items:center;gap:var(--space-sm);margin-top:var(--space-md)"><img src="" alt="Ana Paula R." onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" style="width:48px;height:48px;border-radius:50%"><div class="avatar-fallback" style="display:none">AP</div><div><strong>Ana Paula R.</strong><br><small style="color:var(--color-gray-400)">Empreendedora</small></div></div></div>
-        <div class="testimonial-card"><p>"Finalmente um método que resiste ao mundo real."</p><div style="display:flex;align-items:center;gap:var(--space-sm);margin-top:var(--space-md)"><img src="" alt="Rafael T." onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" style="width:48px;height:48px;border-radius:50%"><div class="avatar-fallback" style="display:none">RT</div><div><strong>Rafael T.</strong><br><small style="color:var(--color-gray-400)">Gerente de Projetos</small></div></div></div>
-      </div>
-      <div class="carousel-controls"><button class="prev" aria-label="Anterior"><svg width="24" height="24"><use href="assets/svg/icons.svg#icon-arrow-left"/></svg></button><button class="next" aria-label="Próximo"><svg width="24" height="24"><use href="assets/svg/icons.svg#icon-arrow-right"/></svg></button></div>
-    </section>
-
-    <section id="preco" class="pricing">
-      <h2 class="section-title" data-animate="fade-up">Investimento</h2>
-      <div class="pricing__card" data-animate="fade-up">
-        <p class="price-original">De R$ 1.997,00</p>
-        <p class="price-promo">12x R$ 97,00</p>
-        <ul class="pricing__benefits">
-          <li><svg><use href="assets/svg/icons.svg#icon-check"/></svg> 8 módulos completos</li>
-          <li><svg><use href="assets/svg/icons.svg#icon-check"/></svg> Acesso vitalício</li>
-          <li><svg><use href="assets/svg/icons.svg#icon-check"/></svg> Comunidade exclusiva</li>
-          <li><svg><use href="assets/svg/icons.svg#icon-check"/></svg> Certificado de conclusão</li>
-        </ul>
-        <div id="countdown" style="font-size:1.5rem;font-weight:700;margin:var(--space-md) 0;">Carregando...</div>
-        <a href="#" class="btn btn--primary" id="cta-compra" data-ripple target="_blank" rel="noopener noreferrer">Garantir minha vaga</a>
-        <div class="guarantee-badge" style="margin-top:var(--space-md);justify-content:center;">
-          <svg width="20" height="20"><use href="assets/svg/icons.svg#icon-shield"/></svg> 7 dias de garantia incondicional
-        </div>
-      </div>
-    </section>
-
-    <section id="faq" class="faq">
-      <h2 class="section-title" data-animate="fade-up">Perguntas Frequentes</h2>
-      <details class="faq__item"><summary class="faq__summary">O curso é ao vivo ou gravado? <span class="faq__icon">+</span></summary><div class="faq__body">As aulas são 100% gravadas, com encontros ao vivo mensais para mentoria coletiva.</div></details>
-      <details class="faq__item"><summary class="faq__summary">Por quanto tempo terei acesso? <span class="faq__icon">+</span></summary><div class="faq__body">Acesso vitalício ao conteúdo e atualizações futuras.</div></details>
-      <details class="faq__item"><summary class="faq__summary">Preciso de algum conhecimento prévio? <span class="faq__icon">+</span></summary><div class="faq__body">Não. O curso é desenhado para profissionais de qualquer área.</div></details>
-      <details class="faq__item"><summary class="faq__summary">Como funciona a garantia de 7 dias? <span class="faq__icon">+</span></summary><div class="faq__body">Se não ficar satisfeito, devolvemos 100% do valor sem burocracia.</div></details>
-      <details class="faq__item"><summary class="faq__summary">Tem certificado? <span class="faq__icon">+</span></summary><div class="faq__body">Sim, certificado digital ao concluir todos os módulos.</div></details>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="footer__inner">
-      <p>&copy; <span id="year"></span> Mastery Black. Todos os direitos reservados.</p>
-      <div class="footer__links">
-        <a href="#" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>
-        <a href="#" target="_blank" rel="noopener noreferrer">Termos de Uso</a>
-      </div>
-      <div class="footer__social">
-        <a href="#" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><svg><use href="assets/svg/icons.svg#icon-instagram"/></svg></a>
-        <a href="#" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer"><svg><use href="assets/svg/icons.svg#icon-linkedin"/></svg></a>
-        <a href="#" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><svg><use href="assets/svg/icons.svg#icon-youtube"/></svg></a>
-      </div>
-      <a href="#hero" class="btn btn--secondary" style="font-size:0.85rem; padding:0.5rem 1.5rem;">Voltar ao topo ↑</a>
+        <div class="status">🟢 Online · Nenhum módulo ativo no momento</div>
     </div>
-  </footer>
-
-  <script defer src="assets/js/cursor.js"></script>
-  <script defer src="assets/js/navbar.js"></script>
-  <script defer src="assets/js/animations.js"></script>
-  <script defer src="assets/js/carousel.js"></script>
-  <script defer src="assets/js/faq.js"></script>
-  <script defer src="assets/js/countdown.js"></script>
-  <script defer src="assets/js/ripple.js"></script>
 </body>
 </html>
