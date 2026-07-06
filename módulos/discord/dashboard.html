@@ -3,185 +3,709 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Tools - Dashboard</title>
+    <title>Discord Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        :root {
+            --bg-deep: #060609;
+            --bg-primary: #0b0b0f;
+            --bg-secondary: #111118;
+            --bg-tertiary: #16161f;
+            --bg-card: rgba(18, 18, 26, 0.7);
+            --glass: rgba(14, 14, 22, 0.8);
+            --border: rgba(255, 255, 255, 0.05);
+            --border-hover: rgba(255, 255, 255, 0.1);
+            --text: #e8e8ed;
+            --text-secondary: #9d9dab;
+            --text-muted: #5c5c6e;
+            --purple: #8b5cf6;
+            --purple-light: #a78bfa;
+            --rose: #e83e5a;
+            --rose-light: #f4728b;
+            --blue: #3b82f6;
+            --blue-light: #60a5fa;
+            --green: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.4);
+            --gradient-1: linear-gradient(135deg, #8b5cf6, #e83e5a);
+            --gradient-2: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --gradient-card: linear-gradient(145deg, rgba(22,22,33,0.9), rgba(14,14,22,0.95));
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+            --shadow-md: 0 8px 32px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px rgba(139,92,246,0.15);
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-xl: 22px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0b0b0f;
-            color: #e0e0e0;
-            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2a2a38; border-radius: 2px; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 250px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 0;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 0 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-circle {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-1);
+            border-radius: 14px;
+            margin: 0 auto 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
-        }
-        .dashboard-container { max-width: 600px; width: 100%; }
-        .card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
-        }
-        h2 { font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; }
-        .form-group { margin-bottom: 1.2rem; }
-        .form-group label { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; color: #aaa; }
-        .form-group input {
-            width: 100%;
-            padding: 0.7rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
+            font-size: 1.3rem;
             color: #fff;
-            font-size: 0.95rem;
-            outline: none;
-            transition: 0.2s;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
         }
-        .form-group input:focus { border-color: #5865f2; }
-        .btn {
-            width: 100%;
-            padding: 0.8rem;
-            border: none;
-            border-radius: 8px;
-            background: #5865f2;
+
+        .app-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.55rem 1rem;
+            margin: 0.1rem 0.6rem;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .nav-item i { width: 18px; text-align: center; font-size: 0.9rem; }
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(232,62,90,0.15));
             color: #fff;
             font-weight: 600;
-            cursor: pointer;
-            margin-top: 0.5rem;
-            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(139,92,246,0.15);
         }
-        .btn:hover { background: #4752c4; }
-        .error { color: #f04747; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
-        .user-info { display: none; margin-top: 2rem; }
-        .user-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-        .avatar { width: 64px; height: 64px; border-radius: 50%; background: #333; }
-        .badges { display: flex; gap: 0.3rem; margin-top: 0.5rem; }
-        .badge-icon { width: 22px; height: 22px; }
-        .progress-section { margin-top: 1.5rem; }
-        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
-        .progress-fill { height: 100%; border-radius: 4px; }
-        .nitro-fill { background: linear-gradient(90deg, #5865f2, #eb459e); }
-        .boost-fill { background: #f47fff; }
-        .back-link { display: inline-block; margin-top: 1.5rem; color: #888; text-decoration: none; font-size: 0.85rem; }
-        .back-link:hover { color: #fff; }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .avatar-small {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #333;
+            position: relative;
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            border: 2px solid var(--bg-primary);
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            box-shadow: 0 0 6px var(--green-glow);
+        }
+
+        .user-mini { font-size: 0.78rem; line-height: 1.3; }
+        .user-mini span { display: block; color: var(--text-muted); font-size: 0.68rem; }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .content {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            background: var(--bg-deep);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .top-bar h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-online {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .status-online .dot {
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--green-glow);
+        }
+
+        .window-btns { display: flex; gap: 0.4rem; }
+        .window-btns span {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+        .window-btns span:hover { opacity: 1; }
+        .window-btns .min { background: #f59e0b; }
+        .window-btns .max { background: #10b981; }
+        .window-btns .close { background: #ef4444; }
+
+        /* ===== LOGIN BOX ===== */
+        .login-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem 2rem;
+            max-width: 420px;
+            margin: 0 auto;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+
+        .login-card h2 { margin-bottom: 0.5rem; font-size: 1.3rem; }
+        .login-card .subtitle { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 1.5rem; }
+
+        .form-group { margin-bottom: 1rem; text-align: left; }
+        .form-group label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .form-group input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--gradient-1);
+            color: #fff;
+        }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+
+        .error-msg { color: var(--rose); font-size: 0.8rem; margin-top: 0.5rem; display: none; }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1.2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+        .back-link:hover { color: var(--text); }
+
+        /* ===== USER CARD ===== */
+        .user-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .avatar-large {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+        }
+
+        .user-details { flex: 1; }
+        .user-details h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .badges { display: flex; gap: 0.2rem; }
+        .badges img { height: 18px; }
+        .username-tag { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.1rem; }
+        .accounts-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            background: rgba(139,92,246,0.2);
+            color: var(--purple-light);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            margin-top: 0.3rem;
+        }
+
+        .connect-status {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-shrink: 0;
+        }
+        .connect-btn {
+            background: var(--green);
+            border: none;
+            color: #fff;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: default;
+            box-shadow: 0 0 14px var(--green-glow);
+        }
+        .uptime { font-size: 0.72rem; color: var(--text-muted); }
+
+        /* ===== STATS ===== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.1rem 1.2rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .stat-card:hover { border-color: var(--border-hover); box-shadow: var(--shadow-glow); }
+        .stat-card .stat-icon { font-size: 1.1rem; color: var(--purple-light); margin-bottom: 0.4rem; }
+        .stat-card .stat-title { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+        .stat-card .stat-value { font-size: 1.6rem; font-weight: 700; margin-top: 0.2rem; }
+
+        /* ===== ACTIVITY ===== */
+        .activity-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .activity-panel i { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.4; }
+
+        /* ===== RIGHT PANEL ===== */
+        .right-panel {
+            width: 260px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border);
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+        }
+
+        .panel-section { margin-bottom: 1.5rem; }
+        .panel-section h4 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .task-indicators { display: flex; justify-content: space-between; margin-bottom: 0.8rem; }
+        .task-ind { text-align: center; font-size: 0.75rem; }
+        .task-ind .num { font-size: 1.2rem; font-weight: 700; }
+        .task-ind .label { font-size: 0.6rem; color: var(--text-muted); }
+
+        .progress-bar {
+            height: 5px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0.4rem 0 0.2rem;
+        }
+        .progress-fill { height: 100%; border-radius: 3px; }
+        .progress-fill.purple-bar { background: var(--gradient-1); }
+        .progress-fill.blue-bar { background: var(--gradient-2); }
+
+        .progress-icons { display: flex; gap: 0.15rem; margin: 0.2rem 0; font-size: 0.65rem; }
+
+        .quick-links { list-style: none; }
+        .quick-links li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.45rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.78rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .quick-links li:hover { color: var(--text); }
+
+        .logout-btn-secondary {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .logout-btn-secondary:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .right-panel { display: none; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .user-card { flex-direction: column; text-align: center; }
+            .content { padding: 1rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="card" id="loginBox">
-            <h2><i class="fa-brands fa-discord"></i> Acessar Ferramentas</h2>
-            <div class="form-group">
-                <label>Token do Discord</label>
-                <input type="password" id="tokenInput" placeholder="Cole seu token aqui">
-            </div>
-            <div class="form-group">
-                <label>Key de acesso</label>
-                <input type="password" id="keyInput" placeholder="Chave de acesso">
-            </div>
-            <div class="error" id="loginError">Token ou key inválidos.</div>
-            <button class="btn" id="loginBtn">Entrar</button>
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-circle"><i class="fa-brands fa-discord"></i></div>
+            <div class="app-name">Discord Tools</div>
         </div>
+        <nav>
+            <div class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</div>
+            <div class="nav-item"><i class="fa-solid fa-copy"></i> Clonar Server</div>
+            <div class="nav-item"><i class="fa-solid fa-paper-plane"></i> Webhook</div>
+            <div class="nav-item"><i class="fa-solid fa-gear"></i> Configurações</div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="avatar-small" id="sidebarAvatar" style="background-color:#333;"></div>
+            <div class="user-mini">
+                <strong id="sidebarName">Conecte-se</strong>
+                <span>Desconectado</span>
+            </div>
+        </div>
+    </aside>
 
-        <div class="user-info" id="userInfo">
-            <div class="user-header">
-                <img id="avatarImg" class="avatar" src="" alt="Avatar">
-                <div>
-                    <h3 id="displayName">Carregando...</h3>
-                    <p id="usernameTag" style="color:#aaa;"></p>
-                    <div class="badges" id="badgesContainer"></div>
+    <!-- ===== MAIN ===== -->
+    <div class="main-content">
+        <div class="content">
+            <!-- Top bar -->
+            <div class="top-bar">
+                <h1>Dashboard</h1>
+                <div class="top-actions">
+                    <div class="status-online"><span class="dot"></span> Online</div>
+                    <div class="window-btns">
+                        <span class="min"></span><span class="max"></span><span class="close"></span>
+                    </div>
                 </div>
             </div>
-            <div class="progress-section">
-                <h4>Progresso Nitro</h4>
-                <div class="progress-bar"><div class="progress-fill nitro-fill" id="nitroBar" style="width:0%"></div></div>
-                <small id="nitroText">Nenhuma assinatura</small>
+
+            <!-- Login (hidden after auth) -->
+            <div id="loginBox">
+                <div class="login-card">
+                    <h2><i class="fa-brands fa-discord"></i> Acessar Dashboard</h2>
+                    <p class="subtitle">Conecte sua conta para visualizar estatísticas</p>
+                    <div class="form-group">
+                        <label>Token do Discord</label>
+                        <input type="password" id="tokenInput" placeholder="Cole seu token aqui">
+                    </div>
+                    <div class="form-group">
+                        <label>Key de acesso</label>
+                        <input type="password" id="keyInput" placeholder="Chave de acesso">
+                    </div>
+                    <div class="error-msg" id="loginError">Token ou key inválidos.</div>
+                    <button class="btn" id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+                </div>
             </div>
-            <div class="progress-section">
-                <h4>Progresso Boost (servidor)</h4>
-                <div class="progress-bar"><div class="progress-fill boost-fill" id="boostBar" style="width:0%"></div></div>
-                <small id="boostText">Nenhum boost ativo</small>
+
+            <!-- Dashboard (hidden before auth) -->
+            <div id="dashboardBox" style="display:none;">
+                <!-- User card -->
+                <div class="user-card">
+                    <div class="avatar-large" id="mainAvatar"></div>
+                    <div class="user-details">
+                        <h2>
+                            <span id="displayName">Usuário</span>
+                            <span class="badges" id="badgesContainer"></span>
+                        </h2>
+                        <div class="username-tag" id="usernameTag">@user</div>
+                        <div class="accounts-badge" id="guildCount">0 servidores</div>
+                    </div>
+                    <div class="connect-status">
+                        <button class="connect-btn">Conectado</button>
+                        <span class="uptime" id="creationDate">—</span>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-message"></i></div>
+                        <div class="stat-title">Servidores</div>
+                        <div class="stat-value" id="statGuilds">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-bolt"></i></div>
+                        <div class="stat-title">Amigos</div>
+                        <div class="stat-value" id="statFriends">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div class="stat-title">Conta criada</div>
+                        <div class="stat-value" id="statCreated">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-play"></i></div>
+                        <div class="stat-title">Locale</div>
+                        <div class="stat-value" id="statLocale">—</div>
+                    </div>
+                </div>
+
+                <!-- Activity -->
+                <div class="activity-panel">
+                    <i class="fa-solid fa-inbox"></i>
+                    <p>Nenhuma atividade registrada.</p>
+                </div>
             </div>
-            <button class="btn" id="logoutBtn" style="margin-top:1.5rem;">Sair</button>
-            <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Voltar para Central</a>
         </div>
+
+        <!-- ===== RIGHT PANEL ===== -->
+        <div class="right-panel" id="rightPanel" style="display:none;">
+            <div class="panel-section">
+                <h4>Indicadores</h4>
+                <div class="task-indicators">
+                    <div class="task-ind"><span class="num" id="totalTasks">0</span><span class="label">Tasks</span></div>
+                    <div class="task-ind"><span class="num" id="doneTasks">0</span><span class="label">Feitas</span></div>
+                    <div class="task-ind"><span class="num" id="errorTasks">0</span><span class="label">Erros</span></div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h4>Progresso Nitro</h4>
+                <div class="progress-icons">
+                    <i class="fa-solid fa-gem" style="color:#a78bfa;"></i>
+                    <i class="fa-solid fa-gem" style="color:#60a5fa;"></i>
+                    <i class="fa-solid fa-gem" style="color:#f59e0b;"></i>
+                    <i class="fa-solid fa-gem" style="color:#e83e5a;"></i>
+                </div>
+                <div class="progress-bar"><div class="progress-fill purple-bar" id="nitroBar" style="width:0%;"></div></div>
+                <small style="color:var(--text-muted);" id="nitroText">Nenhuma assinatura</small>
+            </div>
+
+            <div class="panel-section">
+                <h4>Progresso Boost</h4>
+                <div class="progress-icons">
+                    <i class="fa-solid fa-rocket" style="color:#f59e0b;"></i>
+                    <i class="fa-solid fa-rocket" style="color:#f59e0b;"></i>
+                    <i class="fa-solid fa-rocket" style="color:#5c5c6e;"></i>
+                    <i class="fa-solid fa-rocket" style="color:#5c5c6e;"></i>
+                </div>
+                <div class="progress-bar"><div class="progress-fill blue-bar" id="boostBar" style="width:0%;"></div></div>
+                <small style="color:var(--text-muted);" id="boostText">Nenhum boost</small>
+            </div>
+
+            <div class="panel-section">
+                <h4>Links Rápidos</h4>
+                <ul class="quick-links">
+                    <li><span><i class="fa-solid fa-user"></i> Perfil</span> <i class="fa-solid fa-chevron-right"></i></li>
+                    <li><span><i class="fa-solid fa-chart-line"></i> Analytics</span> <i class="fa-solid fa-chevron-right"></i></li>
+                    <li><span><i class="fa-solid fa-gear"></i> Configurações</span> <i class="fa-solid fa-chevron-right"></i></li>
+                </ul>
+            </div>
+
+            <button class="logout-btn-secondary" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Desconectar</button>
+        </div>
+    </div>
+
+    <!-- ===== BACK LINK ===== -->
+    <div style="position:fixed;bottom:1rem;left:1rem;z-index:999;">
+        <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Central</a>
     </div>
 
     <script>
         const API_BASE = 'https://discord.com/api/v10';
-        const VALID_KEY = 'void'; // key válida para acesso
+        const VALID_KEY = 'void';
 
+        let userToken = '';
+        let userData = null;
+
+        // DOM
         const loginBox = document.getElementById('loginBox');
-        const userInfo = document.getElementById('userInfo');
+        const dashboardBox = document.getElementById('dashboardBox');
+        const rightPanel = document.getElementById('rightPanel');
         const loginError = document.getElementById('loginError');
         const tokenInput = document.getElementById('tokenInput');
         const keyInput = document.getElementById('keyInput');
         const loginBtn = document.getElementById('loginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
 
-        let userToken = '';
-
+        // Login
         loginBtn.addEventListener('click', async () => {
             const token = tokenInput.value.trim();
             const key = keyInput.value.trim();
 
             if (!token || key !== VALID_KEY) {
-                loginError.textContent = key !== VALID_KEY ? 'Key inválida.' : 'Token e key são obrigatórios.';
+                loginError.textContent = key !== VALID_KEY ? 'Key inválida.' : 'Preencha todos os campos.';
                 loginError.style.display = 'block';
                 return;
             }
 
             loginError.style.display = 'none';
             try {
-                const res = await fetch(`${API_BASE}/users/@me`, {
-                    headers: { Authorization: token }
-                });
+                const res = await fetch(`${API_BASE}/users/@me`, { headers: { Authorization: token } });
                 if (!res.ok) throw new Error('Token inválido');
-                const userData = await res.json();
+                userData = await res.json();
                 userToken = token;
-                displayUserData(userData);
+                renderDashboard(userData);
                 loginBox.style.display = 'none';
-                userInfo.style.display = 'block';
+                dashboardBox.style.display = 'block';
+                rightPanel.style.display = 'block';
             } catch (err) {
-                loginError.textContent = 'Token inválido ou sem conexão.';
+                loginError.textContent = 'Token inválido ou erro de conexão.';
                 loginError.style.display = 'block';
             }
         });
 
+        // Logout
         logoutBtn.addEventListener('click', () => {
             userToken = '';
+            userData = null;
             tokenInput.value = '';
             keyInput.value = '';
             loginBox.style.display = 'block';
-            userInfo.style.display = 'none';
+            dashboardBox.style.display = 'none';
+            rightPanel.style.display = 'none';
+            document.getElementById('sidebarName').textContent = 'Conecte-se';
+            document.querySelector('.user-mini span').textContent = 'Desconectado';
+            document.getElementById('sidebarAvatar').style.backgroundImage = '';
         });
 
-        function displayUserData(user) {
+        // Render
+        async function renderDashboard(user) {
+            // Sidebar
+            document.getElementById('sidebarName').textContent = user.global_name || user.username;
+            document.querySelector('.user-mini span').textContent = 'Conectado';
+            const avatarURL = user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
+                : `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator || '0') % 5}.png`;
+            document.getElementById('sidebarAvatar').style.backgroundImage = `url(${avatarURL})`;
+
+            // Main avatar
+            const mainAvatarURL = user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
+                : `https://cdn.discordapp.com/embed/avatars/${parseInt(user.discriminator || '0') % 5}.png`;
+            document.getElementById('mainAvatar').style.backgroundImage = `url(${mainAvatarURL})`;
+
+            // Name & tag
             document.getElementById('displayName').textContent = user.global_name || user.username;
             document.getElementById('usernameTag').textContent = `${user.username}#${user.discriminator}`;
-
-            const avatarURL = user.avatar
-                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
-                : `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
-            document.getElementById('avatarImg').src = avatarURL;
 
             // Badges
             const flags = user.public_flags || 0;
             const badgeMap = {
-                1: 'staff',
-                2: 'partner',
-                4: 'hypesquad_events',
-                8: 'bug_hunter_green',
-                64: 'hypesquad_bravery',
-                128: 'hypesquad_brilliance',
-                256: 'hypesquad_balance',
-                512: 'early_supporter',
-                16384: 'bug_hunter_gold',
-                131072: 'verified_developer'
+                1: 'staff', 2: 'partner', 4: 'hypesquad_events',
+                8: 'bug_hunter_green', 64: 'hypesquad_bravery',
+                128: 'hypesquad_brilliance', 256: 'hypesquad_balance',
+                512: 'early_supporter', 16384: 'bug_hunter_gold', 131072: 'verified_developer'
             };
             const badgesDiv = document.getElementById('badgesContainer');
             badgesDiv.innerHTML = '';
@@ -189,19 +713,42 @@
                 if (flags & parseInt(flag)) {
                     const img = document.createElement('img');
                     img.src = `https://cdn.discordapp.com/badge-icons/${name}.png`;
-                    img.className = 'badge-icon';
                     img.alt = name;
                     badgesDiv.appendChild(img);
                 }
             }
 
-            // Nitro status
+            // Guild count
+            try {
+                const guildsRes = await fetch(`${API_BASE}/users/@me/guilds`, { headers: { Authorization: userToken } });
+                const guilds = await guildsRes.json();
+                document.getElementById('guildCount').textContent = `${guilds.length} servidores`;
+                document.getElementById('statGuilds').textContent = guilds.length;
+            } catch (e) {
+                document.getElementById('guildCount').textContent = '— servidores';
+                document.getElementById('statGuilds').textContent = '—';
+            }
+
+            // Friends (placeholder - Discord não expõe API de amigos para bots/user tokens facilmente)
+            document.getElementById('statFriends').textContent = '—';
+
+            // Creation date (Snowflake)
+            const createdTimestamp = Math.floor((BigInt(user.id) >> 22n) + 1420070400000n);
+            const createdDate = new Date(Number(createdTimestamp));
+            document.getElementById('statCreated').textContent = createdDate.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+            document.getElementById('creationDate').textContent = '🕒 ' + createdDate.toLocaleDateString('pt-BR');
+
+            // Locale
+            document.getElementById('statLocale').textContent = (user.locale || 'pt-BR').toUpperCase();
+
+            // Nitro
             const premiumType = user.premium_type || 0;
             const nitroBar = document.getElementById('nitroBar');
             const nitroText = document.getElementById('nitroText');
+            const nitroLevels = ['Sem Nitro', 'Nitro Classic', 'Nitro Full', 'Nitro Basic'];
             if (premiumType === 0) {
-                nitroBar.style.width = '0%';
-                nitroText.textContent = 'Sem Nitro';
+                nitroBar.style.width = '5%';
+                nitroText.textContent = 'Sem assinatura';
             } else if (premiumType === 1) {
                 nitroBar.style.width = '50%';
                 nitroText.textContent = 'Nitro Classic';
@@ -213,21 +760,37 @@
                 nitroText.textContent = 'Nitro Basic';
             }
 
-            // Boost (placeholder - não buscamos servidores específicos, mostramos uma barra estática)
-            document.getElementById('boostBar').style.width = '0%';
-            document.getElementById('boostText').textContent = 'Verifique em um servidor específico';
-
-            // Tenta buscar assinaturas para melhorar info de nitro (opcional)
-            fetch(`${API_BASE}/users/@me/billing/subscriptions`, {
-                headers: { Authorization: userToken }
-            }).then(res => res.json()).then(subs => {
-                const nitroSub = subs.find(s => s.type === 1);
-                if (nitroSub) {
-                    nitroBar.style.width = '100%';
-                    nitroText.textContent = `Nitro ativo (${nitroSub.status})`;
+            // Boost (try subscriptions)
+            try {
+                const subsRes = await fetch(`${API_BASE}/users/@me/billing/subscriptions`, {
+                    headers: { Authorization: userToken }
+                });
+                if (subsRes.ok) {
+                    const subs = await subsRes.json();
+                    const nitroSub = subs.find(s => s.type === 1);
+                    if (nitroSub) {
+                        nitroBar.style.width = '100%';
+                        nitroText.textContent = `Nitro ativo (${nitroSub.status})`;
+                    }
+                    // Boosts
+                    const boostSubs = subs.filter(s => s.type === 2);
+                    const boostBar = document.getElementById('boostBar');
+                    const boostText = document.getElementById('boostText');
+                    if (boostSubs.length > 0) {
+                        boostBar.style.width = `${Math.min(boostSubs.length * 50, 100)}%`;
+                        boostText.textContent = `${boostSubs.length} boost(s) ativo(s)`;
+                    } else {
+                        boostBar.style.width = '0%';
+                        boostText.textContent = 'Nenhum boost';
+                    }
                 }
-            }).catch(() => {});
+            } catch (e) {}
+
+            // Task indicators (placeholders)
+            document.getElementById('totalTasks').textContent = '—';
+            document.getElementById('doneTasks').textContent = '—';
+            document.getElementById('errorTasks').textContent = '—';
         }
     </script>
 </body>
-  </html>
+</html>
