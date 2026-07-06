@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Tools - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0b0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .dashboard-container { max-width: 600px; width: 100%; }
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        h2 { font-size: 1.5rem; margin-bottom: 1.5rem; text-align: center; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; color: #aaa; }
+        .form-group input {
+            width: 100%;
+            padding: 0.7rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .form-group input:focus { border-color: #5865f2; }
+        .btn {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background: #5865f2;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: 0.2s;
+        }
+        .btn:hover { background: #4752c4; }
+        .error { color: #f04747; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+        .user-info { display: none; margin-top: 2rem; }
+        .user-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .avatar { width: 64px; height: 64px; border-radius: 50%; background: #333; }
+        .badges { display: flex; gap: 0.3rem; margin-top: 0.5rem; }
+        .badge-icon { width: 22px; height: 22px; }
+        .progress-section { margin-top: 1.5rem; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin: 0.5rem 0; }
+        .progress-fill { height: 100%; border-radius: 4px; }
+        .nitro-fill { background: linear-gradient(90deg, #5865f2, #eb459e); }
+        .boost-fill { background: #f47fff; }
+        .back-link { display: inline-block; margin-top: 1.5rem; color: #888; text-decoration: none; font-size: 0.85rem; }
+        .back-link:hover { color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="card" id="loginBox">
+            <h2><i class="fa-brands fa-discord"></i> Acessar Ferramentas</h2>
+            <div class="form-group">
+                <label>Token do Discord</label>
+                <input type="password" id="tokenInput" placeholder="Cole seu token aqui">
+            </div>
+            <div class="form-group">
+                <label>Key de acesso</label>
+                <input type="password" id="keyInput" placeholder="Chave de acesso">
+            </div>
+            <div class="error" id="loginError">Token ou key inválidos.</div>
+            <button class="btn" id="loginBtn">Entrar</button>
+        </div>
+
+        <div class="user-info" id="userInfo">
+            <div class="user-header">
+                <img id="avatarImg" class="avatar" src="" alt="Avatar">
+                <div>
+                    <h3 id="displayName">Carregando...</h3>
+                    <p id="usernameTag" style="color:#aaa;"></p>
+                    <div class="badges" id="badgesContainer"></div>
+                </div>
+            </div>
+            <div class="progress-section">
+                <h4>Progresso Nitro</h4>
+                <div class="progress-bar"><div class="progress-fill nitro-fill" id="nitroBar" style="width:0%"></div></div>
+                <small id="nitroText">Nenhuma assinatura</small>
+            </div>
+            <div class="progress-section">
+                <h4>Progresso Boost (servidor)</h4>
+                <div class="progress-bar"><div class="progress-fill boost-fill" id="boostBar" style="width:0%"></div></div>
+                <small id="boostText">Nenhum boost ativo</small>
+            </div>
+            <button class="btn" id="logoutBtn" style="margin-top:1.5rem;">Sair</button>
+            <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Voltar para Central</a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://discord.com/api/v10';
+        const VALID_KEY = 'void'; // key válida para acesso
+
+        const loginBox = document.getElementById('loginBox');
+        const userInfo = document.getElementById('userInfo');
+        const loginError = document.getElementById('loginError');
+        const tokenInput = document.getElementById('tokenInput');
+        const keyInput = document.getElementById('keyInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        let userToken = '';
+
+        loginBtn.addEventListener('click', async () => {
+            const token = tokenInput.value.trim();
+            const key = keyInput.value.trim();
+
+            if (!token || key !== VALID_KEY) {
+                loginError.textContent = key !== VALID_KEY ? 'Key inválida.' : 'Token e key são obrigatórios.';
+                loginError.style.display = 'block';
+                return;
+            }
+
+            loginError.style.display = 'none';
+            try {
+                const res = await fetch(`${API_BASE}/users/@me`, {
+                    headers: { Authorization: token }
+                });
+                if (!res.ok) throw new Error('Token inválido');
+                const userData = await res.json();
+                userToken = token;
+                displayUserData(userData);
+                loginBox.style.display = 'none';
+                userInfo.style.display = 'block';
+            } catch (err) {
+                loginError.textContent = 'Token inválido ou sem conexão.';
+                loginError.style.display = 'block';
+            }
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            userToken = '';
+            tokenInput.value = '';
+            keyInput.value = '';
+            loginBox.style.display = 'block';
+            userInfo.style.display = 'none';
+        });
+
+        function displayUserData(user) {
+            document.getElementById('displayName').textContent = user.global_name || user.username;
+            document.getElementById('usernameTag').textContent = `${user.username}#${user.discriminator}`;
+
+            const avatarURL = user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=128`
+                : `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`;
+            document.getElementById('avatarImg').src = avatarURL;
+
+            // Badges
+            const flags = user.public_flags || 0;
+            const badgeMap = {
+                1: 'staff',
+                2: 'partner',
+                4: 'hypesquad_events',
+                8: 'bug_hunter_green',
+                64: 'hypesquad_bravery',
+                128: 'hypesquad_brilliance',
+                256: 'hypesquad_balance',
+                512: 'early_supporter',
+                16384: 'bug_hunter_gold',
+                131072: 'verified_developer'
+            };
+            const badgesDiv = document.getElementById('badgesContainer');
+            badgesDiv.innerHTML = '';
+            for (const [flag, name] of Object.entries(badgeMap)) {
+                if (flags & parseInt(flag)) {
+                    const img = document.createElement('img');
+                    img.src = `https://cdn.discordapp.com/badge-icons/${name}.png`;
+                    img.className = 'badge-icon';
+                    img.alt = name;
+                    badgesDiv.appendChild(img);
+                }
+            }
+
+            // Nitro status
+            const premiumType = user.premium_type || 0;
+            const nitroBar = document.getElementById('nitroBar');
+            const nitroText = document.getElementById('nitroText');
+            if (premiumType === 0) {
+                nitroBar.style.width = '0%';
+                nitroText.textContent = 'Sem Nitro';
+            } else if (premiumType === 1) {
+                nitroBar.style.width = '50%';
+                nitroText.textContent = 'Nitro Classic';
+            } else if (premiumType === 2) {
+                nitroBar.style.width = '100%';
+                nitroText.textContent = 'Nitro Full';
+            } else {
+                nitroBar.style.width = '75%';
+                nitroText.textContent = 'Nitro Basic';
+            }
+
+            // Boost (placeholder - não buscamos servidores específicos, mostramos uma barra estática)
+            document.getElementById('boostBar').style.width = '0%';
+            document.getElementById('boostText').textContent = 'Verifique em um servidor específico';
+
+            // Tenta buscar assinaturas para melhorar info de nitro (opcional)
+            fetch(`${API_BASE}/users/@me/billing/subscriptions`, {
+                headers: { Authorization: userToken }
+            }).then(res => res.json()).then(subs => {
+                const nitroSub = subs.find(s => s.type === 1);
+                if (nitroSub) {
+                    nitroBar.style.width = '100%';
+                    nitroText.textContent = `Nitro ativo (${nitroSub.status})`;
+                }
+            }).catch(() => {});
+        }
+    </script>
+</body>
+  </html>
