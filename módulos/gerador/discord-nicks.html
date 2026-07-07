@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Nick Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0b0b0f;
+            --card: rgba(20,20,28,0.7);
+            --border: rgba(255,255,255,0.06);
+            --text: #ededf1;
+            --text-secondary: #9a9aa8;
+            --accent: #5865f2;
+            --green: #10b981;
+            --red: #ef4444;
+            --radius: 14px;
+            --radius-sm: 10px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+        .container { max-width: 700px; width: 100%; }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .header p { color: var(--text-secondary); }
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+        .back-link:hover { color: #fff; }
+
+        .main-card {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .mode-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .mode-btn:hover { background: rgba(255,255,255,0.1); }
+        .mode-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .current-nick {
+            background: rgba(0,0,0,0.3);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .available { background: rgba(16,185,129,0.2); color: var(--green); }
+        .taken { background: rgba(239,68,68,0.2); color: var(--red); }
+        .checking { background: rgba(251,191,36,0.2); color: #fbbf24; }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .stat { text-align: center; }
+        .stat .num { font-size: 1.3rem; font-weight: 700; color: var(--text); }
+
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary { background: var(--accent); border: none; color: #fff; }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); }
+        .btn-danger { background: #ef4444; border: none; color: #fff; }
+
+        .found-list {
+            background: rgba(0,0,0,0.3);
+            border-radius: var(--radius-sm);
+            padding: 0.8rem;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .found-list .item {
+            padding: 0.2rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+        .found-list .item:last-child { border: none; }
+        .copy-icon { cursor: pointer; color: var(--text-secondary); }
+        .copy-icon:hover { color: #fff; }
+
+        @media (max-width: 500px) {
+            body { padding: 1rem; }
+            .stats { flex-direction: column; gap: 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Voltar para Geradores</a>
+        <div class="header">
+            <h1><i class="fa-brands fa-discord"></i> Discord Nick Generator</h1>
+            <p>Gere nicks aleatórios e verifique disponibilidade na API do Discord em tempo real</p>
+        </div>
+
+        <div class="main-card">
+            <!-- Seleção de modo -->
+            <div class="mode-selector">
+                <button class="mode-btn active" data-mode="rr">RR (abababab)</button>
+                <button class="mode-btn" data-mode="5n">5N (5 dígitos)</button>
+                <button class="mode-btn" data-mode="4l">4L (4 chars)</button>
+            </div>
+
+            <!-- Nick atual e status -->
+            <div class="current-nick" id="currentNick">--------</div>
+            <div style="text-align:center; margin-bottom:1rem;">
+                <span id="statusBadge" class="status-badge checking">Verificando...</span>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="stats">
+                <div class="stat"><span class="num" id="statChecked">0</span><br>Verificados</div>
+                <div class="stat"><span class="num" id="statFound">0</span><br>Disponíveis</div>
+                <div class="stat"><span class="num" id="statRate">0</span><br>Taxa/min</div>
+            </div>
+
+            <!-- Controles -->
+            <div class="controls">
+                <button class="btn btn-primary" id="startBtn"><i class="fa-solid fa-play"></i> Iniciar</button>
+                <button class="btn btn-danger" id="stopBtn" style="display:none;"><i class="fa-solid fa-stop"></i> Parar</button>
+                <button class="btn btn-secondary" id="clearBtn"><i class="fa-solid fa-trash"></i> Limpar</button>
+            </div>
+
+            <!-- Lista de nicks disponíveis encontrados -->
+            <div class="found-list" id="foundList">
+                <p style="color:var(--text-secondary);">Nenhum nick disponível encontrado ainda.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ ESTADO ============
+        const API_CHECK = '/api/check-username'; // proxy no backend
+        let running = false;
+        let stopRequested = false;
+        let checkedCount = 0;
+        let foundCount = 0;
+        let startTime = 0;
+        let foundNicks = []; // nicks disponíveis encontrados nesta sessão
+
+        // DOM
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        const currentNickEl = document.getElementById('currentNick');
+        const statusBadge = document.getElementById('statusBadge');
+        const statChecked = document.getElementById('statChecked');
+        const statFound = document.getElementById('statFound');
+        const statRate = document.getElementById('statRate');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const foundListEl = document.getElementById('foundList');
+
+        let currentMode = 'rr';
+
+        // Carregar nicks salvos (localStorage)
+        const STORAGE_KEY = 'discordNicks_found';
+        function loadSavedNicks() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? JSON.parse(saved) : [];
+        }
+        function saveNicksToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(foundNicks));
+        }
+
+        // Inicializa lista salva
+        foundNicks = loadSavedNicks();
+        foundCount = foundNicks.length;
+        updateFoundListUI();
+        statFound.textContent = foundCount;
+
+        // ============ GERAÇÃO DE NICKS ============
+        const letters = "abcdefghijklmnopqrstuvwxyz";
+        const numbers = "0123456789";
+        const optional = "._";
+
+        function random(str) { return str[Math.floor(Math.random() * str.length)]; }
+
+        function generateRR() {
+            const a = random(letters + numbers);
+            const b = random(letters + numbers);
+            return a + b + a + b + a + b + a + b;
+        }
+
+        function generate5N() {
+            let r = '';
+            for (let i = 0; i < 5; i++) r += random(numbers);
+            if (/^(\d)\1+$/.test(r)) return generate5N(); // evita todos iguais
+            return r;
+        }
+
+        function generate4L() {
+            let name = '';
+            let hasLetter = false, hasNumber = false;
+            for (let i = 0; i < 4; i++) {
+                let pool = letters + numbers;
+                if (Math.random() < 0.15) pool += optional;
+                let c = random(pool);
+                if (letters.includes(c)) hasLetter = true;
+                if (numbers.includes(c)) hasNumber = true;
+                name += c;
+            }
+            if (!hasLetter || !hasNumber) return generate4L();
+            return name;
+        }
+
+        function generateNick(mode) {
+            if (mode === 'rr') return generateRR();
+            if (mode === '5n') return generate5N();
+            if (mode === '4l') return generate4L();
+            return generateRR();
+        }
+
+        // ============ VERIFICAÇÃO ============
+        async function checkUsername(username) {
+            try {
+                const res = await fetch(API_CHECK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                if (!res.ok) return false;
+                const data = await res.json();
+                return data.available === true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // ============ SCANNER ============
+        async function scanner() {
+            running = true;
+            stopRequested = false;
+            startTime = Date.now();
+            updateUIForRunning(true);
+
+            while (!stopRequested) {
+                const nick = generateNick(currentMode);
+                currentNickEl.textContent = nick;
+                statusBadge.textContent = 'Verificando...';
+                statusBadge.className = 'status-badge checking';
+
+                const available = await checkUsername(nick);
+                checkedCount++;
+                statChecked.textContent = checkedCount;
+
+                // Atualizar taxa
+                const elapsed = (Date.now() - startTime) / 1000 / 60;
+                const rate = elapsed > 0 ? Math.round(checkedCount / elapsed) : 0;
+                statRate.textContent = rate;
+
+                if (available) {
+                    if (!foundNicks.includes(nick)) {
+                        foundNicks.push(nick);
+                        foundCount++;
+                        statFound.textContent = foundCount;
+                        saveNicksToStorage();
+                        updateFoundListUI();
+                        currentNickEl.innerHTML = `${nick} <span class="status-badge available">Disponível</span>`;
+                        statusBadge.textContent = 'Disponível!';
+                        statusBadge.className = 'status-badge available';
+                    }
+                } else {
+                    currentNickEl.innerHTML = `${nick} <span class="status-badge taken">Indisponível</span>`;
+                    statusBadge.textContent = 'Indisponível';
+                    statusBadge.className = 'status-badge taken';
+                }
+
+                // Delay entre verificações (respeitar rate limit)
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            running = false;
+            updateUIForRunning(false);
+            currentNickEl.textContent = '--------';
+            statusBadge.textContent = 'Parado';
+            statusBadge.className = 'status-badge checking';
+        }
+
+        function updateUIForRunning(isRunning) {
+            startBtn.style.display = isRunning ? 'none' : 'flex';
+            stopBtn.style.display = isRunning ? 'flex' : 'none';
+        }
+
+        function updateFoundListUI() {
+            if (foundNicks.length === 0) {
+                foundListEl.innerHTML = '<p style="color:var(--text-secondary);">Nenhum nick disponível encontrado ainda.</p>';
+                return;
+            }
+            foundListEl.innerHTML = foundNicks.slice().reverse().map(nick => `
+                <div class="item">
+                    <span>${nick}</span>
+                    <span class="copy-icon" onclick="copyNick('${nick}', this)" title="Copiar"><i class="fa-solid fa-copy"></i></span>
+                </div>
+            `).join('');
+        }
+
+        // Função global para cópia
+        window.copyNick = function(nick, el) {
+            navigator.clipboard.writeText(nick).then(() => {
+                el.innerHTML = '<i class="fa-solid fa-check" style="color:var(--green);"></i>';
+                setTimeout(() => el.innerHTML = '<i class="fa-solid fa-copy"></i>', 1500);
+            });
+        };
+
+        // ============ EVENTOS ============
+        modeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+            });
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (running) return;
+            scanner();
+        });
+
+        stopBtn.addEventListener('click', () => {
+            stopRequested = true;
+        });
+
+        clearBtn.addEventListener('click', () => {
+            if (running) {
+                stopRequested = true;
+                setTimeout(() => performClear(), 500);
+            } else {
+                performClear();
+            }
+        });
+
+        function performClear() {
+            foundNicks = [];
+            foundCount = 0;
+            checkedCount = 0;
+            statFound.textContent = '0';
+            statChecked.textContent = '0';
+            statRate.textContent = '0';
+            saveNicksToStorage();
+            updateFoundListUI();
+        }
+    </script>
+</body>
+</html>
