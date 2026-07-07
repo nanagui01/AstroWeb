@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geradores — Central de Ferramentas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0b0b0f;
+            --card: rgba(20, 20, 28, 0.7);
+            --border: rgba(255,255,255,0.06);
+            --text: #ededf1;
+            --text-secondary: #9a9aa8;
+            --text-muted: #58586a;
+            --accent: #8b5cf6;
+            --accent-light: #a78bfa;
+            --green: #10b981;
+            --radius: 14px;
+            --radius-sm: 10px;
+            --transition: 0.2s ease;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 1100px; width: 100%; }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        .header p { color: var(--text-secondary); font-size: 0.95rem; }
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            transition: var(--transition);
+        }
+        .back-link:hover { color: #fff; }
+
+        /* Categorias */
+        .category {
+            margin-bottom: 2rem;
+        }
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.2rem;
+        }
+        .card {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card h3 i { color: var(--accent-light); font-size: 0.95rem; }
+        .output {
+            background: rgba(0,0,0,0.35);
+            border-radius: var(--radius-sm);
+            padding: 0.7rem 0.9rem;
+            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.88rem;
+            word-break: break-all;
+            margin-bottom: 0.8rem;
+            min-height: 2.5rem;
+            display: flex;
+            align-items: center;
+            color: #ccc;
+            border: 1px solid transparent;
+            transition: var(--transition);
+        }
+        .output:focus-within { border-color: var(--accent); }
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn {
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            padding: 0.45rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.83rem;
+            transition: var(--transition);
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.03); }
+        input[type="number"], input[type="text"], select {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        input[type="number"] { width: 70px; }
+        select { width: auto; }
+        label { font-size: 0.8rem; color: var(--text-secondary); margin-right: 0.3rem; white-space: nowrap; }
+        .color-preview {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+        }
+        .flex-center { display: flex; align-items: center; }
+
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Voltar para Central</a>
+        <div class="header">
+            <h1><i class="fa-solid fa-wand-magic-sparkles"></i> Geradores</h1>
+            <p>Ferramentas para gerar dados aleatórios, códigos e identificadores</p>
+        </div>
+
+        <!-- CATEGORIA: TEXTO E DADOS -->
+        <div class="category">
+            <h2 class="category-title"><i class="fa-solid fa-font"></i> Texto e Dados</h2>
+            <div class="grid">
+                <!-- Lorem Ipsum -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-align-left"></i> Lorem Ipsum</h3>
+                    <div class="output" id="loremOutput">Clique em gerar</div>
+                    <div class="controls">
+                        <label>Parágrafos:</label>
+                        <input type="number" id="loremCount" value="1" min="1" max="10">
+                        <button class="btn" id="generateLorem">Gerar</button>
+                        <button class="btn btn-secondary" id="copyLorem"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- Nome Aleatório -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-user"></i> Nome Aleatório</h3>
+                    <div class="output" id="nameOutput">Clique em gerar</div>
+                    <div class="controls">
+                        <select id="nameGender">
+                            <option value="any">Qualquer</option>
+                            <option value="male">Masculino</option>
+                            <option value="female">Feminino</option>
+                        </select>
+                        <button class="btn" id="generateName">Gerar</button>
+                        <button class="btn btn-secondary" id="copyName"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- Slug / URL -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-link"></i> Slug Amigável</h3>
+                    <div class="output" id="slugOutput">digite algo</div>
+                    <div class="controls">
+                        <input type="text" id="slugInput" placeholder="Digite um texto..." style="flex:1; min-width:120px;">
+                        <button class="btn" id="generateSlug">Gerar</button>
+                        <button class="btn btn-secondary" id="copySlug"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORIA: SEGURANÇA E IDENTIFICAÇÃO -->
+        <div class="category">
+            <h2 class="category-title"><i class="fa-solid fa-shield-halved"></i> Segurança e Identificação</h2>
+            <div class="grid">
+                <!-- Senha -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-key"></i> Senha Segura</h3>
+                    <div class="output" id="passwordOutput">Clique em gerar</div>
+                    <div class="controls">
+                        <label>Tamanho:</label>
+                        <input type="number" id="passLength" value="16" min="4" max="128">
+                        <button class="btn" id="generatePassword">Gerar</button>
+                        <button class="btn btn-secondary" id="copyPassword"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- UUID -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-fingerprint"></i> UUID v4</h3>
+                    <div class="output" id="uuidOutput">Clique em gerar</div>
+                    <div class="controls">
+                        <button class="btn" id="generateUUID">Gerar</button>
+                        <button class="btn btn-secondary" id="copyUUID"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- Hash MD5 / SHA256 -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-hashtag"></i> Hash (SHA256)</h3>
+                    <div class="output" id="hashOutput">digite algo</div>
+                    <div class="controls">
+                        <input type="text" id="hashInput" placeholder="Texto..." style="flex:1; min-width:120px;">
+                        <select id="hashType">
+                            <option value="SHA-256">SHA-256</option>
+                            <option value="MD5">MD5</option>
+                            <option value="SHA-1">SHA-1</option>
+                        </select>
+                        <button class="btn" id="generateHash">Gerar</button>
+                        <button class="btn btn-secondary" id="copyHash"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORIA: DOCUMENTOS E NÚMEROS -->
+        <div class="category">
+            <h2 class="category-title"><i class="fa-solid fa-file-invoice"></i> Documentos e Números</h2>
+            <div class="grid">
+                <!-- CPF -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-id-card"></i> CPF Válido</h3>
+                    <div class="output" id="cpfOutput">Clique em gerar</div>
+                    <div class="controls">
+                        <button class="btn" id="generateCPF">Gerar CPF</button>
+                        <button class="btn btn-secondary" id="copyCPF"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- CNPJ -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-building"></i> CNPJ Válido</h3>
+                    <div class="output" id="cnpjOutput">Clique em gerar</div>
+                    <div class="controls">
+                        <button class="btn" id="generateCNPJ">Gerar CNPJ</button>
+                        <button class="btn btn-secondary" id="copyCNPJ"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- Número Aleatório -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-dice"></i> Número Aleatório</h3>
+                    <div class="output" id="numberOutput">0</div>
+                    <div class="controls">
+                        <label>Min:</label><input type="number" id="minNum" value="1">
+                        <label>Max:</label><input type="number" id="maxNum" value="100">
+                        <button class="btn" id="generateNumber">Gerar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORIA: WEB E CORES -->
+        <div class="category">
+            <h2 class="category-title"><i class="fa-solid fa-globe"></i> Web e Cores</h2>
+            <div class="grid">
+                <!-- Cor Hex -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-palette"></i> Cor Hexadecimal</h3>
+                    <div class="output flex-center" id="colorOutput">
+                        <span class="color-preview" id="colorPreview" style="background:#fff;"></span>
+                        <span id="colorHex">#FFFFFF</span>
+                    </div>
+                    <div class="controls">
+                        <button class="btn" id="generateColor">Gerar Cor</button>
+                        <button class="btn btn-secondary" id="copyColor"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- Token aleatório (estilo Discord) -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-barcode"></i> Token Aleatório</h3>
+                    <div class="output" id="tokenOutput">Clique em gerar</div>
+                    <div class="controls">
+                        <button class="btn" id="generateToken">Gerar Token</button>
+                        <button class="btn btn-secondary" id="copyToken"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- Base64 -->
+                <div class="card">
+                    <h3><i class="fa-solid fa-code"></i> Base64 Encode/Decode</h3>
+                    <div class="output" id="base64Output">resultado</div>
+                    <div class="controls">
+                        <input type="text" id="base64Input" placeholder="Texto..." style="flex:1; min-width:120px;">
+                        <select id="base64Mode">
+                            <option value="encode">Codificar</option>
+                            <option value="decode">Decodificar</option>
+                        </select>
+                        <button class="btn" id="generateBase64">Aplicar</button>
+                        <button class="btn btn-secondary" id="copyBase64"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ UTILITÁRIOS ============
+        function copyText(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-check"></i>';
+                setTimeout(() => button.innerHTML = originalHTML, 1500);
+            });
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // ============ LOREM IPSUM ============
+        const loremParagraphs = [
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+            "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+            "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam."
+        ];
+        document.getElementById('generateLorem').addEventListener('click', () => {
+            const count = parseInt(document.getElementById('loremCount').value) || 1;
+            let text = '';
+            for (let i = 0; i < count; i++) {
+                text += loremParagraphs[Math.floor(Math.random() * loremParagraphs.length)] + '\n\n';
+            }
+            document.getElementById('loremOutput').textContent = text.trim();
+        });
+        document.getElementById('copyLorem').addEventListener('click', function() {
+            copyText(document.getElementById('loremOutput').textContent, this);
+        });
+
+        // ============ NOME ALEATÓRIO ============
+        const namesMale = ['Lucas', 'Gabriel', 'Mateus', 'Rafael', 'Pedro', 'Felipe', 'Bruno', 'André', 'Thiago', 'Marcos'];
+        const namesFemale = ['Ana', 'Mariana', 'Juliana', 'Camila', 'Beatriz', 'Amanda', 'Larissa', 'Fernanda', 'Patrícia', 'Carolina'];
+        const surnames = ['Silva', 'Santos', 'Oliveira', 'Souza', 'Lima', 'Pereira', 'Costa', 'Almeida', 'Rodrigues', 'Ferreira'];
+        document.getElementById('generateName').addEventListener('click', () => {
+            const gender = document.getElementById('nameGender').value;
+            let name;
+            if (gender === 'male') name = namesMale[Math.floor(Math.random() * namesMale.length)];
+            else if (gender === 'female') name = namesFemale[Math.floor(Math.random() * namesFemale.length)];
+            else name = [...namesMale, ...namesFemale][Math.floor(Math.random() * 20)];
+            const surname = surnames[Math.floor(Math.random() * surnames.length)];
+            document.getElementById('nameOutput').textContent = `${name} ${surname}`;
+        });
+        document.getElementById('copyName').addEventListener('click', function() {
+            copyText(document.getElementById('nameOutput').textContent, this);
+        });
+
+        // ============ SLUG ============
+        document.getElementById('generateSlug').addEventListener('click', () => {
+            const text = document.getElementById('slugInput').value.trim() || 'exemplo de texto';
+            const slug = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            document.getElementById('slugOutput').textContent = slug;
+        });
+        document.getElementById('copySlug').addEventListener('click', function() {
+            copyText(document.getElementById('slugOutput').textContent, this);
+        });
+
+        // ============ SENHA ============
+        document.getElementById('generatePassword').addEventListener('click', () => {
+            const length = parseInt(document.getElementById('passLength').value) || 16;
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*()-_=+[]{}|;:,.<>?';
+            let result = '';
+            for (let i = 0; i < length; i++) result += chars[Math.floor(Math.random() * chars.length)];
+            document.getElementById('passwordOutput').textContent = result;
+        });
+        document.getElementById('copyPassword').addEventListener('click', function() {
+            copyText(document.getElementById('passwordOutput').textContent, this);
+        });
+
+        // ============ UUID ============
+        document.getElementById('generateUUID').addEventListener('click', () => {
+            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            document.getElementById('uuidOutput').textContent = uuid;
+        });
+        document.getElementById('copyUUID').addEventListener('click', function() {
+            copyText(document.getElementById('uuidOutput').textContent, this);
+        });
+
+        // ============ HASH ============
+        document.getElementById('generateHash').addEventListener('click', async () => {
+            const text = document.getElementById('hashInput').value.trim() || 'texto';
+            const type = document.getElementById('hashType').value;
+            let hash;
+            if (type === 'MD5') {
+                hash = await crypto.subtle.digest('MD5', new TextEncoder().encode(text)).then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')).catch(() => 'MD5 não suportado');
+            } else if (type === 'SHA-1') {
+                hash = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(text)).then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+            } else {
+                hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+            }
+            document.getElementById('hashOutput').textContent = hash;
+        });
+        document.getElementById('copyHash').addEventListener('click', function() {
+            copyText(document.getElementById('hashOutput').textContent, this);
+        });
+
+        // ============ CPF ============
+        function generateCPF() {
+            const n = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10));
+            let d1 = 0, d2 = 0;
+            for (let i = 0; i < 9; i++) d1 += n[i] * (10 - i);
+            d1 = (d1 * 10) % 11; if (d1 === 10) d1 = 0;
+            n.push(d1);
+            for (let i = 0; i < 10; i++) d2 += n[i] * (11 - i);
+            d2 = (d2 * 10) % 11; if (d2 === 10) d2 = 0;
+            n.push(d2);
+            return `${n[0]}${n[1]}${n[2]}.${n[3]}${n[4]}${n[5]}.${n[6]}${n[7]}${n[8]}-${n[9]}${n[10]}`;
+        }
+        document.getElementById('generateCPF').addEventListener('click', () => {
+            document.getElementById('cpfOutput').textContent = generateCPF();
+        });
+        document.getElementById('copyCPF').addEventListener('click', function() {
+            copyText(document.getElementById('cpfOutput').textContent, this);
+        });
+
+        // ============ CNPJ ============
+        function generateCNPJ() {
+            const n = Array.from({ length: 12 }, () => Math.floor(Math.random() * 10));
+            n[8] = 0; n[9] = 0; n[10] = 0; n[11] = 1; // filial padrão
+            let d1 = 0, d2 = 0;
+            const w1 = [5,4,3,2,9,8,7,6,5,4,3,2];
+            for (let i = 0; i < 12; i++) d1 += n[i] * w1[i];
+            d1 = d1 % 11; d1 = d1 < 2 ? 0 : 11 - d1;
+            n.push(d1);
+            const w2 = [6,5,4,3,2,9,8,7,6,5,4,3,2];
+            for (let i = 0; i < 13; i++) d2 += n[i] * w2[i];
+            d2 = d2 % 11; d2 = d2 < 2 ? 0 : 11 - d2;
+            n.push(d2);
+            return `${n[0]}${n[1]}.${n[2]}${n[3]}${n[4]}.${n[5]}${n[6]}${n[7]}/${n[8]}${n[9]}${n[10]}${n[11]}-${n[12]}${n[13]}`;
+        }
+        document.getElementById('generateCNPJ').addEventListener('click', () => {
+            document.getElementById('cnpjOutput').textContent = generateCNPJ();
+        });
+        document.getElementById('copyCNPJ').addEventListener('click', function() {
+            copyText(document.getElementById('cnpjOutput').textContent, this);
+        });
+
+        // ============ NÚMERO ALEATÓRIO ============
+        document.getElementById('generateNumber').addEventListener('click', () => {
+            const min = parseInt(document.getElementById('minNum').value) || 0;
+            const max = parseInt(document.getElementById('maxNum').value) || 100;
+            document.getElementById('numberOutput').textContent = getRandomInt(min, max);
+        });
+
+        // ============ COR HEX ============
+        document.getElementById('generateColor').addEventListener('click', () => {
+            const hex = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            document.getElementById('colorHex').textContent = hex;
+            document.getElementById('colorPreview').style.background = hex;
+        });
+        document.getElementById('copyColor').addEventListener('click', function() {
+            copyText(document.getElementById('colorHex').textContent, this);
+        });
+
+        // ============ TOKEN ALEATÓRIO ============
+        document.getElementById('generateToken').addEventListener('click', () => {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-';
+            let token = btoa(Math.random().toString(36).substring(2,15)).replace(/=/g, '') + '.';
+            token += btoa(Date.now().toString()).replace(/=/g, '') + '.';
+            let secret = '';
+            for (let i = 0; i < 27; i++) secret += chars[Math.floor(Math.random() * chars.length)];
+            token += secret;
+            document.getElementById('tokenOutput').textContent = token;
+        });
+        document.getElementById('copyToken').addEventListener('click', function() {
+            copyText(document.getElementById('tokenOutput').textContent, this);
+        });
+
+        // ============ BASE64 ============
+        document.getElementById('generateBase64').addEventListener('click', () => {
+            const text = document.getElementById('base64Input').value.trim() || 'texto';
+            const mode = document.getElementById('base64Mode').value;
+            try {
+                const result = mode === 'encode' ? btoa(text) : atob(text);
+                document.getElementById('base64Output').textContent = result;
+            } catch (e) {
+                document.getElementById('base64Output').textContent = 'Erro: texto inválido para decodificação.';
+            }
+        });
+        document.getElementById('copyBase64').addEventListener('click', function() {
+            copyText(document.getElementById('base64Output').textContent, this);
+        });
+
+        // ============ INICIALIZA COM EXEMPLOS ============
+        document.getElementById('generateLorem').click();
+        document.getElementById('generateName').click();
+        document.getElementById('generateSlug').click();
+        document.getElementById('generatePassword').click();
+        document.getElementById('generateUUID').click();
+        document.getElementById('generateHash').click();
+        document.getElementById('generateCPF').click();
+        document.getElementById('generateCNPJ').click();
+        document.getElementById('generateNumber').click();
+        document.getElementById('generateColor').click();
+        document.getElementById('generateToken').click();
+        document.getElementById('generateBase64').click();
+    </script>
+</body>
+                                                                                                          </html>
