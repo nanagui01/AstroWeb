@@ -1,16 +1,15 @@
-// voicefarmer.js — Módulo Voice Farmer completo com seleção de servidor/canal, agendamento, histórico, ping, auto-reconexão
+// voicefarmer.js — Módulo Voice Farmer (versão corrigida)
 
 const VoiceFarmer = (function() {
-    // Estado interno
-    let activeConnection = null; // { ws, guildId, channelId, heartbeatInterval, connectedAt, lastPing, ping }
+    let activeConnection = null;
     let reconnectAttempts = 0;
     const MAX_RECONNECT_ATTEMPTS = 5;
     let reconnectTimeout = null;
-    let autoReconnectEnabled = true; // padrão ativo
+    let autoReconnectEnabled = true;
     let scheduleInterval = null;
-    let pingInterval = null;
+    let lastHeartbeatSent = 0;   // timestamp do último heartbeat enviado
+    let pingValue = 0;
 
-    // Configuração e persistência
     function getConfig() {
         const raw = localStorage.getItem('novaHub_voiceConfig');
         return raw ? JSON.parse(raw) : {};
@@ -28,7 +27,7 @@ const VoiceFarmer = (function() {
 
     function getSchedule() {
         const config = getConfig();
-        return config.schedule || null; // { start: ISO string, end: ISO string, enabled: boolean }
+        return config.schedule || null;
     }
 
     function saveSchedule(schedule) {
@@ -46,7 +45,6 @@ const VoiceFarmer = (function() {
         localStorage.setItem('novaHub_voiceHistory', JSON.stringify(history));
     }
 
-    // Verificar se estamos conectados
     function isConnected() {
         return activeConnection !== null && activeConnection.ws && activeConnection.ws.readyState === WebSocket.OPEN;
     }
@@ -61,10 +59,15 @@ const VoiceFarmer = (function() {
     }
 
     function getPing() {
-        return activeConnection?.ping || null;
+        return isConnected() ? pingValue : null;
     }
 
-    // Parar tudo (desconectar e limpar temporizadores)
+    // Envia heartbeat uma única vez (chamado pelo heartbeatInterval)
+    function sendHeartbeat(ws, sequence) {
+        lastHeartbeatSent = Date.now();
+        ws.send(JSON.stringify({ op: 1, d: sequence ?? null }));
+    }
+
     function fullStop() {
         if (activeConnection) {
             try {
@@ -75,7 +78,6 @@ const VoiceFarmer = (function() {
                 }
                 ws.close();
             } catch (e) {}
-            // Salvar tempo no histórico
             if (activeConnection.connectedAt) {
                 const duration = Math.floor((Date.now() - activeConnection.connectedAt) / 1000);
                 addHistoryRecord({
@@ -90,26 +92,22 @@ const VoiceFarmer = (function() {
         }
         if (reconnectTimeout) { clearTimeout(reconnectTimeout); reconnectTimeout = null; }
         if (scheduleInterval) { clearInterval(scheduleInterval); scheduleInterval = null; }
-        if (pingInterval) { clearInterval(pingInterval); pingInterval = null; }
         reconnectAttempts = 0;
+        pingValue = 0;
     }
 
-    // Função principal para iniciar conexão
     async function start(token, guildId, channelId, statusCallback) {
         if (isConnected()) {
-            statusCallback('error', 'Já existe uma conexão ativa. Desconecte primeiro.');
+            statusCallback('error', 'Já existe uma conexão ativa.');
             return;
         }
-
-        // Salvar configuração para possível reconexão
         saveConfig({ lastGuildId: guildId, lastChannelId: channelId, autoReconnect: autoReconnectEnabled });
-
         await connect(token, guildId, channelId, statusCallback);
     }
 
     async function connect(token, guildId, channelId, statusCallback) {
         try {
-            // Verificar canal
+            // Verifica canal
             const channelRes = await fetch(`https://discord.com/api/v10/channels/${channelId}`, {
                 headers: { Authorization: token }
             });
@@ -119,16 +117,15 @@ const VoiceFarmer = (function() {
             }
             const channel = await channelRes.json();
             if (channel.type !== 2 && channel.type !== 13) {
-                statusCallback('error', 'O ID fornecido não é um canal de voz (precisa ser tipo 2 ou 13).');
+                statusCallback('error', 'O ID não é de um canal de voz (tipo 2 ou 13).');
                 return;
             }
 
-            // Gateway
             const gatewayRes = await fetch('https://discord.com/api/v10/gateway', {
                 headers: { Authorization: token }
             });
             if (!gatewayRes.ok) {
-                statusCallback('error', 'Não foi possível obter o gateway.');
+                statusCallback('error', 'Não foi possível obter gateway.');
                 return;
             }
             const gatewayData = await gatewayRes.json();
@@ -137,98 +134,85 @@ const VoiceFarmer = (function() {
             const ws = new WebSocket(gatewayUrl);
             let heartbeatInterval;
             let sequence = null;
-            let lastPingSent = Date.now();
-            let pingValue = 0;
-
-            // Ping monitor
-            function monitorPing() {
-                if (!ws || ws.readyState !== WebSocket.OPEN) return;
-                lastPingSent = Date.now();
-                ws.send(JSON.stringify({ op: 1, d: sequence }));
-            }
+            let resolved = false; // para garantir que o ready só processe uma vez
 
             ws.onopen = () => {
                 statusCallback('log', 'WebSocket conectado, identificando...');
-                // Iniciar monitoramento de ping
-                pingInterval = setInterval(monitorPing, 5000);
-                monitorPing();
             };
 
             ws.onmessage = (event) => {
                 const payload = JSON.parse(event.data);
                 const { op, d, s, t } = payload;
-                if (s) sequence = s;
+                if (s !== undefined) sequence = s;
 
-                if (op === 10) {
-                    const { heartbeat_interval } = d;
-                    ws.send(JSON.stringify({
-                        op: 2,
-                        d: {
-                            token: token,
-                            properties: {
-                                '$os': 'linux',
-                                '$browser': 'Discord Client',
-                                '$device': 'discord.js'
+                switch (op) {
+                    case 10: { // Hello
+                        const { heartbeat_interval } = d;
+                        // Identificar
+                        ws.send(JSON.stringify({
+                            op: 2,
+                            d: {
+                                token: token,
+                                properties: {
+                                    '$os': 'linux',
+                                    '$browser': 'Discord Client',
+                                    '$device': 'discord.js'
+                                }
+                            }
+                        }));
+                        // Inicia heartbeat com intervalo sugerido
+                        heartbeatInterval = setInterval(() => sendHeartbeat(ws, sequence), heartbeat_interval);
+                        break;
+                    }
+                    case 11: // Heartbeat ACK – calcula ping
+                        pingValue = Date.now() - lastHeartbeatSent;
+                        break;
+                    case 0: // Dispatch
+                        if (t === 'READY' && !resolved) {
+                            resolved = true;
+                            ws.send(JSON.stringify({
+                                op: 4,
+                                d: {
+                                    guild_id: guildId,
+                                    channel_id: channelId,
+                                    self_mute: false,
+                                    self_deaf: false
+                                }
+                            }));
+                            activeConnection = {
+                                ws,
+                                guildId,
+                                channelId,
+                                heartbeatInterval,
+                                connectedAt: Date.now()
+                            };
+                            statusCallback('connected', `Conectado ao canal <#${channelId}>`);
+                            reconnectAttempts = 0;
+                        } else if (t === 'VOICE_STATE_UPDATE') {
+                            const userId = getUserIdFromToken(token);
+                            // Só age se for o nosso usuário e o canal for null (significa que saiu)
+                            if (d.user_id === userId && d.channel_id === null && isConnected()) {
+                                statusCallback('log', 'Você saiu do canal.');
+                                fullStop();
+                                if (statusCallback.onStop) statusCallback.onStop();
+                                if (autoReconnectEnabled && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                                    statusCallback('log', `Tentando reconectar em 5s (${reconnectAttempts + 1}/${MAX_RECONNECT_ATTEMPTS})...`);
+                                    reconnectAttempts++;
+                                    reconnectTimeout = setTimeout(() => connect(token, guildId, channelId, statusCallback), 5000);
+                                }
                             }
                         }
-                    }));
-                    heartbeatInterval = setInterval(() => {
-                        ws.send(JSON.stringify({ op: 1, d: sequence }));
-                    }, heartbeat_interval);
-                }
-
-                if (op === 11) {
-                    // Heartbeat ACK → calcular ping
-                    pingValue = Date.now() - lastPingSent;
-                    if (activeConnection) activeConnection.ping = pingValue;
-                }
-
-                if (t === 'READY') {
-                    ws.send(JSON.stringify({
-                        op: 4,
-                        d: {
-                            guild_id: guildId,
-                            channel_id: channelId,
-                            self_mute: false,
-                            self_deaf: false
-                        }
-                    }));
-                    activeConnection = {
-                        ws,
-                        guildId,
-                        channelId,
-                        heartbeatInterval,
-                        connectedAt: Date.now(),
-                        ping: 0
-                    };
-                    statusCallback('connected', `Conectado ao canal <#${channelId}>`);
-                    reconnectAttempts = 0;
-                }
-
-                if (t === 'VOICE_STATE_UPDATE') {
-                    // Se o próprio usuário saiu do canal, tentar reconectar se autoReconnect ativo
-                    const userId = getUserIdFromToken(token);
-                    if (d.user_id === userId && d.channel_id === null) {
-                        if (autoReconnectEnabled && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                            statusCallback('log', `Conexão perdida. Tentando reconectar (${reconnectAttempts + 1}/${MAX_RECONNECT_ATTEMPTS})...`);
-                            fullStop(); // limpa conexão atual, mas mantém schedule e histórico
-                            reconnectAttempts++;
-                            reconnectTimeout = setTimeout(() => {
-                                connect(token, guildId, channelId, statusCallback);
-                            }, 5000);
-                        } else {
-                            statusCallback('disconnected', 'Desconectado do canal (não será reconectado).');
-                            fullStop();
-                            if (statusCallback.onStop) statusCallback.onStop();
-                        }
-                    }
+                        break;
                 }
             };
 
             ws.onclose = () => {
                 if (heartbeatInterval) clearInterval(heartbeatInterval);
-                if (pingInterval) clearInterval(pingInterval);
-                // A reconexão é tratada no VOICE_STATE_UPDATE
+                if (isConnected()) {
+                    statusCallback('log', 'Conexão fechada pelo servidor.');
+                    fullStop();
+                    if (statusCallback.onStop) statusCallback.onStop();
+                }
             };
 
             ws.onerror = (error) => {
@@ -250,7 +234,6 @@ const VoiceFarmer = (function() {
         return true;
     }
 
-    // Auto-reconexão toggle
     function setAutoReconnect(enabled) {
         autoReconnectEnabled = enabled;
         saveConfig({ autoReconnect: enabled });
@@ -260,7 +243,6 @@ const VoiceFarmer = (function() {
         return autoReconnectEnabled;
     }
 
-    // Agendamento
     function checkSchedule(token, statusCallback) {
         const schedule = getSchedule();
         if (!schedule || !schedule.enabled) return;
@@ -269,11 +251,9 @@ const VoiceFarmer = (function() {
         const end = new Date(schedule.end);
         if (now >= start && now <= end && !isConnected()) {
             const config = getConfig();
-            const guildId = config.lastGuildId;
-            const channelId = config.lastChannelId;
-            if (guildId && channelId) {
+            if (config.lastGuildId && config.lastChannelId) {
                 statusCallback('log', 'Iniciando agendamento automático...');
-                start(token, guildId, channelId, statusCallback);
+                start(token, config.lastGuildId, config.lastChannelId, statusCallback);
             }
         } else if (now > end && isConnected()) {
             statusCallback('log', 'Encerrando agendamento automático...');
@@ -283,9 +263,8 @@ const VoiceFarmer = (function() {
 
     function enableSchedule(startISO, endISO, token, statusCallback) {
         saveSchedule({ start: startISO, end: endISO, enabled: true });
-        // Configurar verificação periódica
         if (scheduleInterval) clearInterval(scheduleInterval);
-        scheduleInterval = setInterval(() => checkSchedule(token, statusCallback), 30000); // verifica a cada 30s
+        scheduleInterval = setInterval(() => checkSchedule(token, statusCallback), 30000);
     }
 
     function disableSchedule() {
@@ -293,7 +272,6 @@ const VoiceFarmer = (function() {
         if (scheduleInterval) { clearInterval(scheduleInterval); scheduleInterval = null; }
     }
 
-    // Obter ID do token (base64 decode)
     function getUserIdFromToken(token) {
         try {
             const encoded = token.split('.')[0];
