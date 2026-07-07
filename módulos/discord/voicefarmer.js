@@ -1,4 +1,4 @@
-// voicefarmer.js — Módulo Voice Farmer (versão corrigida)
+// voicefarmer.js — Módulo Voice Farmer (corrigido com intents e logs)
 
 const VoiceFarmer = (function() {
     let activeConnection = null;
@@ -7,8 +7,9 @@ const VoiceFarmer = (function() {
     let reconnectTimeout = null;
     let autoReconnectEnabled = true;
     let scheduleInterval = null;
-    let lastHeartbeatSent = 0;   // timestamp do último heartbeat enviado
+    let lastHeartbeatSent = 0;
     let pingValue = 0;
+    let sequence = null;
 
     function getConfig() {
         const raw = localStorage.getItem('novaHub_voiceConfig');
@@ -62,12 +63,6 @@ const VoiceFarmer = (function() {
         return isConnected() ? pingValue : null;
     }
 
-    // Envia heartbeat uma única vez (chamado pelo heartbeatInterval)
-    function sendHeartbeat(ws, sequence) {
-        lastHeartbeatSent = Date.now();
-        ws.send(JSON.stringify({ op: 1, d: sequence ?? null }));
-    }
-
     function fullStop() {
         if (activeConnection) {
             try {
@@ -94,6 +89,7 @@ const VoiceFarmer = (function() {
         if (scheduleInterval) { clearInterval(scheduleInterval); scheduleInterval = null; }
         reconnectAttempts = 0;
         pingValue = 0;
+        sequence = null;
     }
 
     async function start(token, guildId, channelId, statusCallback) {
@@ -133,8 +129,7 @@ const VoiceFarmer = (function() {
 
             const ws = new WebSocket(gatewayUrl);
             let heartbeatInterval;
-            let sequence = null;
-            let resolved = false; // para garantir que o ready só processe uma vez
+            let resolved = false;
 
             ws.onopen = () => {
                 statusCallback('log', 'WebSocket conectado, identificando...');
@@ -148,28 +143,58 @@ const VoiceFarmer = (function() {
                 switch (op) {
                     case 10: { // Hello
                         const { heartbeat_interval } = d;
-                        // Identificar
+                        // Identificar com intents
                         ws.send(JSON.stringify({
                             op: 2,
                             d: {
                                 token: token,
+                                capabilities: 8189, // Necessário para voice
                                 properties: {
                                     '$os': 'linux',
                                     '$browser': 'Discord Client',
                                     '$device': 'discord.js'
+                                },
+                                presence: {
+                                    status: 'online',
+                                    since: null,
+                                    activities: [],
+                                    afk: false
+                                },
+                                compress: false,
+                                client_state: {
+                                    guild_hashes: {},
+                                    highest_last_message_id: '0',
+                                    read_state_version: 0,
+                                    user_guild_settings_version: -1,
+                                    user_settings_version: -1
                                 }
                             }
                         }));
-                        // Inicia heartbeat com intervalo sugerido
-                        heartbeatInterval = setInterval(() => sendHeartbeat(ws, sequence), heartbeat_interval);
+                        heartbeatInterval = setInterval(() => {
+                            if (ws.readyState === WebSocket.OPEN) {
+                                lastHeartbeatSent = Date.now();
+                                ws.send(JSON.stringify({ op: 1, d: sequence }));
+                            }
+                        }, heartbeat_interval);
+                        statusCallback('log', `Identificado com intents. Heartbeat a cada ${heartbeat_interval}ms`);
                         break;
                     }
-                    case 11: // Heartbeat ACK – calcula ping
+                    case 11: // Heartbeat ACK
                         pingValue = Date.now() - lastHeartbeatSent;
+                        break;
+                    case 9: // Invalid Session
+                        statusCallback('error', 'Sessão inválida. Tentando reconectar...');
+                        fullStop();
+                        if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                            reconnectAttempts++;
+                            setTimeout(() => connect(token, guildId, channelId, statusCallback), 5000);
+                        }
                         break;
                     case 0: // Dispatch
                         if (t === 'READY' && !resolved) {
                             resolved = true;
+                            statusCallback('log', `Pronto como ${d.user.username}#${d.user.discriminator}`);
+                            // Conectar ao canal de voz
                             ws.send(JSON.stringify({
                                 op: 4,
                                 d: {
@@ -190,7 +215,6 @@ const VoiceFarmer = (function() {
                             reconnectAttempts = 0;
                         } else if (t === 'VOICE_STATE_UPDATE') {
                             const userId = getUserIdFromToken(token);
-                            // Só age se for o nosso usuário e o canal for null (significa que saiu)
                             if (d.user_id === userId && d.channel_id === null && isConnected()) {
                                 statusCallback('log', 'Você saiu do canal.');
                                 fullStop();
@@ -206,10 +230,10 @@ const VoiceFarmer = (function() {
                 }
             };
 
-            ws.onclose = () => {
+            ws.onclose = (event) => {
+                statusCallback('log', `WebSocket fechado (código ${event.code}).`);
                 if (heartbeatInterval) clearInterval(heartbeatInterval);
                 if (isConnected()) {
-                    statusCallback('log', 'Conexão fechada pelo servidor.');
                     fullStop();
                     if (statusCallback.onStop) statusCallback.onStop();
                 }
