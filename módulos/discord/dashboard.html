@@ -169,7 +169,6 @@
         .activity-list li { display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.8rem; color:var(--text-secondary); }
         canvas { width:100%; height:150px; }
 
-        /* Server selection */
         .server-selection-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; }
         .server-picker {
             background:var(--card); backdrop-filter:blur(14px);
@@ -203,19 +202,9 @@
             border:1px solid var(--border); border-radius:8px; color:#fff; font-size:0.85rem;
         }
 
-        .btn-primary {
-            background:var(--gradient-brand); border:none; padding:0.6rem 1.3rem;
-            border-radius:20px; color:#fff; font-weight:600; cursor:pointer;
-            margin-right:0.5rem;
-        }
-        .btn-secondary {
-            background:transparent; border:1px solid var(--border);
-            padding:0.6rem 1.3rem; border-radius:20px; color:var(--text); cursor:pointer;
-        }
-        .btn-danger {
-            background:#ef4444; border:none; padding:0.6rem 1.3rem;
-            border-radius:20px; color:#fff; font-weight:600; cursor:pointer;
-        }
+        .btn-primary { background:var(--gradient-brand); border:none; padding:0.6rem 1.3rem; border-radius:20px; color:#fff; font-weight:600; cursor:pointer; margin-right:0.5rem; }
+        .btn-secondary { background:transparent; border:1px solid var(--border); padding:0.6rem 1.3rem; border-radius:20px; color:var(--text); cursor:pointer; }
+        .btn-danger { background:#ef4444; border:none; padding:0.6rem 1.3rem; border-radius:20px; color:#fff; font-weight:600; cursor:pointer; }
         .progress-log {
             margin-top:1rem; background:rgba(0,0,0,0.3); border-radius:10px;
             padding:0.7rem; max-height:180px; overflow-y:auto; font-size:0.75rem;
@@ -249,6 +238,29 @@
         .voice-status.connected { background:rgba(16,185,129,0.15); border:1px solid var(--green); color:var(--green); }
         .voice-status.disconnected { background:rgba(255,255,255,0.03); border:1px solid var(--border); color:var(--text-muted); }
         .voice-status.error { background:rgba(239,68,68,0.15); border:1px solid #ef4444; color:#ef4444; }
+
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .modal-confirm {
+            background: var(--card); backdrop-filter: blur(24px);
+            border: 1px solid var(--border); border-radius: var(--radius-xl);
+            padding: 2rem; text-align: center; max-width: 350px;
+        }
+        .schedule-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .schedule-row input[type="datetime-local"] {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 8px; color: #fff; padding: 0.5rem; font-size: 0.85rem;
+        }
+        .history-list { max-height: 200px; overflow-y: auto; }
+        .history-list .history-item { padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.8rem; color:var(--text-secondary); }
+        .ping-indicator { font-size:0.8rem; display:flex; align-items:center; gap:0.3rem; }
+        .ping-dot { width:6px; height:6px; border-radius:50%; }
+        .ping-good { background:#10b981; }
+        .ping-medium { background:#f59e0b; }
+        .ping-bad { background:#ef4444; }
 
         @media (max-width:1024px) { .section-row { grid-template-columns:1fr; } .stats-row { grid-template-columns:repeat(3, 1fr); } .server-selection-grid { grid-template-columns:1fr; } }
         @media (max-width:768px) {
@@ -289,14 +301,15 @@
         </div>
     </aside>
 
-    <!-- Main -->
+    <!-- Main Content -->
     <div class="main-content">
         <div class="content" id="mainView">
-            <!-- LOGIN -->
+            <!-- LOGIN VIEW -->
             <div id="loginView">
                 <div style="max-width:400px; margin:3rem auto; text-align:center;">
                     <div class="logo-circle" style="margin:0 auto 1rem; width:56px; height:56px; font-size:1.5rem;"><i class="fa-brands fa-discord"></i></div>
                     <h2>Autenticação</h2>
+                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Conecte sua conta Discord</p>
                     <input type="password" id="tokenInput" placeholder="Token" style="width:100%; padding:0.7rem; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; color:#fff; margin-bottom:0.8rem;">
                     <input type="password" id="keyInput" placeholder="Key" style="width:100%; padding:0.7rem; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; color:#fff; margin-bottom:1rem;">
                     <button id="loginBtn" class="btn-primary" style="width:100%;">Entrar</button>
@@ -304,7 +317,7 @@
                 </div>
             </div>
 
-            <!-- DASHBOARD -->
+            <!-- DASHBOARD VIEW -->
             <div id="dashboardView" style="display:none;">
                 <div class="top-bar"><h1>Dashboard</h1><div class="top-actions"><div class="status-online"><span class="dot"></span> Online</div><div class="window-btns"><span class="min"></span><span class="max"></span><span class="close"></span></div></div></div>
                 <div id="skeletonLoader">
@@ -328,7 +341,7 @@
                         <div class="stat-card"><div class="stat-icon"><i class="fa-regular fa-calendar"></i></div><div class="stat-title">Conta criada</div><div class="stat-value" id="statCreated">—</div></div>
                     </div>
                     <div class="section-row">
-                        <div class="graph-panel"><h4>Atividade</h4><canvas id="activityChart"></canvas></div>
+                        <div class="graph-panel"><h4>Atividade (7 dias)</h4><canvas id="activityChart"></canvas></div>
                         <div class="activity-panel"><h4>Atividades Recentes</h4><ul class="activity-list" id="recentActivityList"><li style="color:var(--text-muted);">Nenhuma atividade.</li></ul></div>
                     </div>
                     <button id="refreshDataBtn" class="btn-secondary" style="margin-top:1rem;">Atualizar</button>
@@ -361,20 +374,44 @@
                 <div class="top-bar"><h1>Voice Farmer</h1></div>
                 <div id="voiceLoginNotice" style="display:none; color:#ef4444;">Faça login para usar o Voice Farmer.</div>
                 <div id="voiceForm" style="display:none;">
-                    <div class="voice-status disconnected" id="voiceStatus">
-                        <i class="fa-solid fa-circle"></i> Desconectado
+                    <div class="voice-status disconnected" id="voiceStatus"><i class="fa-solid fa-circle"></i> Desconectado</div>
+
+                    <div class="server-selection-grid" style="margin-bottom:1rem;">
+                        <div class="server-picker"><h4>Servidor</h4><div class="server-list-container" id="voiceServerList"></div></div>
+                        <div class="server-picker"><h4>Canal de Voz</h4><div class="server-list-container" id="voiceChannelList"><p style="padding:0.5rem;color:var(--text-muted);">Selecione um servidor primeiro</p></div></div>
                     </div>
-                    <div class="voice-panel">
-                        <div class="form-group"><label>ID do Servidor</label><input type="text" id="voiceGuildId" placeholder="ID do servidor"></div>
-                        <div class="form-group"><label>ID do Canal de Voz</label><input type="text" id="voiceChannelId" placeholder="ID do canal de voz"></div>
-                        <button class="btn-primary" id="startVoiceBtn"><i class="fa-solid fa-play"></i> Iniciar</button>
-                        <button class="btn-danger" id="stopVoiceBtn" style="display:none;"><i class="fa-solid fa-stop"></i> Parar</button>
+
+                    <div class="cloner-options" style="margin-bottom:1rem;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>Auto-reconexão</span>
+                            <label style="cursor:pointer;"><input type="checkbox" id="autoReconnectCheck" checked> Ativada</label>
+                        </div>
+                        <div class="ping-indicator" id="pingDisplay" style="margin-top:0.5rem; display:none;">
+                            Ping: <span id="pingValue">—</span> ms <span class="ping-dot" id="pingDot"></span>
+                        </div>
                     </div>
-                    <div class="progress-log" id="voiceLog" style="display:none;"></div>
+
+                    <div style="display:flex; gap:0.5rem;">
+                        <button class="btn-primary" id="startVoiceBtn"><i class="fa-solid fa-play"></i> Conectar</button>
+                        <button class="btn-danger" id="stopVoiceBtn" style="display:none;"><i class="fa-solid fa-stop"></i> Desconectar</button>
+                    </div>
+
+                    <div class="cloner-options" style="margin-top:1rem;">
+                        <h4 style="color:var(--text-muted); margin-bottom:0.5rem;">Agendamento</h4>
+                        <div class="schedule-row">
+                            <input type="datetime-local" id="scheduleStart"><span>até</span><input type="datetime-local" id="scheduleEnd">
+                            <button class="btn-secondary" id="enableScheduleBtn">Agendar</button>
+                            <button class="btn-secondary" id="disableScheduleBtn" style="display:none;">Cancelar</button>
+                        </div>
+                        <small id="scheduleInfo" style="color:var(--text-muted);"></small>
+                    </div>
+
+                    <div class="progress-log" id="voiceLog" style="display:none; margin-top:1rem;"></div>
+                    <div style="margin-top:1rem;"><h4 style="color:var(--text-muted);">Histórico de Sessões</h4><div class="history-list" id="historyList">Nenhum registro.</div></div>
                 </div>
             </div>
 
-            <!-- THEMES -->
+            <!-- THEMES VIEW -->
             <div id="themesView" style="display:none;">
                 <div class="top-bar"><h1>Personalizar Tema</h1></div>
                 <div style="display:flex; gap:1rem; flex-wrap:wrap;">
@@ -387,6 +424,26 @@
         </div>
     </div>
 
+    <!-- Disconnect confirmation modal -->
+    <div class="modal-overlay" id="disconnectModal">
+        <div class="modal-confirm">
+            <h3>Tem certeza?</h3>
+            <p style="color:var(--text-muted); margin:1rem 0;">Deseja realmente desconectar do canal de voz?</p>
+            <button class="btn-primary" id="confirmDisconnect">Sim, desconectar</button>
+            <button class="btn-secondary" id="cancelDisconnect">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Logout confirmation modal -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-confirm">
+            <h3>Tem certeza?</h3>
+            <p style="color:var(--text-muted); margin:1rem 0;">Sua sessão será encerrada.</p>
+            <button class="btn-primary" id="confirmLogout">Sim, sair</button>
+            <button class="btn-secondary" id="cancelLogout">Cancelar</button>
+        </div>
+    </div>
+
     <script src="clonerserver.js"></script>
     <script src="voicefarmer.js"></script>
     <script>
@@ -395,6 +452,8 @@
             const VALID_KEY = 'void';
             let token = '', userData = null, allGuilds = [];
             let selectedOrigemId = null, selectedDestinoId = null;
+            let selectedVoiceGuildId = null;
+            let voiceChannelsCache = {};
 
             const toast = document.getElementById('toast');
             const skeletonLoader = document.getElementById('skeletonLoader');
@@ -413,7 +472,8 @@
                 else if (v === 'voicefarmer') document.getElementById('voicefarmerView').style.display = 'block';
                 else if (v === 'themes') document.getElementById('themesView').style.display = 'block';
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                document.querySelector(`.nav-item[data-view="${v}"]`)?.classList.add('active');
+                const navItem = document.querySelector(`.nav-item[data-view="${v}"]`);
+                if (navItem) navItem.classList.add('active');
                 sidebar.classList.remove('open');
             }
 
@@ -440,6 +500,7 @@
                     await loadDashboardData();
                     skeletonLoader.style.display = 'none'; realContent.style.display = 'block';
                     showToast('Conectado!', 'success');
+                    addActivity('Login efetuado');
                 } catch (e) { showToast('Falha na autenticação.', 'error'); }
             });
 
@@ -534,13 +595,19 @@
                 showToast('Atualizado!', 'success');
             });
 
-            document.getElementById('logoutBtn').addEventListener('click', () => {
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', () => document.getElementById('logoutModal').style.display = 'flex');
+            document.getElementById('confirmLogout').addEventListener('click', () => {
                 token = ''; userData = null;
-                document.getElementById('loginView').style.display = 'block';
-                document.getElementById('dashboardView').style.display = 'none';
+                showView('loginView');
                 document.getElementById('sidebarName').textContent = 'Conecte-se';
                 document.getElementById('sidebarStatus').textContent = 'Desconectado';
+                document.getElementById('sidebarAvatar').style.backgroundImage = '';
+                document.getElementById('logoutModal').style.display = 'none';
+                showToast('Desconectado.');
             });
+            document.getElementById('cancelLogout').addEventListener('click', () => document.getElementById('logoutModal').style.display = 'none');
+            document.getElementById('logoutModal').addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
 
             // Themes
             document.querySelectorAll('.theme-option').forEach(btn => btn.addEventListener('click', () => {
@@ -552,11 +619,11 @@
             const savedTheme = localStorage.getItem('novaHub_theme');
             if (savedTheme) document.body.dataset.theme = savedTheme;
 
-            // ===== CLONER SERVER (usando módulo externo) =====
+            // ===== CLONER SERVER =====
             function populateClonerLists() {
                 if (!allGuilds.length) return;
                 const html = allGuilds.map(g => `
-                    <div class="server-item" data-id="${g.id}" data-name="${g.name}">
+                    <div class="server-item" data-id="${g.id}">
                         <img src="${g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=64` : ''}" onerror="this.style.display='none'">
                         <span class="server-name">${g.name}</span>
                         <span class="member-count">~${g.approximate_member_count || '?'}</span>
@@ -581,11 +648,14 @@
                     document.getElementById('clonerForm').style.display = 'block';
                     populateClonerLists();
                 } else if (token) {
-                    document.getElementById('clonerLoginNotice').style.display = 'none';
-                    document.getElementById('clonerForm').style.display = 'block';
                     fetch(`${API}/users/@me/guilds`, { headers: { Authorization: token } }).then(r => r.json()).then(guilds => {
                         allGuilds = guilds;
+                        document.getElementById('clonerLoginNotice').style.display = 'none';
+                        document.getElementById('clonerForm').style.display = 'block';
                         populateClonerLists();
+                    }).catch(() => {
+                        document.getElementById('clonerLoginNotice').style.display = 'block';
+                        document.getElementById('clonerForm').style.display = 'none';
                     });
                 } else {
                     document.getElementById('clonerLoginNotice').style.display = 'block';
@@ -599,8 +669,7 @@
                 const tipo = document.getElementById('tipoClonagem').value;
                 const excluir = document.getElementById('excluirExistentes').value === 'sim';
                 const log = document.getElementById('clonerLog');
-                log.style.display = 'block';
-                log.textContent = 'Iniciando...\n';
+                log.style.display = 'block'; log.textContent = 'Iniciando...\n';
                 const abortController = ClonerServer.createAbortController();
                 document.getElementById('stopClonerBtn').style.display = 'inline-block';
                 try {
@@ -628,11 +697,188 @@
             }
             renderClonerHistory();
 
-            // ===== VOICE FARMER (usando módulo externo) =====
+            // ===== VOICE FARMER =====
+            function populateVoiceServerList() {
+                if (!allGuilds.length) return;
+                const list = document.getElementById('voiceServerList');
+                list.innerHTML = allGuilds.map(g => `
+                    <div class="server-item" data-id="${g.id}">
+                        <img src="${g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=64` : ''}" onerror="this.style.display='none'">
+                        <span class="server-name">${g.name}</span>
+                    </div>`).join('');
+                list.querySelectorAll('.server-item').forEach(el => el.addEventListener('click', () => {
+                    list.querySelectorAll('.server-item').forEach(e => e.classList.remove('selected'));
+                    el.classList.add('selected');
+                    selectedVoiceGuildId = el.dataset.id;
+                    loadVoiceChannels(selectedVoiceGuildId);
+                }));
+            }
+
+            async function loadVoiceChannels(guildId) {
+                const list = document.getElementById('voiceChannelList');
+                list.innerHTML = '<p style="padding:0.5rem;color:var(--text-muted);">Carregando canais...</p>';
+                if (!token) return;
+                try {
+                    const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+                        headers: { Authorization: token }
+                    });
+                    if (!res.ok) throw new Error('Erro');
+                    const channels = await res.json();
+                    const voiceChannels = channels.filter(c => c.type === 2 || c.type === 13);
+                    voiceChannelsCache[guildId] = voiceChannels;
+                    list.innerHTML = voiceChannels.map(c => `
+                        <div class="server-item" data-id="${c.id}" data-type="${c.type === 13 ? 'Stage' : 'Voz'}">
+                            <i class="fa-solid ${c.type === 13 ? 'fa-microphone-lines' : 'fa-volume-high'}" style="width:32px;text-align:center;color:var(--accent-light);"></i>
+                            <span class="server-name">${c.name}</span>
+                            <span class="member-count">${c.type === 13 ? 'Stage' : 'Voz'}</span>
+                        </div>`).join('');
+                    list.querySelectorAll('.server-item').forEach(el => el.addEventListener('click', () => {
+                        list.querySelectorAll('.server-item').forEach(e => e.classList.remove('selected'));
+                        el.classList.add('selected');
+                        document.getElementById('startVoiceBtn').dataset.channelId = el.dataset.id;
+                        document.getElementById('startVoiceBtn').dataset.guildId = guildId;
+                    }));
+                } catch (e) {
+                    list.innerHTML = '<p style="padding:0.5rem;color:#ef4444;">Erro ao carregar canais.</p>';
+                }
+            }
+
+            function updateVoiceUI() {
+                const statusEl = document.getElementById('voiceStatus');
+                const startBtn = document.getElementById('startVoiceBtn');
+                const stopBtn = document.getElementById('stopVoiceBtn');
+                const log = document.getElementById('voiceLog');
+                const pingDisplay = document.getElementById('pingDisplay');
+                const pingValue = document.getElementById('pingValue');
+                const pingDot = document.getElementById('pingDot');
+                const autoReconnectCheck = document.getElementById('autoReconnectCheck');
+                const scheduleInfo = document.getElementById('scheduleInfo');
+
+                autoReconnectCheck.checked = VoiceFarmer.isAutoReconnectEnabled();
+
+                if (VoiceFarmer.isConnected()) {
+                    statusEl.className = 'voice-status connected';
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle" style="animation: pulse 1s infinite;"></i> Conectado (' + VoiceFarmer.getConnectionTime() + ')';
+                    startBtn.style.display = 'none';
+                    stopBtn.style.display = 'inline-block';
+                    log.style.display = 'block';
+                    const ping = VoiceFarmer.getPing();
+                    if (ping !== null) {
+                        pingDisplay.style.display = 'flex';
+                        pingValue.textContent = ping;
+                        pingDot.className = 'ping-dot ' + (ping < 100 ? 'ping-good' : ping < 300 ? 'ping-medium' : 'ping-bad');
+                    }
+                } else {
+                    statusEl.className = 'voice-status disconnected';
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> Desconectado';
+                    startBtn.style.display = 'inline-block';
+                    stopBtn.style.display = 'none';
+                    log.style.display = 'none';
+                    pingDisplay.style.display = 'none';
+                }
+
+                const schedule = VoiceFarmer.getSchedule();
+                if (schedule && schedule.enabled) {
+                    scheduleInfo.textContent = `Agendado de ${new Date(schedule.start).toLocaleString()} até ${new Date(schedule.end).toLocaleString()}`;
+                    document.getElementById('enableScheduleBtn').style.display = 'none';
+                    document.getElementById('disableScheduleBtn').style.display = 'inline-block';
+                } else {
+                    scheduleInfo.textContent = '';
+                    document.getElementById('enableScheduleBtn').style.display = 'inline-block';
+                    document.getElementById('disableScheduleBtn').style.display = 'none';
+                }
+
+                renderHistory();
+            }
+
+            function renderHistory() {
+                const history = VoiceFarmer.getHistory();
+                const list = document.getElementById('historyList');
+                if (!history.length) {
+                    list.innerHTML = '<p style="color:var(--text-muted);">Nenhum registro.</p>';
+                    return;
+                }
+                list.innerHTML = history.slice(0, 10).map(h => {
+                    const duration = h.durationSeconds ? `${Math.floor(h.durationSeconds/60)}m ${h.durationSeconds%60}s` : '?';
+                    return `<div class="history-item">${new Date(h.startTime).toLocaleString()} — ${duration}</div>`;
+                }).join('');
+            }
+
+            document.getElementById('startVoiceBtn').addEventListener('click', async () => {
+                if (!token) return showToast('Faça login.', 'error');
+                const btn = document.getElementById('startVoiceBtn');
+                const guildId = btn.dataset.guildId;
+                const channelId = btn.dataset.channelId;
+                if (!guildId || !channelId) return showToast('Selecione um servidor e um canal de voz.', 'error');
+
+                const log = document.getElementById('voiceLog');
+                log.style.display = 'block';
+                log.textContent = 'Conectando...\n';
+
+                function statusCallback(type, msg) {
+                    log.textContent += `[${type}] ${msg}\n`;
+                    log.scrollTop = log.scrollHeight;
+                    updateVoiceUI();
+                    if (type === 'connected') addActivity('Voice Farmer conectado');
+                    else if (type === 'disconnected') addActivity('Voice Farmer desconectado');
+                }
+                statusCallback.onStop = () => updateVoiceUI();
+
+                await VoiceFarmer.start(token, guildId, channelId, statusCallback);
+                updateVoiceUI();
+            });
+
+            document.getElementById('stopVoiceBtn').addEventListener('click', () => document.getElementById('disconnectModal').style.display = 'flex');
+
+            document.getElementById('confirmDisconnect').addEventListener('click', () => {
+                const log = document.getElementById('voiceLog');
+                VoiceFarmer.stop((type, msg) => {
+                    if (log) {
+                        log.textContent += `[${type}] ${msg}\n`;
+                        log.scrollTop = log.scrollHeight;
+                    }
+                });
+                document.getElementById('disconnectModal').style.display = 'none';
+                updateVoiceUI();
+                addActivity('Voice Farmer desligado');
+            });
+
+            document.getElementById('cancelDisconnect').addEventListener('click', () => document.getElementById('disconnectModal').style.display = 'none');
+
+            document.getElementById('autoReconnectCheck').addEventListener('change', function() {
+                VoiceFarmer.setAutoReconnect(this.checked);
+                showToast(`Auto-reconexão ${this.checked ? 'ativada' : 'desativada'}.`);
+            });
+
+            document.getElementById('enableScheduleBtn').addEventListener('click', () => {
+                const start = document.getElementById('scheduleStart').value;
+                const end = document.getElementById('scheduleEnd').value;
+                if (!start || !end) return showToast('Defina início e fim.', 'error');
+                if (new Date(start) >= new Date(end)) return showToast('Início deve ser antes do fim.', 'error');
+                VoiceFarmer.enableSchedule(start, end, token, (type, msg) => {
+                    const log = document.getElementById('voiceLog');
+                    if (log) {
+                        log.textContent += `[agendamento] ${msg}\n`;
+                        log.scrollTop = log.scrollHeight;
+                    }
+                    updateVoiceUI();
+                });
+                showToast('Agendamento ativado!', 'success');
+                updateVoiceUI();
+                addActivity('Agendamento Voice Farmer configurado');
+            });
+
+            document.getElementById('disableScheduleBtn').addEventListener('click', () => {
+                VoiceFarmer.disableSchedule();
+                showToast('Agendamento cancelado.');
+                updateVoiceUI();
+            });
+
             document.querySelector('.nav-item[data-view="voicefarmer"]').addEventListener('click', () => {
                 if (token) {
                     document.getElementById('voiceLoginNotice').style.display = 'none';
                     document.getElementById('voiceForm').style.display = 'block';
+                    if (allGuilds.length > 0) populateVoiceServerList();
                     updateVoiceUI();
                 } else {
                     document.getElementById('voiceLoginNotice').style.display = 'block';
@@ -640,63 +886,27 @@
                 }
             });
 
-            function updateVoiceUI() {
-                const statusEl = document.getElementById('voiceStatus');
-                const startBtn = document.getElementById('startVoiceBtn');
-                const stopBtn = document.getElementById('stopVoiceBtn');
-                const log = document.getElementById('voiceLog');
-
-                if (VoiceFarmer.isConnected()) {
-                    statusEl.className = 'voice-status connected';
-                    statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> Conectado (' + VoiceFarmer.getConnectionTime() + ')';
-                    startBtn.style.display = 'none';
-                    stopBtn.style.display = 'inline-block';
-                    log.style.display = 'block';
-                } else {
-                    statusEl.className = 'voice-status disconnected';
-                    statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> Desconectado';
-                    startBtn.style.display = 'inline-block';
-                    stopBtn.style.display = 'none';
+            // Atalho Ctrl+Shift+V
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.shiftKey && e.key === 'V') {
+                    e.preventDefault();
+                    if (VoiceFarmer.isConnected()) {
+                        document.getElementById('stopVoiceBtn').click();
+                    } else {
+                        document.getElementById('startVoiceBtn').click();
+                    }
                 }
-
-                // Restaura configuração salva
-                const config = VoiceFarmer.getConfig();
-                if (config) {
-                    document.getElementById('voiceGuildId').value = config.guildId || '';
-                    document.getElementById('voiceChannelId').value = config.channelId || '';
-                }
-            }
-
-            document.getElementById('startVoiceBtn').addEventListener('click', async () => {
-                if (!token) return showToast('Faça login.', 'error');
-                const guildId = document.getElementById('voiceGuildId').value.trim();
-                const channelId = document.getElementById('voiceChannelId').value.trim();
-                if (!guildId || !channelId) return showToast('Preencha os IDs.', 'error');
-
-                const log = document.getElementById('voiceLog');
-                log.style.display = 'block';
-                log.textContent = 'Conectando...\n';
-
-                VoiceFarmer.saveConfig({ guildId, channelId });
-
-                await VoiceFarmer.start(token, guildId, channelId, (type, msg) => {
-                    log.textContent += `[${type}] ${msg}\n`;
-                    log.scrollTop = log.scrollHeight;
-                    updateVoiceUI();
-                });
             });
 
-            document.getElementById('stopVoiceBtn').addEventListener('click', () => {
-                VoiceFarmer.stop();
-                const log = document.getElementById('voiceLog');
-                log.textContent += '[info] Desconectado manualmente.\n';
-                updateVoiceUI();
-                addActivity('Voice Farmer desligado');
+            // Fechar modais com Esc
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.getElementById('disconnectModal').style.display = 'none';
+                    document.getElementById('logoutModal').style.display = 'none';
+                }
             });
 
             updateVoiceUI();
-
-            document.addEventListener('keydown', e => { if (e.key === 'Escape') sidebar.classList.remove('open'); });
             addActivity('Página carregada');
         })();
     </script>
