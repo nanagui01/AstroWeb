@@ -123,6 +123,11 @@
             font-weight: 600;
             font-size: 0.83rem;
             transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
         }
         .btn:hover { opacity: 0.9; }
         .btn-secondary {
@@ -152,6 +157,35 @@
         }
         .flex-center { display: flex; align-items: center; }
 
+        /* Card de atalho (Nick Generator) */
+        .shortcut-card {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .shortcut-card:hover {
+            border-color: var(--accent-light);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .shortcut-card i {
+            font-size: 2.5rem;
+            color: var(--accent-light);
+            margin-bottom: 0.8rem;
+        }
+        .shortcut-card h3 { margin-bottom: 0.3rem; }
+        .shortcut-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
         @media (max-width: 600px) {
             body { padding: 1rem; }
             .grid { grid-template-columns: 1fr; }
@@ -164,6 +198,19 @@
         <div class="header">
             <h1><i class="fa-solid fa-wand-magic-sparkles"></i> Geradores</h1>
             <p>Ferramentas para gerar dados aleatórios, códigos e identificadores</p>
+        </div>
+
+        <!-- CATEGORIA: DISCORD -->
+        <div class="category">
+            <h2 class="category-title"><i class="fa-brands fa-discord"></i> Discord</h2>
+            <div class="grid">
+                <a href="discord-nicks.html" class="shortcut-card" style="text-decoration:none; color:inherit;">
+                    <i class="fa-brands fa-discord"></i>
+                    <h3>Discord Nick Generator</h3>
+                    <p>Gere nicks disponíveis no Discord com verificação em tempo real.</p>
+                    <span class="btn">Acessar Ferramenta</span>
+                </a>
+            </div>
         </div>
 
         <!-- CATEGORIA: TEXTO E DADOS -->
@@ -336,8 +383,9 @@
         </div>
     </div>
 
+    <!-- Scripts das ferramentas (o mesmo código JS da versão anterior, apenas incluído aqui) -->
     <script>
-        // ============ UTILITÁRIOS ============
+        // Utilitários
         function copyText(text, button) {
             navigator.clipboard.writeText(text).then(() => {
                 const originalHTML = button.innerHTML;
@@ -345,12 +393,11 @@
                 setTimeout(() => button.innerHTML = originalHTML, 1500);
             });
         }
-
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        // ============ LOREM IPSUM ============
+        // Lorem Ipsum
         const loremParagraphs = [
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
@@ -370,7 +417,7 @@
             copyText(document.getElementById('loremOutput').textContent, this);
         });
 
-        // ============ NOME ALEATÓRIO ============
+        // Nome Aleatório
         const namesMale = ['Lucas', 'Gabriel', 'Mateus', 'Rafael', 'Pedro', 'Felipe', 'Bruno', 'André', 'Thiago', 'Marcos'];
         const namesFemale = ['Ana', 'Mariana', 'Juliana', 'Camila', 'Beatriz', 'Amanda', 'Larissa', 'Fernanda', 'Patrícia', 'Carolina'];
         const surnames = ['Silva', 'Santos', 'Oliveira', 'Souza', 'Lima', 'Pereira', 'Costa', 'Almeida', 'Rodrigues', 'Ferreira'];
@@ -387,7 +434,7 @@
             copyText(document.getElementById('nameOutput').textContent, this);
         });
 
-        // ============ SLUG ============
+        // Slug
         document.getElementById('generateSlug').addEventListener('click', () => {
             const text = document.getElementById('slugInput').value.trim() || 'exemplo de texto';
             const slug = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -397,7 +444,7 @@
             copyText(document.getElementById('slugOutput').textContent, this);
         });
 
-        // ============ SENHA ============
+        // Senha
         document.getElementById('generatePassword').addEventListener('click', () => {
             const length = parseInt(document.getElementById('passLength').value) || 16;
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*()-_=+[]{}|;:,.<>?';
@@ -409,7 +456,7 @@
             copyText(document.getElementById('passwordOutput').textContent, this);
         });
 
-        // ============ UUID ============
+        // UUID
         document.getElementById('generateUUID').addEventListener('click', () => {
             const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
                 const r = Math.random() * 16 | 0;
@@ -422,7 +469,7 @@
             copyText(document.getElementById('uuidOutput').textContent, this);
         });
 
-        // ============ HASH ============
+        // Hash
         document.getElementById('generateHash').addEventListener('click', async () => {
             const text = document.getElementById('hashInput').value.trim() || 'texto';
             const type = document.getElementById('hashType').value;
@@ -440,7 +487,7 @@
             copyText(document.getElementById('hashOutput').textContent, this);
         });
 
-        // ============ CPF ============
+        // CPF
         function generateCPF() {
             const n = Array.from({ length: 9 }, () => Math.floor(Math.random() * 10));
             let d1 = 0, d2 = 0;
@@ -459,10 +506,10 @@
             copyText(document.getElementById('cpfOutput').textContent, this);
         });
 
-        // ============ CNPJ ============
+        // CNPJ
         function generateCNPJ() {
             const n = Array.from({ length: 12 }, () => Math.floor(Math.random() * 10));
-            n[8] = 0; n[9] = 0; n[10] = 0; n[11] = 1; // filial padrão
+            n[8] = 0; n[9] = 0; n[10] = 0; n[11] = 1;
             let d1 = 0, d2 = 0;
             const w1 = [5,4,3,2,9,8,7,6,5,4,3,2];
             for (let i = 0; i < 12; i++) d1 += n[i] * w1[i];
@@ -481,14 +528,14 @@
             copyText(document.getElementById('cnpjOutput').textContent, this);
         });
 
-        // ============ NÚMERO ALEATÓRIO ============
+        // Número Aleatório
         document.getElementById('generateNumber').addEventListener('click', () => {
             const min = parseInt(document.getElementById('minNum').value) || 0;
             const max = parseInt(document.getElementById('maxNum').value) || 100;
             document.getElementById('numberOutput').textContent = getRandomInt(min, max);
         });
 
-        // ============ COR HEX ============
+        // Cor Hex
         document.getElementById('generateColor').addEventListener('click', () => {
             const hex = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
             document.getElementById('colorHex').textContent = hex;
@@ -498,7 +545,7 @@
             copyText(document.getElementById('colorHex').textContent, this);
         });
 
-        // ============ TOKEN ALEATÓRIO ============
+        // Token Aleatório
         document.getElementById('generateToken').addEventListener('click', () => {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-';
             let token = btoa(Math.random().toString(36).substring(2,15)).replace(/=/g, '') + '.';
@@ -512,7 +559,7 @@
             copyText(document.getElementById('tokenOutput').textContent, this);
         });
 
-        // ============ BASE64 ============
+        // Base64
         document.getElementById('generateBase64').addEventListener('click', () => {
             const text = document.getElementById('base64Input').value.trim() || 'texto';
             const mode = document.getElementById('base64Mode').value;
@@ -527,7 +574,7 @@
             copyText(document.getElementById('base64Output').textContent, this);
         });
 
-        // ============ INICIALIZA COM EXEMPLOS ============
+        // Inicializa exemplos
         document.getElementById('generateLorem').click();
         document.getElementById('generateName').click();
         document.getElementById('generateSlug').click();
@@ -542,4 +589,4 @@
         document.getElementById('generateBase64').click();
     </script>
 </body>
-                                                                                                          </html>
+</html>
