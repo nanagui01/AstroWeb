@@ -1,72 +1,131 @@
-// voice-server.js — Servidor de controle do Voice Farmer
-const express = require('express');
-const { Client } = require('discord.js-selfbot-v13');
-const app = express();
-app.use(express.json());
+// voicefarmer.js — Módulo Voice Farmer (controla backend)
 
-// Armazena clientes ativos por token (apenas um por vez)
-const clients = new Map();
+const VoiceFarmer = (function() {
+    let connected = false;
+    let currentToken = null;
 
-// Iniciar Voice Farmer
-app.post('/api/voice/start', async (req, res) => {
-    const { token, guildId, channelId } = req.body;
-    if (!token || !guildId || !channelId) {
-        return res.status(400).json({ error: 'Dados incompletos.' });
+    function isConnected() {
+        return connected;
     }
 
-    // Se já existe um cliente para esse token, desconecta primeiro
-    if (clients.has(token)) {
-        const old = clients.get(token);
-        try { old.destroy(); } catch (e) {}
-        clients.delete(token);
-    }
-
-    const client = new Client({ checkUpdate: false });
-    clients.set(token, client);
-
-    client.on('ready', async () => {
-        try {
-            const guild = client.guilds.cache.get(guildId);
-            if (!guild) return res.json({ error: 'Servidor não encontrado.' });
-            const channel = guild.channels.cache.get(channelId);
-            if (!channel || (channel.type !== 'GUILD_VOICE' && channel.type !== 'GUILD_STAGE_VOICE')) {
-                return res.json({ error: 'Canal de voz inválido.' });
-            }
-            await channel.join();
-            res.json({ success: true, message: `Conectado a ${channel.name}` });
-        } catch (err) {
-            res.json({ error: err.message });
+    async function start(token, guildId, channelId, statusCallback) {
+        if (connected) {
+            statusCallback('error', 'Já conectado.');
+            return;
         }
-    });
-
-    client.login(token).catch(err => {
-        res.status(401).json({ error: 'Token inválido.' });
-    });
-});
-
-// Parar Voice Farmer
-app.post('/api/voice/stop', async (req, res) => {
-    const { token } = req.body;
-    if (!token) return res.status(400).json({ error: 'Token não fornecido.' });
-    if (clients.has(token)) {
-        const client = clients.get(token);
-        try { client.destroy(); } catch (e) {}
-        clients.delete(token);
-        res.json({ success: true, message: 'Desconectado.' });
-    } else {
-        res.json({ error: 'Nenhuma conexão ativa para esse token.' });
+        try {
+            statusCallback('log', 'Conectando ao backend...');
+            const res = await fetch('/api/voice/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token, guildId, channelId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                connected = true;
+                currentToken = token;
+                statusCallback('connected', data.message);
+            } else {
+                statusCallback('error', data.error || 'Erro desconhecido.');
+            }
+        } catch (e) {
+            statusCallback('error', `Erro de rede: ${e.message}`);
+        }
     }
-});
 
-// Status
-app.get('/api/voice/status', (req, res) => {
-    const { token } = req.query;
-    if (!token) return res.status(400).json({ error: 'Token não fornecido.' });
-    const client = clients.get(token);
-    res.json({ connected: !!client && client.voice?.connections?.size > 0 });
-});
+    async function stop(statusCallback) {
+        if (!connected || !currentToken) {
+            if (statusCallback) statusCallback('error', 'Não conectado.');
+            return;
+        }
+        try {
+            const res = await fetch('/api/voice/stop', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: currentToken })
+            });
+            const data = await res.json();
+            connected = false;
+            currentToken = null;
+            if (statusCallback) statusCallback('disconnected', data.message || 'Desconectado.');
+        } catch (e) {
+            if (statusCallback) statusCallback('error', `Erro: ${e.message}`);
+        }
+    }
 
-const PORT = process.env.VOICE_PORT || 3001;
-app.listen(PORT, () => {
-    console.log(`Voice Farmer API rodando na porta ${PORT}`);
-});
+    // As demais funções (config, histórico, etc.) permanecem iguais
+    function getConfig() {
+        const raw = localStorage.getItem('novaHub_voiceConfig');
+        return raw ? JSON.parse(raw) : {};
+    }
+
+    function saveConfig(config) {
+        const current = getConfig();
+        const updated = { ...current, ...config };
+        localStorage.setItem('novaHub_voiceConfig', JSON.stringify(updated));
+    }
+
+    function getHistory() {
+        return JSON.parse(localStorage.getItem('novaHub_voiceHistory') || '[]');
+    }
+
+    function addHistoryRecord(record) {
+        const history = getHistory();
+        history.unshift(record);
+        if (history.length > 50) history.pop();
+        localStorage.setItem('novaHub_voiceHistory', JSON.stringify(history));
+    }
+
+    function getConnectionTime() {
+        return '—';
+    }
+
+    function getPing() {
+        return null;
+    }
+
+    function setAutoReconnect(enabled) {
+        localStorage.setItem('novaHub_autoReconnect', enabled);
+    }
+
+    function isAutoReconnectEnabled() {
+        return localStorage.getItem('novaHub_autoReconnect') !== 'false';
+    }
+
+    function getSchedule() {
+        const config = getConfig();
+        return config.schedule || null;
+    }
+
+    function saveSchedule(schedule) {
+        saveConfig({ schedule });
+    }
+
+    function enableSchedule(startISO, endISO, token, statusCallback) {
+        saveSchedule({ start: startISO, end: endISO, enabled: true });
+    }
+
+    function disableSchedule() {
+        saveSchedule({ ...getSchedule(), enabled: false });
+    }
+
+    function fullStop() {
+        stop();
+    }
+
+    return {
+        start,
+        stop,
+        isConnected,
+        getConnectionTime,
+        getPing,
+        getConfig,
+        getHistory,
+        setAutoReconnect,
+        isAutoReconnectEnabled,
+        enableSchedule,
+        disableSchedule,
+        getSchedule,
+        fullStop
+    };
+})();
