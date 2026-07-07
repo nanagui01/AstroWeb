@@ -22,7 +22,9 @@
             --rose: #ec4899;
             --blue: #3b82f6;
             --green: #10b981;
-            --green-glow: rgba(16,185,129,0.4);
+            --accent: #8b5cf6;
+            --accent-light: #a78bfa;
+            --accent-glow: rgba(139,92,246,0.3);
             --gradient-brand: linear-gradient(135deg, #8b5cf6, #ec4899);
             --gradient-active: linear-gradient(135deg, rgba(139,92,246,0.28), rgba(236,72,153,0.2));
             --shadow-card: 0 8px 32px rgba(0,0,0,0.5);
@@ -33,13 +35,10 @@
             --sidebar-width: 240px;
         }
 
-        /* Temas */
         [data-theme="purple"] { --accent: #8b5cf6; --accent-light: #a78bfa; --accent-glow: rgba(139,92,246,0.3); }
         [data-theme="blue"] { --accent: #3b82f6; --accent-light: #60a5fa; --accent-glow: rgba(59,130,246,0.3); }
         [data-theme="green"] { --accent: #10b981; --accent-light: #34d399; --accent-glow: rgba(16,185,129,0.3); }
         [data-theme="rose"] { --accent: #ec4899; --accent-light: #f4728b; --accent-glow: rgba(236,72,153,0.3); }
-        [data-theme="purple"] { --accent: #8b5cf6; --accent-light: #a78bfa; --accent-glow: rgba(139,92,246,0.3); }
-        :root { --accent: #8b5cf6; --accent-light: #a78bfa; --accent-glow: rgba(139,92,246,0.3); }
 
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -69,20 +68,11 @@
             z-index:100;
             transition: transform 0.3s ease;
         }
-        .sidebar-header {
-            text-align:center;
-            padding:0 1rem 1.2rem;
-            border-bottom:1px solid var(--border);
-            margin-bottom:0.6rem;
-        }
+        .sidebar-header { text-align:center; padding:0 1rem 1.2rem; border-bottom:1px solid var(--border); margin-bottom:0.6rem; }
         .logo-circle {
-            width:44px; height:44px;
-            background:var(--gradient-brand);
-            border-radius:14px;
-            margin:0 auto 0.5rem;
-            display:flex; align-items:center; justify-content:center;
-            font-size:1.2rem; color:#fff;
-            box-shadow:0 0 20px var(--accent-glow);
+            width:44px; height:44px; background:var(--gradient-brand); border-radius:14px;
+            margin:0 auto 0.5rem; display:flex; align-items:center; justify-content:center;
+            font-size:1.2rem; color:#fff; box-shadow:0 0 20px var(--accent-glow);
         }
         .app-name { font-weight:700; font-size:0.95rem; }
         nav { flex:1; padding:0.3rem 0.6rem; }
@@ -92,25 +82,15 @@
             border-radius:var(--radius-sm);
             color:var(--text-secondary); font-size:0.85rem; font-weight:500;
             cursor:pointer; transition:var(--transition);
-            position:relative;
         }
         .nav-item i { width:18px; text-align:center; }
         .nav-item:hover { background:rgba(255,255,255,0.03); color:var(--text); }
         .nav-item.active {
-            background:var(--gradient-active);
-            color:#fff; font-weight:600;
+            background:var(--gradient-active); color:#fff; font-weight:600;
             box-shadow:0 4px 14px rgba(139,92,246,0.18);
         }
-        .nav-item[data-tooltip]:hover::after {
-            content:attr(data-tooltip);
-            position:absolute; left:100%; top:50%; transform:translateY(-50%);
-            background:var(--card); padding:0.3rem 0.6rem; border-radius:6px;
-            font-size:0.7rem; white-space:nowrap; z-index:10;
-            border:1px solid var(--border);
-        }
         .sidebar-footer {
-            padding:0.8rem 1rem;
-            border-top:1px solid var(--border);
+            padding:0.8rem 1rem; border-top:1px solid var(--border);
             display:flex; align-items:center; gap:0.6rem;
         }
         .avatar-small {
@@ -122,32 +102,22 @@
         .status-dot {
             width:8px; height:8px; background:var(--green); border-radius:50%;
             border:2px solid var(--bg-deep); position:absolute; bottom:0; right:0;
-            animation:pulse 2s infinite;
-            box-shadow:0 0 6px var(--green-glow);
+            animation:pulse 2s infinite; box-shadow:0 0 6px rgba(16,185,129,0.4);
         }
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
         .user-mini { font-size:0.78rem; line-height:1.3; }
         .user-mini span { display:block; color:var(--text-muted); font-size:0.68rem; }
 
         /* Main */
-        .main-content { flex:1; display:flex; overflow:hidden; }
-        .content { flex:1; padding:1.5rem; overflow-y:auto; }
-        .top-bar {
-            display:flex; justify-content:space-between; align-items:center;
-            margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;
-        }
+        .main-content { flex:1; overflow-y:auto; }
+        .content { padding:1.5rem; }
+        .top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
         .top-bar h1 { font-size:1.5rem; font-weight:700; }
         .top-actions { display:flex; align-items:center; gap:1rem; }
-        .status-online {
-            display:flex; align-items:center; gap:0.4rem;
-            font-size:0.78rem; color:var(--text-secondary);
-        }
-        .status-online .dot { width:7px; height:7px; background:var(--green); border-radius:50%; box-shadow:0 0 8px var(--green-glow); }
+        .status-online { display:flex; align-items:center; gap:0.4rem; font-size:0.78rem; color:var(--text-secondary); }
+        .status-online .dot { width:7px; height:7px; background:var(--green); border-radius:50%; box-shadow:0 0 8px rgba(16,185,129,0.4); }
         .window-btns { display:flex; gap:0.4rem; }
-        .window-btns span {
-            width:10px; height:10px; border-radius:50%; cursor:pointer; opacity:0.7;
-        }
-        .window-btns span:hover { opacity:1; }
+        .window-btns span { width:10px; height:10px; border-radius:50%; cursor:pointer; opacity:0.7; }
         .window-btns .min { background:#f59e0b; } .window-btns .max { background:#10b981; } .window-btns .close { background:#ef4444; }
 
         /* User card */
@@ -165,24 +135,38 @@
         }
         .user-details { flex:1; min-width:180px; }
         .user-details h2 { font-size:1.2rem; font-weight:700; display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; }
-        .badges { display:flex; gap:0.2rem; flex-wrap:wrap; }
-        .badges img { height:20px; }
+        .badges { display:flex; gap:0.3rem; flex-wrap:wrap; }
+        /* Badge icons – usando CSS puro (símbolos) */
+        .badge-icon {
+            display:inline-flex; align-items:center; justify-content:center;
+            width:20px; height:20px; border-radius:50%;
+            font-size:0.7rem; font-weight:700;
+            color:#fff; margin-right:2px;
+        }
+        .badge-staff { background:#5865f2; }
+        .badge-partner { background:#3b82f6; }
+        .badge-hypesquad { background:#fbbf24; color:#000; }
+        .badge-bughunter { background:#10b981; }
+        .badge-bravery { background:#9c27b0; }
+        .badge-brilliance { background:#e91e63; }
+        .badge-balance { background:#4caf50; }
+        .badge-early { background:#ff9800; }
+        .badge-developer { background:#607d8b; }
         .username-tag { color:var(--text-muted); font-size:0.8rem; }
         .accounts-badge {
             display:inline-block; font-size:0.7rem;
             background:rgba(139,92,246,0.18); color:var(--purple-light);
             padding:0.2rem 0.6rem; border-radius:20px; margin-top:0.3rem;
         }
-        .connect-status { display:flex; align-items:center; gap:0.8rem; flex-shrink:0; }
         .connect-btn {
             background:var(--green); border:none; color:#fff;
             padding:0.4rem 1rem; border-radius:20px; font-weight:600;
-            font-size:0.75rem; box-shadow:0 0 16px var(--green-glow); cursor:default;
+            font-size:0.75rem; box-shadow:0 0 16px rgba(16,185,129,0.4); cursor:default;
         }
 
         /* Stats */
         .stats-row {
-            display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; margin-bottom:1.4rem;
+            display:grid; grid-template-columns:repeat(4, 1fr); gap:1rem; margin-bottom:1.4rem;
         }
         .stat-card {
             background:var(--card); backdrop-filter:blur(14px);
@@ -195,57 +179,17 @@
         .stat-card .stat-value { font-size:1.5rem; font-weight:700; }
 
         /* Activity / Graph */
-        .section-row {
-            display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.4rem;
-        }
+        .section-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.4rem; }
         .activity-panel, .graph-panel {
             background:var(--card); backdrop-filter:blur(14px);
             border:1px solid var(--border); border-radius:var(--radius-xl);
             padding:1.5rem;
         }
-        .activity-panel h4, .graph-panel h4 {
-            font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px;
-            color:var(--text-muted); margin-bottom:0.8rem;
-        }
+        .activity-panel h4, .graph-panel h4 { font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:0.8rem; }
         .activity-list { list-style:none; max-height:180px; overflow-y:auto; }
-        .activity-list li {
-            display:flex; align-items:center; gap:0.5rem;
-            padding:0.4rem 0; border-bottom:1px solid var(--border);
-            font-size:0.8rem; color:var(--text-secondary);
-        }
+        .activity-list li { display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.8rem; color:var(--text-secondary); }
         .activity-list li i { color:var(--accent-light); width:16px; text-align:center; }
         canvas { width:100%; height:150px; }
-
-        /* Right panel */
-        .right-panel {
-            width:260px; background:var(--glass); backdrop-filter:blur(24px);
-            border-left:1px solid var(--border); padding:1.4rem 1rem;
-            overflow-y:auto; display:flex; flex-direction:column;
-        }
-        .panel-section { margin-bottom:1.4rem; }
-        .panel-section h4 { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); font-weight:600; margin-bottom:0.6rem; }
-        .progress-bar { height:6px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; margin:0.4rem 0 0.3rem; }
-        .progress-fill { height:100%; border-radius:3px; }
-        .progress-fill.purple-bar { background:var(--gradient-brand); }
-        .progress-icons { display:flex; gap:0.3rem; font-size:0.7rem; color:var(--text-muted); margin-bottom:0.2rem; }
-        .progress-icons i.active { color:var(--purple-light); }
-        .progress-meta { display:flex; justify-content:space-between; font-size:0.66rem; color:var(--text-muted); }
-
-        /* Server search */
-        .server-search {
-            background:var(--card); border:1px solid var(--border);
-            border-radius:var(--radius-sm); padding:0.6rem 1rem;
-            margin-bottom:1rem; width:100%; color:var(--text);
-            font-size:0.85rem; outline:none;
-        }
-        .server-search:focus { border-color:var(--accent); }
-        .server-list { max-height:120px; overflow-y:auto; }
-        .server-list .server-item {
-            padding:0.3rem 0; font-size:0.78rem; color:var(--text-secondary);
-            cursor:pointer; transition:var(--transition);
-            display:flex; align-items:center; gap:0.5rem;
-        }
-        .server-list .server-item:hover { color:var(--text); }
 
         /* Modal */
         .modal-overlay {
@@ -262,19 +206,13 @@
         .modal h3 { margin-bottom:1.2rem; }
         .modal .form-group { margin-bottom:0.8rem; }
         .modal .form-group label { display:block; font-size:0.78rem; margin-bottom:0.25rem; color:var(--text-secondary); }
-        .modal .form-group input, .modal .form-group select {
+        .modal select, .modal input {
             width:100%; padding:0.6rem; background:rgba(255,255,255,0.05);
             border:1px solid var(--border); border-radius:8px; color:#fff; font-size:0.85rem;
         }
         .btn-group { display:flex; gap:0.7rem; margin-top:1.2rem; }
-        .btn-primary {
-            background:var(--gradient-brand); border:none; padding:0.6rem 1.3rem;
-            border-radius:20px; color:#fff; font-weight:600; cursor:pointer;
-        }
-        .btn-secondary {
-            background:transparent; border:1px solid var(--border);
-            padding:0.6rem 1.3rem; border-radius:20px; color:var(--text); cursor:pointer;
-        }
+        .btn-primary { background:var(--gradient-brand); border:none; padding:0.6rem 1.3rem; border-radius:20px; color:#fff; font-weight:600; cursor:pointer; }
+        .btn-secondary { background:transparent; border:1px solid var(--border); padding:0.6rem 1.3rem; border-radius:20px; color:var(--text); cursor:pointer; }
         .progress-log {
             margin-top:1rem; background:rgba(0,0,0,0.3); border-radius:10px;
             padding:0.7rem; max-height:180px; overflow-y:auto; font-size:0.75rem;
@@ -292,13 +230,6 @@
         .toast.show { opacity:1; }
         .toast.error { border-color:#ef4444; color:#ef4444; }
         .toast.success { border-color:var(--green); color:var(--green); }
-
-        /* Skeleton */
-        .skeleton {
-            background:linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
-            background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:8px;
-        }
-        @keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
 
         /* Float button */
         .float-top-btn {
@@ -325,12 +256,7 @@
             font-size:1.2rem;
         }
 
-        /* Responsive */
-        @media (max-width:1024px) {
-            .section-row { grid-template-columns:1fr; }
-            .right-panel { display:none; }
-            .stats-row { grid-template-columns:repeat(2, 1fr); }
-        }
+        @media (max-width:1024px) { .section-row { grid-template-columns:1fr; } .stats-row { grid-template-columns:repeat(3, 1fr); } }
         @media (max-width:768px) {
             .sidebar { position:fixed; left:calc(-1 * var(--sidebar-width)); height:100%; }
             .sidebar.open { left:0; }
@@ -340,23 +266,13 @@
             .user-card { flex-direction:column; text-align:center; }
             .top-bar { flex-direction:column; align-items:flex-start; }
         }
-        @media (max-width:480px) {
-            .stats-row { grid-template-columns:1fr; }
-        }
+        @media (max-width:480px) { .stats-row { grid-template-columns:1fr; } }
     </style>
 </head>
 <body data-theme="purple">
-
-    <!-- Hamburger -->
     <button class="hamburger" id="hamburgerBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
-
-    <!-- Float top button -->
     <button class="float-top-btn" id="floatTopBtn" title="Voltar ao topo"><i class="fa-solid fa-arrow-up"></i></button>
-
-    <!-- Rate limit indicator -->
     <div class="rate-limit-indicator" id="rateLimitIndicator"><i class="fa-solid fa-exclamation-triangle"></i> Rate limit</div>
-
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <!-- Sidebar -->
@@ -366,9 +282,9 @@
             <div class="app-name">NovaHub</div>
         </div>
         <nav>
-            <div class="nav-item active" data-view="dashboard" data-tooltip="Painel principal"><i class="fa-solid fa-house"></i> Dashboard</div>
-            <div class="nav-item" data-view="clonerserver" data-tooltip="Clonar servidores"><i class="fa-solid fa-copy"></i> Clonar Server</div>
-            <div class="nav-item" data-view="themes" data-tooltip="Personalizar tema" id="themeToggle"><i class="fa-solid fa-palette"></i> Tema</div>
+            <div class="nav-item active" data-view="dashboard"><i class="fa-solid fa-house"></i> Dashboard</div>
+            <div class="nav-item" data-view="clonerserver"><i class="fa-solid fa-copy"></i> Clonar Servidor</div>
+            <div class="nav-item" data-view="themes"><i class="fa-solid fa-palette"></i> Tema</div>
         </nav>
         <div class="sidebar-footer">
             <div class="avatar-small" id="sidebarAvatar"></div>
@@ -379,7 +295,7 @@
         </div>
     </aside>
 
-    <!-- Main -->
+    <!-- Main Content -->
     <div class="main-content">
         <div class="content" id="mainView">
             <!-- LOGIN VIEW -->
@@ -410,18 +326,15 @@
                         <div class="window-btns"><span class="min"></span><span class="max"></span><span class="close"></span></div>
                     </div>
                 </div>
-
-                <!-- Skeleton loading -->
                 <div id="skeletonLoader">
-                    <div class="user-card"><div class="skeleton" style="width:64px;height:64px;border-radius:50%;"></div><div style="flex:1;"><div class="skeleton" style="width:200px;height:20px;margin-bottom:0.5rem;"></div><div class="skeleton" style="width:150px;height:14px;"></div></div></div>
+                    <div class="user-card"><div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.05);animation:shimmer 1.5s infinite;"></div><div style="flex:1;"><div style="width:200px;height:20px;background:rgba(255,255,255,0.05);margin-bottom:0.5rem;border-radius:8px;"></div><div style="width:150px;height:14px;background:rgba(255,255,255,0.05);border-radius:8px;"></div></div></div>
                     <div class="stats-row">
-                        <div class="skeleton" style="height:80px;border-radius:var(--radius-lg);"></div>
-                        <div class="skeleton" style="height:80px;border-radius:var(--radius-lg);"></div>
-                        <div class="skeleton" style="height:80px;border-radius:var(--radius-lg);"></div>
+                        <div style="height:80px;border-radius:var(--radius-lg);background:rgba(255,255,255,0.05);animation:shimmer 1.5s infinite;"></div>
+                        <div style="height:80px;border-radius:var(--radius-lg);background:rgba(255,255,255,0.05);animation:shimmer 1.5s infinite;"></div>
+                        <div style="height:80px;border-radius:var(--radius-lg);background:rgba(255,255,255,0.05);animation:shimmer 1.5s infinite;"></div>
+                        <div style="height:80px;border-radius:var(--radius-lg);background:rgba(255,255,255,0.05);animation:shimmer 1.5s infinite;"></div>
                     </div>
                 </div>
-
-                <!-- Real content -->
                 <div id="realContent" style="display:none;">
                     <div class="user-card">
                         <div class="avatar-large" id="mainAvatar"></div>
@@ -438,18 +351,15 @@
                         <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-server"></i></div><div class="stat-title">Servidores</div><div class="stat-value" id="statGuilds">—</div></div>
                         <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-user-group"></i></div><div class="stat-title">Amigos</div><div class="stat-value" id="statFriends">—</div></div>
                         <div class="stat-card"><div class="stat-icon"><i class="fa-solid fa-id-badge"></i></div><div class="stat-title">ID</div><div class="stat-value" id="statId" style="font-size:1rem; cursor:pointer;" title="Clique para copiar">—</div></div>
+                        <div class="stat-card"><div class="stat-icon"><i class="fa-regular fa-calendar"></i></div><div class="stat-title">Conta criada</div><div class="stat-value" id="statCreated" style="font-size:1.2rem;">—</div></div>
                     </div>
                     <div class="section-row">
-                        <div class="graph-panel">
-                            <h4>Atividade (7 dias)</h4>
-                            <canvas id="activityChart"></canvas>
-                        </div>
-                        <div class="activity-panel">
-                            <h4>Atividades Recentes</h4>
-                            <ul class="activity-list" id="recentActivityList">
-                                <li style="color:var(--text-muted);">Nenhuma atividade registrada.</li>
-                            </ul>
-                        </div>
+                        <div class="graph-panel"><h4>Atividade (7 dias)</h4><canvas id="activityChart"></canvas></div>
+                        <div class="activity-panel"><h4>Atividades Recentes</h4><ul class="activity-list" id="recentActivityList"><li style="color:var(--text-muted);">Nenhuma atividade registrada.</li></ul></div>
+                    </div>
+                    <div style="display:flex; gap:1rem; margin-top:1rem;">
+                        <button id="refreshDataBtn" style="background:transparent; border:1px solid var(--border); padding:0.5rem 1.5rem; border-radius:8px; color:var(--text-secondary); cursor:pointer; font-size:0.8rem;"><i class="fa-solid fa-rotate"></i> Atualizar dados</button>
+                        <button id="logoutBtn" style="background:transparent; border:1px solid var(--border); padding:0.5rem 1.5rem; border-radius:8px; color:var(--text-secondary); cursor:pointer; font-size:0.8rem;"><i class="fa-solid fa-right-from-bracket"></i> Desconectar</button>
                     </div>
                 </div>
             </div>
@@ -457,18 +367,20 @@
             <!-- CLONER VIEW -->
             <div id="clonerserverView" style="display:none;">
                 <div class="top-bar"><h1>Clonar Servidor</h1></div>
-                <div style="max-width:600px;">
-                    <div class="form-group"><label>ID Servidor Origem</label><input type="text" id="origemId" placeholder="1234567890"></div>
-                    <div class="form-group"><label>ID Servidor Destino</label><input type="text" id="destinoId" placeholder="9876543210"></div>
+                <p style="margin-bottom:1rem; color:var(--text-secondary);">Selecione os servidores de origem e destino para iniciar a clonagem.</p>
+                <div id="clonerLoginNotice" style="display:none; color:#ef4444;">Faça login para carregar seus servidores.</div>
+                <div id="clonerForm" style="display:none;">
+                    <div class="form-group"><label>Servidor Origem</label><select id="origemSelect"><option value="">Carregando...</option></select></div>
+                    <div class="form-group"><label>Servidor Destino</label><select id="destinoSelect"><option value="">Carregando...</option></select></div>
                     <div class="form-group"><label>Tipo de clonagem</label><select id="tipoClonagem"><option value="tudo">Tudo</option><option value="apenas_cargos">Apenas Cargos</option><option value="apenas_canais">Apenas Canais</option><option value="apenas_emojis">Apenas Emojis</option><option value="cargos_canais">Cargos + Canais</option></select></div>
-                    <div class="form-group"><label>Excluir existentes?</label><select id="excluirExistentes"><option value="sim">Sim</option><option value="nao">Não</option></select></div>
+                    <div class="form-group"><label>Excluir conteúdo existente?</label><select id="excluirExistentes"><option value="sim">Sim</option><option value="nao">Não</option></select></div>
                     <button class="btn-primary" id="startClonerBtn" style="margin-right:0.5rem;">Iniciar Clonagem</button>
                     <button class="btn-secondary" id="stopClonerBtn" style="display:none;">Parar</button>
-                    <div class="progress-log" id="clonerLog" style="display:none;"></div>
-                    <div style="margin-top:1rem;">
-                        <h4 style="font-size:0.75rem; color:var(--text-muted);">Histórico de clonagens</h4>
-                        <div class="progress-log" id="clonerHistory" style="display:block; max-height:120px;">Nenhum histórico.</div>
-                    </div>
+                </div>
+                <div class="progress-log" id="clonerLog" style="display:none; margin-top:1rem;"></div>
+                <div style="margin-top:1rem;">
+                    <h4 style="font-size:0.75rem; color:var(--text-muted);">Histórico</h4>
+                    <div class="progress-log" id="clonerHistory" style="display:block; max-height:120px;">Nenhum histórico.</div>
                 </div>
             </div>
 
@@ -481,31 +393,6 @@
                     <button class="theme-option" data-theme="green" style="padding:1rem 2rem; border-radius:12px; background:linear-gradient(135deg,#10b981,#34d399); color:#fff; border:none; cursor:pointer;">Verde</button>
                     <button class="theme-option" data-theme="rose" style="padding:1rem 2rem; border-radius:12px; background:linear-gradient(135deg,#ec4899,#f4728b); color:#fff; border:none; cursor:pointer;">Rosa</button>
                 </div>
-            </div>
-        </div>
-
-        <!-- Right panel (simplificado, sem indicadores) -->
-        <div class="right-panel" id="rightPanel" style="display:none;">
-            <div class="panel-section">
-                <h4>Pesquisar Servidores</h4>
-                <input type="text" class="server-search" id="serverSearch" placeholder="Filtrar servidores...">
-                <div class="server-list" id="serverList"></div>
-            </div>
-            <div class="panel-section">
-                <h4>Nitro</h4>
-                <div class="progress-icons" id="nitroIcons"></div>
-                <div class="progress-bar"><div class="progress-fill purple-bar" id="nitroBar" style="width:0%"></div></div>
-                <div class="progress-meta"><span id="nitroPercent">0%</span><span id="nitroStatus">—</span></div>
-            </div>
-            <div class="panel-section">
-                <h4>Boost</h4>
-                <div class="progress-icons" id="boostIcons"></div>
-                <div class="progress-bar"><div class="progress-fill purple-bar" id="boostBar" style="width:0%; background:#3b82f6;"></div></div>
-                <div class="progress-meta"><span id="boostPercent">0%</span><span id="boostStatus">Nenhum</span></div>
-            </div>
-            <div style="margin-top:auto; display:flex; flex-direction:column; gap:0.5rem;">
-                <button id="logoutBtn" style="background:transparent; border:1px solid var(--border); padding:0.5rem; border-radius:8px; color:var(--text); cursor:pointer;">Desconectar</button>
-                <button id="refreshDataBtn" style="background:transparent; border:1px solid var(--border); padding:0.5rem; border-radius:8px; color:var(--text-secondary); cursor:pointer; font-size:0.8rem;"><i class="fa-solid fa-rotate"></i> Atualizar dados</button>
             </div>
         </div>
     </div>
@@ -536,7 +423,6 @@
     const dashboardView = document.getElementById('dashboardView');
     const clonerserverView = document.getElementById('clonerserverView');
     const themesView = document.getElementById('themesView');
-    const rightPanel = document.getElementById('rightPanel');
     const skeletonLoader = document.getElementById('skeletonLoader');
     const realContent = document.getElementById('realContent');
     const sidebar = document.getElementById('sidebar');
@@ -545,13 +431,11 @@
     const toast = document.getElementById('toast');
     const rateLimitIndicator = document.getElementById('rateLimitIndicator');
 
-    // Toast helper
     function showToast(msg, type = '') {
         toast.textContent = msg; toast.className = 'toast ' + type + ' show';
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Rate limit handling
     let rateLimitTimeout;
     function handleRateLimit(retryAfter = 5) {
         rateLimitIndicator.style.display = 'block';
@@ -560,19 +444,16 @@
         rateLimitTimeout = setTimeout(() => rateLimitIndicator.style.display = 'none', retryAfter * 1000);
     }
 
-    // Fetch wrapper with rate limit detection
     async function apiFetch(url, opts = {}) {
         const res = await fetch(url, { ...opts, headers: { ...opts.headers, Authorization: token } });
         if (res.status === 429) {
             const data = await res.json();
-            const retry = data.retry_after || 5;
-            handleRateLimit(retry);
+            handleRateLimit(data.retry_after || 5);
             throw new Error('Rate limit');
         }
         return res;
     }
 
-    // Navigation
     function showView(view) {
         loginView.style.display = 'none';
         dashboardView.style.display = 'none';
@@ -584,16 +465,14 @@
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         const navItem = document.querySelector(`.nav-item[data-view="${view}"]`);
         if (navItem) navItem.classList.add('active');
-        if (sidebar.classList.contains('open')) sidebar.classList.remove('open');
+        sidebar.classList.remove('open');
     }
 
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => showView(item.dataset.view));
     });
-
     hamburgerBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
 
-    // Float button
     window.addEventListener('scroll', () => {
         floatTopBtn.style.display = window.scrollY > 400 ? 'flex' : 'none';
     });
@@ -615,17 +494,17 @@
             if (!res.ok) throw new Error('Token inválido');
             userData = await res.json();
             token = t;
-            showView('dashboard');
-            rightPanel.style.display = 'flex';
             document.getElementById('sidebarAvatar').style.backgroundImage = `url(${userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=64` : `https://cdn.discordapp.com/embed/avatars/${(userData.discriminator||'0')%5}.png`})`;
             document.getElementById('sidebarName').textContent = userData.global_name || userData.username;
             document.getElementById('sidebarStatus').textContent = 'Conectado';
+            showView('dashboard');
             skeletonLoader.style.display = 'block';
             realContent.style.display = 'none';
             await loadDashboardData();
             skeletonLoader.style.display = 'none';
             realContent.style.display = 'block';
             showToast('Conectado com sucesso!', 'success');
+            addActivity('Login efetuado');
         } catch (e) {
             err.style.display = 'block';
             err.textContent = 'Falha na autenticação.';
@@ -634,34 +513,42 @@
     });
 
     async function loadDashboardData() {
-        // User info
         document.getElementById('displayName').textContent = userData.global_name || userData.username;
         document.getElementById('usernameTag').textContent = `${userData.username}#${userData.discriminator}`;
         document.getElementById('mainAvatar').style.backgroundImage = `url(${userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=128` : `https://cdn.discordapp.com/embed/avatars/${(userData.discriminator||'0')%5}.png`})`;
         document.getElementById('statId').textContent = userData.id;
         document.getElementById('statId').onclick = () => { navigator.clipboard.writeText(userData.id); showToast('ID copiado!', 'success'); };
 
-        // Badges (CORRIGIDO - busca todos os flags)
+        // Data de criação
+        const createdTimestamp = Number((BigInt(userData.id) >> 22n) + 1420070400000n);
+        document.getElementById('statCreated').textContent = new Date(createdTimestamp).toLocaleDateString('pt-BR');
+
+        // Badges (usando ícones CSS)
         const flags = userData.public_flags || 0;
-        const badgeMap = {
-            1: 'staff', 2: 'partner', 4: 'hypesquad_events',
-            8: 'bug_hunter_green', 64: 'hypesquad_bravery',
-            128: 'hypesquad_brilliance', 256: 'hypesquad_balance',
-            512: 'early_supporter', 16384: 'bug_hunter_gold',
-            131072: 'verified_developer', 262144: 'active_developer'
-        };
+        const badgeDefs = [
+            [1, 'Staff', 'badge-staff', 'fa-brands fa-discord'],
+            [2, 'Partner', 'badge-partner', 'fa-solid fa-handshake'],
+            [4, 'HypeSquad', 'badge-hypesquad', 'fa-solid fa-star'],
+            [8, 'Bug Hunter', 'badge-bughunter', 'fa-solid fa-bug'],
+            [64, 'Bravery', 'badge-bravery', 'fa-solid fa-shield'],
+            [128, 'Brilliance', 'badge-brilliance', 'fa-solid fa-gem'],
+            [256, 'Balance', 'badge-balance', 'fa-solid fa-scale-balanced'],
+            [512, 'Early Supporter', 'badge-early', 'fa-solid fa-clock'],
+            [16384, 'Bug Hunter Gold', 'badge-bughunter', 'fa-solid fa-bug'],
+            [131072, 'Developer', 'badge-developer', 'fa-solid fa-code'],
+            [262144, 'Active Developer', 'badge-developer', 'fa-solid fa-code']
+        ];
         const badgesDiv = document.getElementById('badgesContainer');
         badgesDiv.innerHTML = '';
-        for (const [flag, name] of Object.entries(badgeMap)) {
-            if (flags & parseInt(flag)) {
-                const img = document.createElement('img');
-                img.src = `https://cdn.discordapp.com/badge-icons/${name}.png`;
-                img.alt = name.replace(/_/g, ' ');
-                img.title = name.replace(/_/g, ' ');
-                img.style.height = '20px';
-                badgesDiv.appendChild(img);
+        badgeDefs.forEach(([flag, name, cls, icon]) => {
+            if (flags & flag) {
+                const span = document.createElement('span');
+                span.className = `badge-icon ${cls}`;
+                span.innerHTML = `<i class="${icon}"></i>`;
+                span.title = name;
+                badgesDiv.appendChild(span);
             }
-        }
+        });
 
         // Guilds
         try {
@@ -669,12 +556,11 @@
             allGuilds = await gRes.json();
             document.getElementById('guildCount').textContent = `${allGuilds.length} servidores`;
             document.getElementById('statGuilds').textContent = allGuilds.length;
-            populateServerList(allGuilds);
         } catch (e) {
             document.getElementById('statGuilds').textContent = '—';
         }
 
-        // Friends (API não expõe, mas podemos tentar relationships - pode não funcionar)
+        // Friends
         try {
             const fRes = await apiFetch(`${API}/users/@me/relationships`);
             const friends = await fRes.json();
@@ -684,42 +570,8 @@
             document.getElementById('statFriends').textContent = '—';
         }
 
-        // Nitro
-        const premium = userData.premium_type || 0;
-        document.getElementById('nitroBar').style.width = premium === 2 ? '100%' : premium === 1 ? '50%' : '5%';
-        document.getElementById('nitroPercent').textContent = premium === 2 ? '100%' : premium === 1 ? '50%' : '5%';
-        document.getElementById('nitroStatus').textContent = premium === 0 ? 'Sem assinatura' : `Nitro ${premium===2?'Full':premium===1?'Classic':'Basic'}`;
-
-        // Nitro/Boost subscriptions
-        try {
-            const subsRes = await apiFetch(`${API}/users/@me/billing/subscriptions`);
-            if (subsRes.ok) {
-                const subs = await subsRes.json();
-                const nitroSub = subs.find(s => s.type === 1);
-                if (nitroSub) {
-                    document.getElementById('nitroBar').style.width = '100%';
-                    document.getElementById('nitroPercent').textContent = '100%';
-                    document.getElementById('nitroStatus').textContent = 'Nitro ativo';
-                }
-                const boosts = subs.filter(s => s.type === 2);
-                document.getElementById('boostBar').style.width = Math.min(boosts.length * 50, 100) + '%';
-                document.getElementById('boostPercent').textContent = Math.min(boosts.length * 50, 100) + '%';
-                document.getElementById('boostStatus').textContent = boosts.length ? `${boosts.length} boost(s)` : 'Nenhum';
-            }
-        } catch (e) {}
-
-        // Graph
         drawActivityGraph();
         updateRecentActivities();
-    }
-
-    function populateServerList(guilds) {
-        const list = document.getElementById('serverList');
-        list.innerHTML = guilds.slice(0, 20).map(g => `<div class="server-item">${g.name}</div>`).join('');
-        document.getElementById('serverSearch').oninput = function() {
-            const q = this.value.toLowerCase();
-            list.innerHTML = guilds.filter(g => g.name.toLowerCase().includes(q)).slice(0, 20).map(g => `<div class="server-item">${g.name}</div>`).join('');
-        };
     }
 
     function drawActivityGraph() {
@@ -730,8 +582,7 @@
         canvas.height = 150;
         const w = canvas.width, h = canvas.height;
         ctx.clearRect(0, 0, w, h);
-        const points = [];
-        for (let i = 0; i < 7; i++) points.push(Math.floor(Math.random() * 100));
+        const points = Array.from({length: 7}, () => Math.floor(Math.random() * 100));
         ctx.beginPath();
         ctx.strokeStyle = '#8b5cf6';
         ctx.lineWidth = 2;
@@ -743,7 +594,6 @@
             else ctx.lineTo(x, y);
         });
         ctx.stroke();
-        // Fill
         ctx.lineTo(w, h);
         ctx.lineTo(0, h);
         ctx.closePath();
@@ -754,11 +604,9 @@
     function updateRecentActivities() {
         const list = document.getElementById('recentActivityList');
         const activities = JSON.parse(localStorage.getItem('novaHub_activities') || '[]');
-        if (activities.length === 0) {
-            list.innerHTML = '<li style="color:var(--text-muted);">Nenhuma atividade registrada.</li>';
-            return;
-        }
-        list.innerHTML = activities.slice(-5).reverse().map(a => `<li><i class="fa-solid fa-circle" style="font-size:0.4rem;"></i> ${a}</li>`).join('');
+        list.innerHTML = activities.length === 0
+            ? '<li style="color:var(--text-muted);">Nenhuma atividade registrada.</li>'
+            : activities.slice(-5).reverse().map(a => `<li><i class="fa-solid fa-circle" style="font-size:0.4rem;"></i> ${a}</li>`).join('');
     }
 
     function addActivity(msg) {
@@ -769,44 +617,36 @@
         updateRecentActivities();
     }
 
-    // Refresh button
     document.getElementById('refreshDataBtn').addEventListener('click', async () => {
         if (!token) return;
-        showToast('Atualizando dados...');
+        showToast('Atualizando...');
         skeletonLoader.style.display = 'block';
         realContent.style.display = 'none';
         await loadDashboardData();
         skeletonLoader.style.display = 'none';
         realContent.style.display = 'block';
-        showToast('Dados atualizados!', 'success');
+        showToast('Atualizado!', 'success');
     });
 
-    // Logout com confirmação
     document.getElementById('logoutBtn').addEventListener('click', () => {
         document.getElementById('logoutModal').style.display = 'flex';
     });
     document.getElementById('confirmLogout').addEventListener('click', () => {
-        token = '';
-        userData = null;
+        token = ''; userData = null;
         loginView.style.display = 'block';
         dashboardView.style.display = 'none';
         clonerserverView.style.display = 'none';
         themesView.style.display = 'none';
-        rightPanel.style.display = 'none';
         document.getElementById('sidebarName').textContent = 'Conecte-se';
         document.getElementById('sidebarStatus').textContent = 'Desconectado';
         document.getElementById('sidebarAvatar').style.backgroundImage = '';
         document.getElementById('logoutModal').style.display = 'none';
         showToast('Desconectado.');
     });
-    document.getElementById('cancelLogout').addEventListener('click', () => {
-        document.getElementById('logoutModal').style.display = 'none';
-    });
-    document.getElementById('logoutModal').addEventListener('click', function(e) {
-        if (e.target === this) this.style.display = 'none';
-    });
+    document.getElementById('cancelLogout').addEventListener('click', () => document.getElementById('logoutModal').style.display = 'none');
+    document.getElementById('logoutModal').addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
 
-    // Theme switching
+    // Theme
     document.querySelectorAll('.theme-option').forEach(btn => {
         btn.addEventListener('click', () => {
             document.body.dataset.theme = btn.dataset.theme;
@@ -818,12 +658,67 @@
     const savedTheme = localStorage.getItem('novaHub_theme');
     if (savedTheme) document.body.dataset.theme = savedTheme;
 
+    // Preencher dropdowns de servidores para o clonador quando a view for aberta
+    function populateClonerServers() {
+        const origemSelect = document.getElementById('origemSelect');
+        const destinoSelect = document.getElementById('destinoSelect');
+        if (!allGuilds.length) {
+            origemSelect.innerHTML = '<option value="">Nenhum servidor encontrado</option>';
+            destinoSelect.innerHTML = '<option value="">Nenhum servidor encontrado</option>';
+            return;
+        }
+        const options = allGuilds.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
+        origemSelect.innerHTML = options;
+        destinoSelect.innerHTML = options;
+    }
+
+    // Quando clicar em "Clonar Servidor", carrega os servidores se logado
+    const clonerViewNav = document.querySelector('.nav-item[data-view="clonerserver"]');
+    clonerViewNav.addEventListener('click', () => {
+        if (token && allGuilds.length > 0) {
+            populateClonerServers();
+            document.getElementById('clonerLoginNotice').style.display = 'none';
+            document.getElementById('clonerForm').style.display = 'block';
+        } else if (token) {
+            document.getElementById('clonerLoginNotice').style.display = 'none';
+            document.getElementById('clonerForm').style.display = 'block';
+            populateClonerServers();
+        } else {
+            document.getElementById('clonerLoginNotice').style.display = 'block';
+            document.getElementById('clonerForm').style.display = 'none';
+        }
+    });
+
+    // Atualiza dropdowns sempre que a view cloner for mostrada
+    const origShowView = showView;
+    showView = function(view) {
+        origShowView(view);
+        if (view === 'clonerserver' && token) {
+            if (allGuilds.length === 0) {
+                // Tenta carregar guilds se ainda não carregado
+                apiFetch(`${API}/users/@me/guilds`).then(r => r.json()).then(guilds => {
+                    allGuilds = guilds;
+                    populateClonerServers();
+                    document.getElementById('clonerForm').style.display = 'block';
+                    document.getElementById('clonerLoginNotice').style.display = 'none';
+                }).catch(() => {
+                    document.getElementById('clonerLoginNotice').style.display = 'block';
+                    document.getElementById('clonerForm').style.display = 'none';
+                });
+            } else {
+                populateClonerServers();
+                document.getElementById('clonerForm').style.display = 'block';
+                document.getElementById('clonerLoginNotice').style.display = 'none';
+            }
+        }
+    };
+
     // Cloner
     document.getElementById('startClonerBtn').addEventListener('click', async () => {
         if (!token) return showToast('Faça login primeiro.', 'error');
-        const origem = document.getElementById('origemId').value.trim();
-        const destino = document.getElementById('destinoId').value.trim();
-        if (!origem || !destino) return showToast('Preencha os IDs.', 'error');
+        const origem = document.getElementById('origemSelect').value;
+        const destino = document.getElementById('destinoSelect').value;
+        if (!origem || !destino) return showToast('Selecione os servidores.', 'error');
         const tipo = document.getElementById('tipoClonagem').value;
         const excluir = document.getElementById('excluirExistentes').value === 'sim';
         const log = document.getElementById('clonerLog');
@@ -836,12 +731,12 @@
                 log.textContent += msg + '\n';
                 log.scrollTop = log.scrollHeight;
             }, clonerAbortController.signal);
-            log.textContent += '\n✅ Concluído com sucesso!';
-            addActivity(`Clonagem: ${origem} → ${destino}`);
+            log.textContent += '\n✅ Concluído!';
+            addActivity(`Clonagem concluída`);
             saveClonerHistory(origem, destino, 'Sucesso');
         } catch (e) {
             if (e.name === 'AbortError') {
-                log.textContent += '\n⏹️ Operação interrompida.';
+                log.textContent += '\n⏹️ Interrompido.';
                 saveClonerHistory(origem, destino, 'Interrompido');
             } else {
                 log.textContent += `\n❌ Erro: ${e.message}`;
@@ -866,10 +761,9 @@
     }
 
     function renderClonerHistory() {
-        const history = JSON.parse(localStorage.getItem('novaHub_clonerHistory') || '[]');
         const el = document.getElementById('clonerHistory');
-        if (history.length === 0) el.textContent = 'Nenhum histórico.';
-        else el.innerHTML = history.map(h => `${h.time} | ${h.origem} → ${h.destino} | ${h.status}`).join('\n');
+        const history = JSON.parse(localStorage.getItem('novaHub_clonerHistory') || '[]');
+        el.innerHTML = history.length === 0 ? 'Nenhum histórico.' : history.map(h => `${h.time} | ${h.origem} → ${h.destino} | ${h.status}`).join('\n');
     }
     renderClonerHistory();
 
@@ -894,10 +788,10 @@
 
         const roleMap = {};
         const totalSteps = (opts.cargos ? 1 : 0) + (opts.canais ? 1 : 0) + (opts.emojis ? 1 : 0) + (excluir ? 1 : 0);
-        let currentStep = 0;
+        let step = 0;
 
         if (opts.cargos && excluir) {
-            log(`[${++currentStep}/${totalSteps}] Deletando cargos...`);
+            log(`[${++step}/${totalSteps}] Deletando cargos...`);
             const roles = dest.roles.filter(r => r.name !== '@everyone');
             for (const r of roles) {
                 if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
@@ -906,7 +800,7 @@
             }
         }
         if (opts.canais && excluir) {
-            log(`[${++currentStep}/${totalSteps}] Deletando canais...`);
+            log(`[${++step}/${totalSteps}] Deletando canais...`);
             const chs = await fetch(`${base}/guilds/${destinoId}/channels`, { headers, signal }).then(r => r.json());
             for (const c of chs) {
                 if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
@@ -915,7 +809,7 @@
             }
         }
         if (opts.cargos) {
-            log(`[${++currentStep}/${totalSteps}] Clonando cargos...`);
+            log(`[${++step}/${totalSteps}] Clonando cargos...`);
             const roles = await fetch(`${base}/guilds/${origemId}/roles`, { headers, signal }).then(r => r.json());
             for (const role of roles.filter(r => r.name !== '@everyone')) {
                 if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
@@ -929,7 +823,7 @@
         }
         const catMap = {};
         if (opts.canais) {
-            log(`[${++currentStep}/${totalSteps}] Clonando canais...`);
+            log(`[${++step}/${totalSteps}] Clonando canais...`);
             const channels = (await fetch(`${base}/guilds/${origemId}/channels`, { headers, signal }).then(r => r.json())).sort((a, b) => a.position - b.position);
             for (const ch of channels.filter(c => c.type === 4)) {
                 if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
@@ -952,7 +846,7 @@
             }
         }
         if (opts.emojis) {
-            log(`[${++currentStep}/${totalSteps}] Clonando emojis...`);
+            log(`[${++step}/${totalSteps}] Clonando emojis...`);
             const emojis = await fetch(`${base}/guilds/${origemId}/emojis`, { headers, signal }).then(r => r.json());
             for (const emoji of emojis) {
                 if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
@@ -967,18 +861,16 @@
         }
     }
 
-    // Close sidebar on outside click (mobile)
+    // Fechar sidebar ao clicar fora (mobile)
     document.addEventListener('click', (e) => {
         if (!sidebar.contains(e.target) && e.target !== hamburgerBtn && !hamburgerBtn.contains(e.target)) {
             sidebar.classList.remove('open');
         }
     });
 
-    // Keyboard shortcut
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             document.getElementById('logoutModal').style.display = 'none';
-            document.getElementById('clonerLog').style.display = 'none';
         }
     });
 
