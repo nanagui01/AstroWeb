@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* ========== BASE & THEMES ========== */
         :root {
             --bg-deep: #0B0B0F;
             --glass: rgba(14,14,20,0.78);
@@ -26,54 +25,16 @@
             --radius-xl: 22px;
             --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
             --sidebar-width: 240px;
-            /* Tema padrão (roxo) */
             --accent: #8b5cf6;
             --accent-light: #a78bfa;
             --accent-glow: rgba(139,92,246,0.3);
             --accent-bg: rgba(139,92,246,0.15);
-            --accent-border: rgba(139,92,246,0.4);
             --gradient-brand: linear-gradient(135deg, #8b5cf6, #ec4899);
             --gradient-active: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(236,72,153,0.2));
-            --badge-staff: #5865f2;
-            --badge-partner: #3b82f6;
-            --badge-hypesquad: #fbbf24;
-            --badge-bravery: #9c27b0;
-            --badge-brilliance: #e91e63;
-            --badge-balance: #4caf50;
-            --badge-bughunter: #10b981;
-            --badge-early: #ff9800;
-            --badge-developer: #607d8b;
         }
-
-        [data-theme="blue"] {
-            --accent: #3b82f6;
-            --accent-light: #60a5fa;
-            --accent-glow: rgba(59,130,246,0.3);
-            --accent-bg: rgba(59,130,246,0.15);
-            --accent-border: rgba(59,130,246,0.4);
-            --gradient-brand: linear-gradient(135deg, #3b82f6, #60a5fa);
-            --gradient-active: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(96,165,250,0.2));
-        }
-
-        [data-theme="green"] {
-            --accent: #10b981;
-            --accent-light: #34d399;
-            --accent-glow: rgba(16,185,129,0.3);
-            --accent-bg: rgba(16,185,129,0.15);
-            --accent-border: rgba(16,185,129,0.4);
-            --gradient-brand: linear-gradient(135deg, #10b981, #34d399);
-            --gradient-active: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(52,211,153,0.2));
-        }
-
-        [data-theme="rose"] {
-            --accent: #ec4899;
-            --accent-light: #f4728b;
-            --accent-glow: rgba(236,72,153,0.3);
-            --accent-bg: rgba(236,72,153,0.15);
-            --accent-border: rgba(236,72,153,0.4);
-            --gradient-brand: linear-gradient(135deg, #ec4899, #f4728b);
-            --gradient-active: linear-gradient(135deg, rgba(236,72,153,0.3), rgba(244,114,139,0.2));
-        }
+        [data-theme="blue"] { --accent: #3b82f6; --accent-light: #60a5fa; --accent-glow: rgba(59,130,246,0.3); --accent-bg: rgba(59,130,246,0.15); --gradient-brand: linear-gradient(135deg, #3b82f6, #60a5fa); --gradient-active: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(96,165,250,0.2)); }
+        [data-theme="green"] { --accent: #10b981; --accent-light: #34d399; --accent-glow: rgba(16,185,129,0.3); --accent-bg: rgba(16,185,129,0.15); --gradient-brand: linear-gradient(135deg, #10b981, #34d399); --gradient-active: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(52,211,153,0.2)); }
+        [data-theme="rose"] { --accent: #ec4899; --accent-light: #f4728b; --accent-glow: rgba(236,72,153,0.3); --accent-bg: rgba(236,72,153,0.15); --gradient-brand: linear-gradient(135deg, #ec4899, #f4728b); --gradient-active: linear-gradient(135deg, rgba(236,72,153,0.3), rgba(244,114,139,0.2)); }
 
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -90,7 +51,6 @@
         ::-webkit-scrollbar-track { background:transparent; }
         ::-webkit-scrollbar-thumb { background:#26262f; border-radius:2px; }
 
-        /* Sidebar */
         .sidebar {
             width:var(--sidebar-width);
             background:var(--glass);
@@ -110,7 +70,7 @@
             font-size:1.2rem; color:#fff; box-shadow:0 0 20px var(--accent-glow);
         }
         .app-name { font-weight:700; font-size:0.95rem; }
-        nav { flex:1; padding:0.3rem 0.6rem; }
+        nav { flex:1; padding:0.3rem 0.6rem; overflow-y:auto; }
         .nav-item {
             display:flex; align-items:center; gap:0.7rem;
             padding:0.6rem 0.8rem; margin:0.15rem 0;
@@ -143,7 +103,6 @@
         .user-mini { font-size:0.78rem; line-height:1.3; }
         .user-mini span { display:block; color:var(--text-muted); font-size:0.68rem; }
 
-        /* Main */
         .main-content { flex:1; overflow-y:auto; }
         .content { padding:1.5rem; }
         .top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
@@ -155,7 +114,6 @@
         .window-btns span { width:10px; height:10px; border-radius:50%; cursor:pointer; opacity:0.7; }
         .window-btns .min { background:#f59e0b; } .window-btns .max { background:#10b981; } .window-btns .close { background:#ef4444; }
 
-        /* User card */
         .user-card {
             background:var(--card); backdrop-filter:blur(18px);
             border:1px solid var(--border); border-radius:var(--radius-xl);
@@ -189,19 +147,17 @@
             font-size:0.75rem; box-shadow:0 0 16px rgba(16,185,129,0.4); cursor:default;
         }
 
-        /* Stats */
         .stats-row { display:grid; grid-template-columns:repeat(4, 1fr); gap:1rem; margin-bottom:1.4rem; }
         .stat-card {
             background:var(--card); backdrop-filter:blur(14px);
             border:1px solid var(--border); border-radius:var(--radius-lg);
             padding:1.1rem; box-shadow:var(--shadow-card); transition:var(--transition);
         }
-        .stat-card:hover { border-color:var(--accent-border); }
+        .stat-card:hover { border-color:var(--accent-glow); }
         .stat-card .stat-icon { font-size:1.1rem; color:var(--accent-light); margin-bottom:0.4rem; }
         .stat-card .stat-title { font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px; }
         .stat-card .stat-value { font-size:1.5rem; font-weight:700; }
 
-        /* Activity / Graph */
         .section-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.4rem; }
         .activity-panel, .graph-panel {
             background:var(--card); backdrop-filter:blur(14px);
@@ -213,29 +169,15 @@
         .activity-list li { display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0; border-bottom:1px solid var(--border); font-size:0.8rem; color:var(--text-secondary); }
         canvas { width:100%; height:150px; }
 
-        /* ========== CLONER SERVER - NOVO DESIGN ========== */
-        .server-selection-grid {
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:1rem;
-            margin-bottom:1.5rem;
-        }
+        /* Server selection */
+        .server-selection-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; }
         .server-picker {
-            background:var(--card);
-            backdrop-filter:blur(14px);
-            border:1px solid var(--border);
-            border-radius:var(--radius-lg);
+            background:var(--card); backdrop-filter:blur(14px);
+            border:1px solid var(--border); border-radius:var(--radius-lg);
             padding:1rem;
         }
-        .server-picker h4 {
-            font-size:0.8rem; color:var(--text-muted);
-            text-transform:uppercase; letter-spacing:0.5px;
-            margin-bottom:0.8rem;
-        }
-        .server-list-container {
-            max-height:220px;
-            overflow-y:auto;
-        }
+        .server-picker h4 { font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.8rem; }
+        .server-list-container { max-height:220px; overflow-y:auto; }
         .server-item {
             display:flex; align-items:center; gap:0.6rem;
             padding:0.6rem; margin-bottom:0.3rem;
@@ -243,40 +185,43 @@
             cursor:pointer; transition:var(--transition);
             border:1px solid transparent;
         }
-        .server-item:hover { background:var(--accent-bg); border-color:var(--accent-border); }
-        .server-item.selected {
-            background:var(--gradient-active);
-            border-color:var(--accent-light);
-            box-shadow:0 0 12px var(--accent-glow);
-        }
-        .server-item img {
-            width:32px; height:32px; border-radius:50%;
-            background:var(--card);
-        }
-        .server-item .server-name {
-            font-size:0.85rem; font-weight:500;
-            flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-        }
-        .server-item .member-count {
-            font-size:0.7rem; color:var(--text-muted);
-            background:rgba(255,255,255,0.05);
-            padding:0.2rem 0.5rem; border-radius:12px;
-        }
-        .cloner-options {
-            background:var(--card);
-            backdrop-filter:blur(14px);
-            border:1px solid var(--border);
-            border-radius:var(--radius-lg);
+        .server-item:hover { background:var(--accent-bg); border-color:var(--accent-glow); }
+        .server-item.selected { background:var(--gradient-active); border-color:var(--accent-light); }
+        .server-item img { width:32px; height:32px; border-radius:50%; background:var(--card); }
+        .server-item .server-name { font-size:0.85rem; font-weight:500; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .server-item .member-count { font-size:0.7rem; color:var(--text-muted); background:rgba(255,255,255,0.05); padding:0.2rem 0.5rem; border-radius:12px; }
+
+        .cloner-options, .voice-panel {
+            background:var(--card); backdrop-filter:blur(14px);
+            border:1px solid var(--border); border-radius:var(--radius-lg);
             padding:1.2rem;
         }
-        .cloner-options .form-group { margin-bottom:0.8rem; }
-        .cloner-options .form-group label { display:block; font-size:0.78rem; margin-bottom:0.25rem; color:var(--text-secondary); }
-        .cloner-options select {
+        .cloner-options .form-group, .voice-panel .form-group { margin-bottom:0.8rem; }
+        .cloner-options label, .voice-panel label { display:block; font-size:0.78rem; margin-bottom:0.25rem; color:var(--text-secondary); }
+        .cloner-options select, .cloner-options input, .voice-panel select, .voice-panel input {
             width:100%; padding:0.6rem; background:rgba(255,255,255,0.05);
             border:1px solid var(--border); border-radius:8px; color:#fff; font-size:0.85rem;
         }
 
-        /* Toast, float button, rate limit */
+        .btn-primary {
+            background:var(--gradient-brand); border:none; padding:0.6rem 1.3rem;
+            border-radius:20px; color:#fff; font-weight:600; cursor:pointer;
+            margin-right:0.5rem;
+        }
+        .btn-secondary {
+            background:transparent; border:1px solid var(--border);
+            padding:0.6rem 1.3rem; border-radius:20px; color:var(--text); cursor:pointer;
+        }
+        .btn-danger {
+            background:#ef4444; border:none; padding:0.6rem 1.3rem;
+            border-radius:20px; color:#fff; font-weight:600; cursor:pointer;
+        }
+        .progress-log {
+            margin-top:1rem; background:rgba(0,0,0,0.3); border-radius:10px;
+            padding:0.7rem; max-height:180px; overflow-y:auto; font-size:0.75rem;
+            color:var(--text-secondary); font-family:monospace; white-space:pre-wrap;
+        }
+
         .toast {
             position:fixed; top:1rem; right:1rem; z-index:2000;
             background:var(--card); border:1px solid var(--border);
@@ -294,32 +239,17 @@
             cursor:pointer; display:none; align-items:center; justify-content:center;
             font-size:1.1rem; box-shadow:0 4px 16px var(--accent-glow);
         }
-        .rate-limit-indicator {
-            position:fixed; bottom:1.5rem; left:1.5rem; z-index:500;
-            background:var(--card); border:1px solid #f59e0b;
-            border-radius:20px; padding:0.3rem 0.8rem; font-size:0.7rem;
-            color:#f59e0b; display:none;
-        }
         .hamburger {
             display:none; position:fixed; top:1rem; left:1rem; z-index:200;
             background:var(--card); border:1px solid var(--border);
             border-radius:8px; padding:0.5rem; color:var(--text); cursor:pointer;
             font-size:1.2rem;
         }
-        .btn-primary {
-            background:var(--gradient-brand); border:none; padding:0.6rem 1.3rem;
-            border-radius:20px; color:#fff; font-weight:600; cursor:pointer;
-            margin-right:0.5rem;
-        }
-        .btn-secondary {
-            background:transparent; border:1px solid var(--border);
-            padding:0.6rem 1.3rem; border-radius:20px; color:var(--text); cursor:pointer;
-        }
-        .progress-log {
-            margin-top:1rem; background:rgba(0,0,0,0.3); border-radius:10px;
-            padding:0.7rem; max-height:180px; overflow-y:auto; font-size:0.75rem;
-            color:var(--text-secondary); font-family:monospace; white-space:pre-wrap;
-        }
+        .voice-status { padding:0.8rem; border-radius:var(--radius-sm); margin-bottom:1rem; font-size:0.85rem; }
+        .voice-status.connected { background:rgba(16,185,129,0.15); border:1px solid var(--green); color:var(--green); }
+        .voice-status.disconnected { background:rgba(255,255,255,0.03); border:1px solid var(--border); color:var(--text-muted); }
+        .voice-status.error { background:rgba(239,68,68,0.15); border:1px solid #ef4444; color:#ef4444; }
+
         @media (max-width:1024px) { .section-row { grid-template-columns:1fr; } .stats-row { grid-template-columns:repeat(3, 1fr); } .server-selection-grid { grid-template-columns:1fr; } }
         @media (max-width:768px) {
             .sidebar { position:fixed; left:calc(-1 * var(--sidebar-width)); height:100%; }
@@ -336,7 +266,6 @@
 <body data-theme="purple">
     <button class="hamburger" id="hamburgerBtn"><i class="fa-solid fa-bars"></i></button>
     <button class="float-top-btn" id="floatTopBtn"><i class="fa-solid fa-arrow-up"></i></button>
-    <div class="rate-limit-indicator" id="rateLimitIndicator">⚠️ Rate limit</div>
     <div class="toast" id="toast"></div>
 
     <!-- Sidebar -->
@@ -347,7 +276,8 @@
         </div>
         <nav>
             <div class="nav-item active" data-view="dashboard"><i class="fa-solid fa-house"></i> Dashboard</div>
-            <div class="nav-item" data-view="clonerserver"><i class="fa-solid fa-copy"></i> Clonar Servidor</div>
+            <div class="nav-item" data-view="clonerserver"><i class="fa-solid fa-copy"></i> Clonar Server</div>
+            <div class="nav-item" data-view="voicefarmer"><i class="fa-solid fa-headphones"></i> Voice Farmer</div>
             <div class="nav-item" data-view="themes"><i class="fa-solid fa-palette"></i> Tema</div>
         </nav>
         <div class="sidebar-footer">
@@ -362,13 +292,11 @@
     <!-- Main -->
     <div class="main-content">
         <div class="content" id="mainView">
-
             <!-- LOGIN -->
             <div id="loginView">
                 <div style="max-width:400px; margin:3rem auto; text-align:center;">
                     <div class="logo-circle" style="margin:0 auto 1rem; width:56px; height:56px; font-size:1.5rem;"><i class="fa-brands fa-discord"></i></div>
                     <h2>Autenticação</h2>
-                    <p style="color:var(--text-muted); margin-bottom:1.5rem;">Conecte sua conta Discord</p>
                     <input type="password" id="tokenInput" placeholder="Token" style="width:100%; padding:0.7rem; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; color:#fff; margin-bottom:0.8rem;">
                     <input type="password" id="keyInput" placeholder="Key" style="width:100%; padding:0.7rem; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:8px; color:#fff; margin-bottom:1rem;">
                     <button id="loginBtn" class="btn-primary" style="width:100%;">Entrar</button>
@@ -381,12 +309,7 @@
                 <div class="top-bar"><h1>Dashboard</h1><div class="top-actions"><div class="status-online"><span class="dot"></span> Online</div><div class="window-btns"><span class="min"></span><span class="max"></span><span class="close"></span></div></div></div>
                 <div id="skeletonLoader">
                     <div class="user-card"><div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.05);"></div><div style="flex:1;"><div style="width:200px;height:20px;background:rgba(255,255,255,0.05);margin-bottom:0.5rem;"></div><div style="width:150px;height:14px;background:rgba(255,255,255,0.05);"></div></div></div>
-                    <div class="stats-row">
-                        <div style="height:80px;background:rgba(255,255,255,0.05);border-radius:var(--radius-lg);"></div>
-                        <div style="height:80px;background:rgba(255,255,255,0.05);border-radius:var(--radius-lg);"></div>
-                        <div style="height:80px;background:rgba(255,255,255,0.05);border-radius:var(--radius-lg);"></div>
-                        <div style="height:80px;background:rgba(255,255,255,0.05);border-radius:var(--radius-lg);"></div>
-                    </div>
+                    <div class="stats-row"><div style="height:80px;background:rgba(255,255,255,0.05);border-radius:var(--radius-lg);"></div><div style="height:80px;background:rgba(255,255,255,0.05);border-radius:var(--radius-lg);"></div><div style="height:80px;background:rgba(255,255,255,0.05);border-radius:var(--radius-lg);"></div><div style="height:80px;background:rgba(255,255,255,0.05);border-radius:var(--radius-lg);"></div></div>
                 </div>
                 <div id="realContent" style="display:none;">
                     <div class="user-card">
@@ -408,34 +331,46 @@
                         <div class="graph-panel"><h4>Atividade</h4><canvas id="activityChart"></canvas></div>
                         <div class="activity-panel"><h4>Atividades Recentes</h4><ul class="activity-list" id="recentActivityList"><li style="color:var(--text-muted);">Nenhuma atividade.</li></ul></div>
                     </div>
-                    <button id="refreshDataBtn" class="btn-secondary" style="margin-top:1rem;"><i class="fa-solid fa-rotate"></i> Atualizar</button>
-                    <button id="logoutBtn" class="btn-secondary" style="margin-top:1rem; margin-left:0.5rem;"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+                    <button id="refreshDataBtn" class="btn-secondary" style="margin-top:1rem;">Atualizar</button>
+                    <button id="logoutBtn" class="btn-secondary" style="margin-top:1rem; margin-left:0.5rem;">Sair</button>
                 </div>
             </div>
 
             <!-- CLONER SERVER -->
             <div id="clonerserverView" style="display:none;">
                 <div class="top-bar"><h1>Clonar Servidor</h1></div>
-                <div id="clonerLoginNotice" style="display:none; color:#ef4444;">⚠️ Faça login para carregar seus servidores.</div>
+                <div id="clonerLoginNotice" style="display:none; color:#ef4444;">Faça login para carregar seus servidores.</div>
                 <div id="clonerForm" style="display:none;">
                     <div class="server-selection-grid">
-                        <div class="server-picker">
-                            <h4>🔹 Servidor Origem</h4>
-                            <div class="server-list-container" id="origemList"></div>
-                        </div>
-                        <div class="server-picker">
-                            <h4>🔸 Servidor Destino</h4>
-                            <div class="server-list-container" id="destinoList"></div>
-                        </div>
+                        <div class="server-picker"><h4>Servidor Origem</h4><div class="server-list-container" id="origemList"></div></div>
+                        <div class="server-picker"><h4>Servidor Destino</h4><div class="server-list-container" id="destinoList"></div></div>
                     </div>
                     <div class="cloner-options">
                         <div class="form-group"><label>Tipo de clonagem</label><select id="tipoClonagem"><option value="tudo">Tudo</option><option value="apenas_cargos">Apenas Cargos</option><option value="apenas_canais">Apenas Canais</option><option value="apenas_emojis">Apenas Emojis</option><option value="cargos_canais">Cargos + Canais</option></select></div>
                         <div class="form-group"><label>Excluir conteúdo existente?</label><select id="excluirExistentes"><option value="sim">Sim</option><option value="nao">Não</option></select></div>
                         <button class="btn-primary" id="startClonerBtn">Iniciar Clonagem</button>
-                        <button class="btn-secondary" id="stopClonerBtn" style="display:none;">Parar</button>
+                        <button class="btn-danger" id="stopClonerBtn" style="display:none;">Parar</button>
                     </div>
                     <div class="progress-log" id="clonerLog" style="display:none;"></div>
                     <div style="margin-top:1rem;"><h4 style="color:var(--text-muted);">Histórico</h4><div class="progress-log" id="clonerHistory">Nenhum histórico.</div></div>
+                </div>
+            </div>
+
+            <!-- VOICE FARMER -->
+            <div id="voicefarmerView" style="display:none;">
+                <div class="top-bar"><h1>Voice Farmer</h1></div>
+                <div id="voiceLoginNotice" style="display:none; color:#ef4444;">Faça login para usar o Voice Farmer.</div>
+                <div id="voiceForm" style="display:none;">
+                    <div class="voice-status disconnected" id="voiceStatus">
+                        <i class="fa-solid fa-circle"></i> Desconectado
+                    </div>
+                    <div class="voice-panel">
+                        <div class="form-group"><label>ID do Servidor</label><input type="text" id="voiceGuildId" placeholder="ID do servidor"></div>
+                        <div class="form-group"><label>ID do Canal de Voz</label><input type="text" id="voiceChannelId" placeholder="ID do canal de voz"></div>
+                        <button class="btn-primary" id="startVoiceBtn"><i class="fa-solid fa-play"></i> Iniciar</button>
+                        <button class="btn-danger" id="stopVoiceBtn" style="display:none;"><i class="fa-solid fa-stop"></i> Parar</button>
+                    </div>
+                    <div class="progress-log" id="voiceLog" style="display:none;"></div>
                 </div>
             </div>
 
@@ -452,272 +387,318 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="logoutModal" style="display:none; position:fixed; top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:1000;">
-        <div style="background:var(--card); padding:2rem; border-radius:var(--radius-xl); text-align:center;">
-            <h3>Tem certeza?</h3>
-            <button class="btn-primary" id="confirmLogout">Sim</button>
-            <button class="btn-secondary" id="cancelLogout">Cancelar</button>
-        </div>
-    </div>
+    <script src="clonerserver.js"></script>
+    <script src="voicefarmer.js"></script>
+    <script>
+        (function() {
+            const API = 'https://discord.com/api/v10';
+            const VALID_KEY = 'void';
+            let token = '', userData = null, allGuilds = [];
+            let selectedOrigemId = null, selectedDestinoId = null;
 
-<script>
-(function() {
-    const API = 'https://discord.com/api/v10';
-    const VALID_KEY = 'void';
-    let token = '', userData = null, allGuilds = [], clonerAbortController = null;
-    let selectedOrigemId = null, selectedDestinoId = null;
+            const toast = document.getElementById('toast');
+            const skeletonLoader = document.getElementById('skeletonLoader');
+            const realContent = document.getElementById('realContent');
+            const sidebar = document.getElementById('sidebar');
 
-    // DOM
-    const loginView = document.getElementById('loginView');
-    const dashboardView = document.getElementById('dashboardView');
-    const clonerserverView = document.getElementById('clonerserverView');
-    const themesView = document.getElementById('themesView');
-    const toast = document.getElementById('toast');
-    const skeletonLoader = document.getElementById('skeletonLoader');
-    const realContent = document.getElementById('realContent');
-    const sidebar = document.getElementById('sidebar');
+            function showToast(msg, type='') { toast.textContent=msg; toast.className='toast '+type+' show'; setTimeout(()=>toast.classList.remove('show'),3000); }
 
-    function showToast(msg, type='') { toast.textContent=msg; toast.className='toast '+type+' show'; setTimeout(()=>toast.classList.remove('show'),3000); }
-    function showView(v) {
-        [loginView, dashboardView, clonerserverView, themesView].forEach(el=>el.style.display='none');
-        if (v==='dashboard') dashboardView.style.display='block';
-        else if (v==='clonerserver') clonerserverView.style.display='block';
-        else if (v==='themes') themesView.style.display='block';
-        document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-        document.querySelector(`.nav-item[data-view="${v}"]`)?.classList.add('active');
-        sidebar.classList.remove('open');
-    }
-    document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>showView(item.dataset.view)));
-    document.getElementById('hamburgerBtn').addEventListener('click',()=>sidebar.classList.toggle('open'));
-    window.addEventListener('scroll',()=>document.getElementById('floatTopBtn').style.display=window.scrollY>400?'flex':'none');
-    document.getElementById('floatTopBtn').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-
-    // Login
-    document.getElementById('loginBtn').addEventListener('click',async ()=>{
-        const t=document.getElementById('tokenInput').value.trim(), k=document.getElementById('keyInput').value.trim();
-        if(!t||k!==VALID_KEY) return showToast(k!==VALID_KEY?'Key inválida':'Preencha os campos.','error');
-        try {
-            const r=await fetch(`${API}/users/@me`,{headers:{Authorization:t}});
-            if(!r.ok) throw new Error('Token inválido');
-            userData=await r.json(); token=t;
-            document.getElementById('sidebarAvatar').style.backgroundImage=`url(${userData.avatar?`https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=64`:`https://cdn.discordapp.com/embed/avatars/${(userData.discriminator||'0')%5}.png`})`;
-            document.getElementById('sidebarName').textContent=userData.global_name||userData.username;
-            document.getElementById('sidebarStatus').textContent='Conectado';
-            showView('dashboard');
-            skeletonLoader.style.display='block'; realContent.style.display='none';
-            await loadDashboardData();
-            skeletonLoader.style.display='none'; realContent.style.display='block';
-            showToast('Conectado!','success');
-        } catch(e) { showToast('Falha na autenticação.','error'); }
-    });
-
-    async function loadDashboardData() {
-        document.getElementById('displayName').textContent=userData.global_name||userData.username;
-        document.getElementById('usernameTag').textContent=`${userData.username}#${userData.discriminator}`;
-        document.getElementById('mainAvatar').style.backgroundImage=`url(${userData.avatar?`https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=128`:`https://cdn.discordapp.com/embed/avatars/${(userData.discriminator||'0')%5}.png`})`;
-        document.getElementById('statId').textContent=userData.id;
-        document.getElementById('statId').onclick=()=>{navigator.clipboard.writeText(userData.id); showToast('ID copiado!','success');};
-        document.getElementById('statCreated').textContent=new Date(Number((BigInt(userData.id)>>22n)+1420070400000n)).toLocaleDateString('pt-BR');
-
-        // Badges (ícones corretos)
-        const flags=userData.public_flags||0;
-        const badgeDefs=[
-            [1,'Staff','#5865f2','fa-brands fa-discord'],
-            [2,'Partner','#3b82f6','fa-solid fa-handshake'],
-            [4,'HypeSquad Events','#fbbf24','fa-solid fa-star'],
-            [8,'Bug Hunter','#10b981','fa-solid fa-bug'],
-            [64,'HypeSquad Bravery','#9c27b0','fa-solid fa-shield-halved'],
-            [128,'HypeSquad Brilliance','#e91e63','fa-solid fa-gem'],
-            [256,'HypeSquad Balance','#4caf50','fa-solid fa-scale-balanced'],
-            [512,'Early Supporter','#ff9800','fa-solid fa-clock'],
-            [16384,'Bug Hunter Gold','#10b981','fa-solid fa-bug'],
-            [131072,'Verified Developer','#607d8b','fa-solid fa-code'],
-            [262144,'Active Developer','#607d8b','fa-solid fa-code']
-        ];
-        const badgesDiv=document.getElementById('badgesContainer');
-        badgesDiv.innerHTML='';
-        badgeDefs.forEach(([flag,name,color,icon])=>{
-            if(flags&flag) {
-                const span=document.createElement('span');
-                span.className='badge-icon';
-                span.style.background=color;
-                span.innerHTML=`<i class="${icon}"></i>`;
-                span.title=name;
-                badgesDiv.appendChild(span);
+            function showView(v) {
+                ['loginView','dashboardView','clonerserverView','voicefarmerView','themesView'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+                if (v === 'dashboard') document.getElementById('dashboardView').style.display = 'block';
+                else if (v === 'clonerserver') document.getElementById('clonerserverView').style.display = 'block';
+                else if (v === 'voicefarmer') document.getElementById('voicefarmerView').style.display = 'block';
+                else if (v === 'themes') document.getElementById('themesView').style.display = 'block';
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.querySelector(`.nav-item[data-view="${v}"]`)?.classList.add('active');
+                sidebar.classList.remove('open');
             }
-        });
 
-        try {
-            const gRes=await fetch(`${API}/users/@me/guilds`,{headers:{Authorization:token}});
-            allGuilds=await gRes.json();
-            document.getElementById('guildCount').textContent=`${allGuilds.length} servidores`;
-            document.getElementById('statGuilds').textContent=allGuilds.length;
-        } catch(e) {}
-        try {
-            const fRes=await fetch(`${API}/users/@me/relationships`,{headers:{Authorization:token}});
-            const friends=await fRes.json();
-            document.getElementById('statFriends').textContent=Array.isArray(friends)?friends.filter(r=>r.type===1).length:'—';
-        } catch(e) { document.getElementById('statFriends').textContent='—'; }
+            document.querySelectorAll('.nav-item').forEach(item => item.addEventListener('click', () => showView(item.dataset.view)));
+            document.getElementById('hamburgerBtn').addEventListener('click', () => sidebar.classList.toggle('open'));
+            window.addEventListener('scroll', () => document.getElementById('floatTopBtn').style.display = window.scrollY > 400 ? 'flex' : 'none');
+            document.getElementById('floatTopBtn').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-        drawGraph();
-        updateActivities();
-    }
-
-    function drawGraph() {
-        const canvas=document.getElementById('activityChart');
-        if(!canvas) return;
-        const ctx=canvas.getContext('2d');
-        canvas.width=canvas.parentElement.clientWidth-30; canvas.height=150;
-        const w=canvas.width, h=canvas.height;
-        ctx.clearRect(0,0,w,h);
-        const pts=Array.from({length:7},()=>Math.floor(Math.random()*100));
-        ctx.beginPath(); ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue('--accent').trim()||'#8b5cf6'; ctx.lineWidth=2;
-        const step=w/(pts.length-1);
-        pts.forEach((v,i)=>{const x=i*step,y=h-(v/100)*h; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-        ctx.stroke(); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
-        ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--accent-bg').trim()||'rgba(139,92,246,0.1)';
-        ctx.fill();
-    }
-
-    function updateActivities() {
-        const list=document.getElementById('recentActivityList');
-        const acts=JSON.parse(localStorage.getItem('novaHub_activities')||'[]');
-        list.innerHTML=acts.length?acts.slice(-5).reverse().map(a=>`<li><i class="fa-solid fa-circle" style="font-size:0.4rem;"></i> ${a}</li>`).join(''):'<li>Nenhuma atividade.</li>';
-    }
-    function addActivity(msg) {
-        const acts=JSON.parse(localStorage.getItem('novaHub_activities')||'[]');
-        acts.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
-        if(acts.length>50) acts.shift();
-        localStorage.setItem('novaHub_activities',JSON.stringify(acts));
-        updateActivities();
-    }
-
-    document.getElementById('refreshDataBtn').addEventListener('click',async ()=>{
-        skeletonLoader.style.display='block'; realContent.style.display='none';
-        await loadDashboardData();
-        skeletonLoader.style.display='none'; realContent.style.display='block';
-        showToast('Atualizado!','success');
-    });
-
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click',()=>document.getElementById('logoutModal').style.display='flex');
-    document.getElementById('confirmLogout').addEventListener('click',()=>{
-        token=''; userData=null;
-        loginView.style.display='block'; dashboardView.style.display='none'; clonerserverView.style.display='none'; themesView.style.display='none';
-        document.getElementById('sidebarName').textContent='Conecte-se'; document.getElementById('sidebarStatus').textContent='Desconectado';
-        document.getElementById('logoutModal').style.display='none';
-    });
-    document.getElementById('cancelLogout').addEventListener('click',()=>document.getElementById('logoutModal').style.display='none');
-
-    // Themes
-    document.querySelectorAll('.theme-option').forEach(btn=>btn.addEventListener('click',()=>{
-        document.body.dataset.theme=btn.dataset.theme;
-        localStorage.setItem('novaHub_theme',btn.dataset.theme);
-        showToast('Tema alterado!','success');
-        drawGraph(); // redesenha gráfico com nova cor
-    }));
-    const savedTheme=localStorage.getItem('novaHub_theme');
-    if(savedTheme) document.body.dataset.theme=savedTheme;
-
-    // CLONER SERVER
-    function populateClonerLists() {
-        if(!allGuilds.length) return;
-        const origemList=document.getElementById('origemList');
-        const destinoList=document.getElementById('destinoList');
-        const html=allGuilds.map(g=>`
-            <div class="server-item" data-id="${g.id}" data-name="${g.name}" data-icon="${g.icon?`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=64`:''}">
-                <img src="${g.icon?`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=64`:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect fill=%22%23555%22 width=%2232%22 height=%2232%22 rx=%2250%22/></svg>'}" onerror="this.src='data:image/svg+xml,...'">
-                <span class="server-name">${g.name}</span>
-                <span class="member-count">~${g.approximate_member_count||'?'}</span>
-            </div>`).join('');
-        origemList.innerHTML=html;
-        destinoList.innerHTML=html;
-
-        // Seleção
-        origemList.querySelectorAll('.server-item').forEach(el=>el.addEventListener('click',()=>{
-            origemList.querySelectorAll('.server-item').forEach(e=>e.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedOrigemId=el.dataset.id;
-        }));
-        destinoList.querySelectorAll('.server-item').forEach(el=>el.addEventListener('click',()=>{
-            destinoList.querySelectorAll('.server-item').forEach(e=>e.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedDestinoId=el.dataset.id;
-        }));
-    }
-
-    document.querySelector('.nav-item[data-view="clonerserver"]').addEventListener('click',()=>{
-        if(token && allGuilds.length>0) {
-            document.getElementById('clonerLoginNotice').style.display='none';
-            document.getElementById('clonerForm').style.display='block';
-            populateClonerLists();
-        } else if(token) {
-            document.getElementById('clonerLoginNotice').style.display='none';
-            document.getElementById('clonerForm').style.display='block';
-            fetch(`${API}/users/@me/guilds`,{headers:{Authorization:token}}).then(r=>r.json()).then(guilds=>{
-                allGuilds=guilds;
-                populateClonerLists();
+            // Login
+            document.getElementById('loginBtn').addEventListener('click', async () => {
+                const t = document.getElementById('tokenInput').value.trim();
+                const k = document.getElementById('keyInput').value.trim();
+                if (!t || k !== VALID_KEY) return showToast(k !== VALID_KEY ? 'Key inválida.' : 'Preencha os campos.', 'error');
+                try {
+                    const r = await fetch(`${API}/users/@me`, { headers: { Authorization: t } });
+                    if (!r.ok) throw new Error('Token inválido');
+                    userData = await r.json();
+                    token = t;
+                    document.getElementById('sidebarAvatar').style.backgroundImage = `url(${userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=64` : `https://cdn.discordapp.com/embed/avatars/${(userData.discriminator||'0')%5}.png`})`;
+                    document.getElementById('sidebarName').textContent = userData.global_name || userData.username;
+                    document.getElementById('sidebarStatus').textContent = 'Conectado';
+                    showView('dashboard');
+                    skeletonLoader.style.display = 'block'; realContent.style.display = 'none';
+                    await loadDashboardData();
+                    skeletonLoader.style.display = 'none'; realContent.style.display = 'block';
+                    showToast('Conectado!', 'success');
+                } catch (e) { showToast('Falha na autenticação.', 'error'); }
             });
-        } else {
-            document.getElementById('clonerLoginNotice').style.display='block';
-            document.getElementById('clonerForm').style.display='none';
-        }
-    });
 
-    document.getElementById('startClonerBtn').addEventListener('click',async ()=>{
-        if(!token) return showToast('Faça login.','error');
-        if(!selectedOrigemId||!selectedDestinoId) return showToast('Selecione os dois servidores.','error');
-        const tipo=document.getElementById('tipoClonagem').value;
-        const excluir=document.getElementById('excluirExistentes').value==='sim';
-        const log=document.getElementById('clonerLog');
-        log.style.display='block'; log.textContent='Iniciando...\n';
-        clonerAbortController=new AbortController();
-        document.getElementById('stopClonerBtn').style.display='inline-block';
-        try {
-            await clonarServidor(token, selectedOrigemId, selectedDestinoId, tipo, excluir, msg=>{log.textContent+=msg+'\n';log.scrollTop=log.scrollHeight;}, clonerAbortController.signal);
-            log.textContent+='\n✅ Concluído!';
-            addActivity('Clonagem concluída');
-        } catch(e) {
-            log.textContent+=e.name==='AbortError'?'\n⏹️ Interrompido.':`\n❌ ${e.message}`;
-        } finally {
-            clonerAbortController=null;
-            document.getElementById('stopClonerBtn').style.display='none';
-        }
-    });
-    document.getElementById('stopClonerBtn').addEventListener('click',()=>clonerAbortController?.abort());
+            async function loadDashboardData() {
+                document.getElementById('displayName').textContent = userData.global_name || userData.username;
+                document.getElementById('usernameTag').textContent = `${userData.username}#${userData.discriminator}`;
+                document.getElementById('mainAvatar').style.backgroundImage = `url(${userData.avatar ? `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png?size=128` : `https://cdn.discordapp.com/embed/avatars/${(userData.discriminator||'0')%5}.png`})`;
+                document.getElementById('statId').textContent = userData.id;
+                document.getElementById('statId').onclick = () => { navigator.clipboard.writeText(userData.id); showToast('ID copiado!', 'success'); };
+                document.getElementById('statCreated').textContent = new Date(Number((BigInt(userData.id) >> 22n) + 1420070400000n)).toLocaleDateString('pt-BR');
 
-    // Histórico
-    function renderClonerHistory() {
-        const hist=JSON.parse(localStorage.getItem('novaHub_clonerHistory')||'[]');
-        document.getElementById('clonerHistory').innerHTML=hist.length?hist.map(h=>`${h.time} | ${h.origem}→${h.destino} | ${h.status}`).join('\n'):'Nenhum histórico.';
-    }
-    renderClonerHistory();
-    function saveClonerHistory(o,d,s) {
-        const hist=JSON.parse(localStorage.getItem('novaHub_clonerHistory')||'[]');
-        hist.unshift({origem:o,destino:d,status:s,time:new Date().toLocaleString()});
-        if(hist.length>5) hist.pop();
-        localStorage.setItem('novaHub_clonerHistory',JSON.stringify(hist));
-        renderClonerHistory();
-    }
+                const flags = userData.public_flags || 0;
+                const badgeDefs = [
+                    [1, 'Staff', '#5865f2', 'fa-brands fa-discord'],
+                    [2, 'Partner', '#3b82f6', 'fa-solid fa-handshake'],
+                    [4, 'HypeSquad Events', '#fbbf24', 'fa-solid fa-star'],
+                    [8, 'Bug Hunter', '#10b981', 'fa-solid fa-bug'],
+                    [64, 'Bravery', '#9c27b0', 'fa-solid fa-shield-halved'],
+                    [128, 'Brilliance', '#e91e63', 'fa-solid fa-gem'],
+                    [256, 'Balance', '#4caf50', 'fa-solid fa-scale-balanced'],
+                    [512, 'Early Supporter', '#ff9800', 'fa-solid fa-clock'],
+                    [16384, 'Bug Hunter Gold', '#10b981', 'fa-solid fa-bug'],
+                    [131072, 'Developer', '#607d8b', 'fa-solid fa-code'],
+                    [262144, 'Active Developer', '#607d8b', 'fa-solid fa-code']
+                ];
+                const badgesDiv = document.getElementById('badgesContainer');
+                badgesDiv.innerHTML = '';
+                badgeDefs.forEach(([flag, name, color, icon]) => {
+                    if (flags & flag) {
+                        const span = document.createElement('span');
+                        span.className = 'badge-icon';
+                        span.style.background = color;
+                        span.innerHTML = `<i class="${icon}"></i>`;
+                        span.title = name;
+                        badgesDiv.appendChild(span);
+                    }
+                });
 
-    async function clonarServidor(tok,orig,dest,tipo,excluir,log,signal) {
-        const headers={Authorization:tok,'Content-Type':'application/json'}, base='https://discord.com/api/v10';
-        const opts={cargos:tipo==='tudo'||tipo.includes('cargos'),canais:tipo==='tudo'||tipo.includes('canais'),emojis:tipo==='tudo'||tipo.includes('emojis')};
-        log('Verificando servidores...'); if(signal.aborted) throw new DOMException('Aborted','AbortError');
-        const [o,d]=await Promise.all([fetch(`${base}/guilds/${orig}`,{headers,signal}).then(r=>r.ok?r.json():Promise.reject('Origem inacessível')),fetch(`${base}/guilds/${dest}`,{headers,signal}).then(r=>r.ok?r.json():Promise.reject('Destino inacessível'))]);
-        const everyone=d.roles.find(r=>r.name==='@everyone')?.id; if(!everyone) throw new Error('@everyone ausente');
-        const roleMap={}, total=(opts.cargos?1:0)+(opts.canais?1:0)+(opts.emojis?1:0)+(excluir?1:0); let step=0;
-        if(opts.cargos&&excluir){log(`[${++step}/${total}] Deletando cargos...`);for(const r of d.roles.filter(r=>r.name!=='@everyone')){if(signal.aborted) throw new DOMException('Aborted','AbortError');await fetch(`${base}/guilds/${dest}/roles/${r.id}`,{method:'DELETE',headers,signal});await new Promise(r=>setTimeout(r,200));}}
-        if(opts.canais&&excluir){log(`[${++step}/${total}] Deletando canais...`);const ch=await fetch(`${base}/guilds/${dest}/channels`,{headers,signal}).then(r=>r.json());for(const c of ch){if(signal.aborted) throw new DOMException('Aborted','AbortError');await fetch(`${base}/channels/${c.id}`,{method:'DELETE',headers,signal});await new Promise(r=>setTimeout(r,200));}}
-        if(opts.cargos){log(`[${++step}/${total}] Clonando cargos...`);const roles=await fetch(`${base}/guilds/${orig}/roles`,{headers,signal}).then(r=>r.json());for(const role of roles.filter(r=>r.name!=='@everyone')){if(signal.aborted) throw new DOMException('Aborted','AbortError');const res=await fetch(`${base}/guilds/${dest}/roles`,{method:'POST',headers,signal,body:JSON.stringify({name:role.name,permissions:role.permissions,color:role.color,hoist:role.hoist,mentionable:role.mentionable})});if(res.ok){const c=await res.json();roleMap[role.id]=c.id;}await new Promise(r=>setTimeout(r,400));}}
-        const catMap={};
-        if(opts.canais){log(`[${++step}/${total}] Clonando canais...`);const chs=(await fetch(`${base}/guilds/${orig}/channels`,{headers,signal}).then(r=>r.json())).sort((a,b)=>a.position-b.position);for(const c of chs.filter(c=>c.type===4)){if(signal.aborted) throw new DOMException('Aborted','AbortError');const ow=c.permission_overwrites?.map(p=>({id:roleMap[p.id]||p.id,type:p.type,allow:p.allow,deny:p.deny}))||[];const res=await fetch(`${base}/guilds/${dest}/channels`,{method:'POST',headers,signal,body:JSON.stringify({name:c.name,type:4,permission_overwrites:ow})});if(res.ok){const cr=await res.json();catMap[c.id]=cr.id;}await new Promise(r=>setTimeout(r,400));}for(const c of chs.filter(c=>c.type!==4)){if(signal.aborted) throw new DOMException('Aborted','AbortError');const ow=c.permission_overwrites?.map(p=>({id:roleMap[p.id]||p.id,type:p.type,allow:p.allow,deny:p.deny}))||[];await fetch(`${base}/guilds/${dest}/channels`,{method:'POST',headers,signal,body:JSON.stringify({name:c.name,type:c.type,parent_id:catMap[c.parent_id]||null,permission_overwrites:ow,topic:c.topic,nsfw:c.nsfw})});await new Promise(r=>setTimeout(r,400));}}
-        if(opts.emojis){log(`[${++step}/${total}] Clonando emojis...`);const emojis=await fetch(`${base}/guilds/${orig}/emojis`,{headers,signal}).then(r=>r.json());for(const e of emojis){if(signal.aborted) throw new DOMException('Aborted','AbortError');const blob=await fetch(`https://cdn.discordapp.com/emojis/${e.id}.${e.animated?'gif':'png'}`).then(r=>r.blob());const dataUrl=await new Promise(res=>{const reader=new FileReader();reader.onload=()=>res(reader.result);reader.readAsDataURL(blob);});await fetch(`${base}/guilds/${dest}/emojis`,{method:'POST',headers,signal,body:JSON.stringify({name:e.name,image:dataUrl})});await new Promise(r=>setTimeout(r,600));}}
-    }
+                try {
+                    const gRes = await fetch(`${API}/users/@me/guilds`, { headers: { Authorization: token } });
+                    allGuilds = await gRes.json();
+                    document.getElementById('guildCount').textContent = `${allGuilds.length} servidores`;
+                    document.getElementById('statGuilds').textContent = allGuilds.length;
+                } catch (e) {}
+                try {
+                    const fRes = await fetch(`${API}/users/@me/relationships`, { headers: { Authorization: token } });
+                    const friends = await fRes.json();
+                    document.getElementById('statFriends').textContent = Array.isArray(friends) ? friends.filter(r => r.type === 1).length : '—';
+                } catch (e) { document.getElementById('statFriends').textContent = '—'; }
 
-    document.addEventListener('keydown',e=>{if(e.key==='Escape') document.getElementById('logoutModal').style.display='none';});
-    addActivity('Página carregada');
-})();
-</script>
+                drawGraph();
+                updateActivities();
+            }
+
+            function drawGraph() {
+                const canvas = document.getElementById('activityChart');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.parentElement.clientWidth - 30;
+                canvas.height = 150;
+                const w = canvas.width, h = canvas.height;
+                ctx.clearRect(0, 0, w, h);
+                const pts = Array.from({ length: 7 }, () => Math.floor(Math.random() * 100));
+                ctx.beginPath();
+                ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#8b5cf6';
+                ctx.lineWidth = 2;
+                const step = w / (pts.length - 1);
+                pts.forEach((v, i) => { const x = i * step, y = h - (v / 100) * h; i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+                ctx.stroke(); ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--accent-bg').trim() || 'rgba(139,92,246,0.1)';
+                ctx.fill();
+            }
+
+            function updateActivities() {
+                const list = document.getElementById('recentActivityList');
+                const acts = JSON.parse(localStorage.getItem('novaHub_activities') || '[]');
+                list.innerHTML = acts.length ? acts.slice(-5).reverse().map(a => `<li><i class="fa-solid fa-circle" style="font-size:0.4rem;"></i> ${a}</li>`).join('') : '<li>Nenhuma atividade.</li>';
+            }
+
+            function addActivity(msg) {
+                const acts = JSON.parse(localStorage.getItem('novaHub_activities') || '[]');
+                acts.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
+                if (acts.length > 50) acts.shift();
+                localStorage.setItem('novaHub_activities', JSON.stringify(acts));
+                updateActivities();
+            }
+
+            document.getElementById('refreshDataBtn').addEventListener('click', async () => {
+                skeletonLoader.style.display = 'block'; realContent.style.display = 'none';
+                await loadDashboardData();
+                skeletonLoader.style.display = 'none'; realContent.style.display = 'block';
+                showToast('Atualizado!', 'success');
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                token = ''; userData = null;
+                document.getElementById('loginView').style.display = 'block';
+                document.getElementById('dashboardView').style.display = 'none';
+                document.getElementById('sidebarName').textContent = 'Conecte-se';
+                document.getElementById('sidebarStatus').textContent = 'Desconectado';
+            });
+
+            // Themes
+            document.querySelectorAll('.theme-option').forEach(btn => btn.addEventListener('click', () => {
+                document.body.dataset.theme = btn.dataset.theme;
+                localStorage.setItem('novaHub_theme', btn.dataset.theme);
+                showToast('Tema alterado!', 'success');
+                drawGraph();
+            }));
+            const savedTheme = localStorage.getItem('novaHub_theme');
+            if (savedTheme) document.body.dataset.theme = savedTheme;
+
+            // ===== CLONER SERVER (usando módulo externo) =====
+            function populateClonerLists() {
+                if (!allGuilds.length) return;
+                const html = allGuilds.map(g => `
+                    <div class="server-item" data-id="${g.id}" data-name="${g.name}">
+                        <img src="${g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png?size=64` : ''}" onerror="this.style.display='none'">
+                        <span class="server-name">${g.name}</span>
+                        <span class="member-count">~${g.approximate_member_count || '?'}</span>
+                    </div>`).join('');
+                document.getElementById('origemList').innerHTML = html;
+                document.getElementById('destinoList').innerHTML = html;
+                document.getElementById('origemList').querySelectorAll('.server-item').forEach(el => el.addEventListener('click', () => {
+                    document.querySelectorAll('#origemList .server-item').forEach(e => e.classList.remove('selected'));
+                    el.classList.add('selected');
+                    selectedOrigemId = el.dataset.id;
+                }));
+                document.getElementById('destinoList').querySelectorAll('.server-item').forEach(el => el.addEventListener('click', () => {
+                    document.querySelectorAll('#destinoList .server-item').forEach(e => e.classList.remove('selected'));
+                    el.classList.add('selected');
+                    selectedDestinoId = el.dataset.id;
+                }));
+            }
+
+            document.querySelector('.nav-item[data-view="clonerserver"]').addEventListener('click', () => {
+                if (token && allGuilds.length > 0) {
+                    document.getElementById('clonerLoginNotice').style.display = 'none';
+                    document.getElementById('clonerForm').style.display = 'block';
+                    populateClonerLists();
+                } else if (token) {
+                    document.getElementById('clonerLoginNotice').style.display = 'none';
+                    document.getElementById('clonerForm').style.display = 'block';
+                    fetch(`${API}/users/@me/guilds`, { headers: { Authorization: token } }).then(r => r.json()).then(guilds => {
+                        allGuilds = guilds;
+                        populateClonerLists();
+                    });
+                } else {
+                    document.getElementById('clonerLoginNotice').style.display = 'block';
+                    document.getElementById('clonerForm').style.display = 'none';
+                }
+            });
+
+            document.getElementById('startClonerBtn').addEventListener('click', async () => {
+                if (!token) return showToast('Faça login.', 'error');
+                if (!selectedOrigemId || !selectedDestinoId) return showToast('Selecione os dois servidores.', 'error');
+                const tipo = document.getElementById('tipoClonagem').value;
+                const excluir = document.getElementById('excluirExistentes').value === 'sim';
+                const log = document.getElementById('clonerLog');
+                log.style.display = 'block';
+                log.textContent = 'Iniciando...\n';
+                const abortController = ClonerServer.createAbortController();
+                document.getElementById('stopClonerBtn').style.display = 'inline-block';
+                try {
+                    await ClonerServer.clonarServidor(token, selectedOrigemId, selectedDestinoId, tipo, excluir, msg => {
+                        log.textContent += msg + '\n';
+                        log.scrollTop = log.scrollHeight;
+                    }, abortController.signal);
+                    log.textContent += '\n✅ Concluído!';
+                    ClonerServer.saveHistory(selectedOrigemId, selectedDestinoId, 'Sucesso');
+                    addActivity('Clonagem concluída');
+                } catch (e) {
+                    log.textContent += e.name === 'AbortError' ? '\n⏹️ Interrompido.' : `\n❌ ${e.message}`;
+                    ClonerServer.saveHistory(selectedOrigemId, selectedDestinoId, e.name === 'AbortError' ? 'Interrompido' : 'Falha');
+                } finally {
+                    document.getElementById('stopClonerBtn').style.display = 'none';
+                    renderClonerHistory();
+                }
+            });
+
+            document.getElementById('stopClonerBtn').addEventListener('click', () => ClonerServer.abort());
+
+            function renderClonerHistory() {
+                const hist = ClonerServer.getHistory();
+                document.getElementById('clonerHistory').innerHTML = hist.length ? hist.map(h => `${h.time} | ${h.origem}→${h.destino} | ${h.status}`).join('\n') : 'Nenhum histórico.';
+            }
+            renderClonerHistory();
+
+            // ===== VOICE FARMER (usando módulo externo) =====
+            document.querySelector('.nav-item[data-view="voicefarmer"]').addEventListener('click', () => {
+                if (token) {
+                    document.getElementById('voiceLoginNotice').style.display = 'none';
+                    document.getElementById('voiceForm').style.display = 'block';
+                    updateVoiceUI();
+                } else {
+                    document.getElementById('voiceLoginNotice').style.display = 'block';
+                    document.getElementById('voiceForm').style.display = 'none';
+                }
+            });
+
+            function updateVoiceUI() {
+                const statusEl = document.getElementById('voiceStatus');
+                const startBtn = document.getElementById('startVoiceBtn');
+                const stopBtn = document.getElementById('stopVoiceBtn');
+                const log = document.getElementById('voiceLog');
+
+                if (VoiceFarmer.isConnected()) {
+                    statusEl.className = 'voice-status connected';
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> Conectado (' + VoiceFarmer.getConnectionTime() + ')';
+                    startBtn.style.display = 'none';
+                    stopBtn.style.display = 'inline-block';
+                    log.style.display = 'block';
+                } else {
+                    statusEl.className = 'voice-status disconnected';
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle"></i> Desconectado';
+                    startBtn.style.display = 'inline-block';
+                    stopBtn.style.display = 'none';
+                }
+
+                // Restaura configuração salva
+                const config = VoiceFarmer.getConfig();
+                if (config) {
+                    document.getElementById('voiceGuildId').value = config.guildId || '';
+                    document.getElementById('voiceChannelId').value = config.channelId || '';
+                }
+            }
+
+            document.getElementById('startVoiceBtn').addEventListener('click', async () => {
+                if (!token) return showToast('Faça login.', 'error');
+                const guildId = document.getElementById('voiceGuildId').value.trim();
+                const channelId = document.getElementById('voiceChannelId').value.trim();
+                if (!guildId || !channelId) return showToast('Preencha os IDs.', 'error');
+
+                const log = document.getElementById('voiceLog');
+                log.style.display = 'block';
+                log.textContent = 'Conectando...\n';
+
+                VoiceFarmer.saveConfig({ guildId, channelId });
+
+                await VoiceFarmer.start(token, guildId, channelId, (type, msg) => {
+                    log.textContent += `[${type}] ${msg}\n`;
+                    log.scrollTop = log.scrollHeight;
+                    updateVoiceUI();
+                });
+            });
+
+            document.getElementById('stopVoiceBtn').addEventListener('click', () => {
+                VoiceFarmer.stop();
+                const log = document.getElementById('voiceLog');
+                log.textContent += '[info] Desconectado manualmente.\n';
+                updateVoiceUI();
+                addActivity('Voice Farmer desligado');
+            });
+
+            updateVoiceUI();
+
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') sidebar.classList.remove('open'); });
+            addActivity('Página carregada');
+        })();
+    </script>
 </body>
 </html>
